@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { invoiceApi } from '../../config/api';
-import { IInvoice } from '../../types/backend';
+import { invoiceApi } from '@/config/api';
+import { IInvoice } from '@/types/backend';
 
 interface IState {
     isFetching: boolean;

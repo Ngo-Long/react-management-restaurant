@@ -2,8 +2,8 @@ import { ModalForm, ProForm, ProFormDigit, ProFormSelect, ProFormText } from "@a
 import { Col, Form, Row, message, notification } from "antd";
 import { isMobile } from 'react-device-detect';
 import { useState, useEffect } from "react";
-import { userApi, roleApi, restaurantApi } from "../../../config/api";
-import { IUser } from "../../../types/backend";
+import { userApi, roleApi, restaurantApi } from "@/config/api";
+import { IUser } from "@/types/backend";
 import { DebounceSelect } from "./debouce.select";
 
 interface IProps {

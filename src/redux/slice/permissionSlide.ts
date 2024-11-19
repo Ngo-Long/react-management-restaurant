@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { permissionApi } from '../../config/api';
-import { IPermission } from '../../types/backend';
+import { permissionApi } from '@/config/api';
+import { IPermission } from '@/types/backend';
 
 interface IState {
     isFetching: boolean;

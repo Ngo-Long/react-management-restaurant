@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { roleApi } from '../../config/api';
-import { IRole } from '../../types/backend';
+import { roleApi } from '@/config/api';
+import { IRole } from '@/types/backend';
 
 interface IState {
     isFetching: boolean;

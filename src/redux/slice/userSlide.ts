@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { IUser } from '../../types/backend';
-import { userApi } from '../../config/api';
+import { IUser } from '@/types/backend';
+import { userApi } from '@/config/api';
 
 interface IState {
     isFetching: boolean;

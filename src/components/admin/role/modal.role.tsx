@@ -1,14 +1,14 @@
 import { FooterToolbar, ModalForm, ProCard, ProFormSwitch, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
 import { Col, Form, Row, message, notification } from "antd";
 import { isMobile } from 'react-device-detect';
-import { roleApi } from "../../../config/api";
-import { IPermission, IRole } from "../../../types/backend";
+import { roleApi } from "@/config/api";
+import { IPermission, IRole } from "@/types/backend";
 import { CheckSquareOutlined } from "@ant-design/icons";
 import ModuleApi from "./module.api";
 import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { resetSingleRole } from "../../../redux/slice/roleSlide";
-import { groupByPermission } from "../../../config/utils";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { resetSingleRole } from "@/redux/slice/roleSlide";
+import { groupByPermission } from "@/config/utils";
 
 interface IProps {
     openModal: boolean;

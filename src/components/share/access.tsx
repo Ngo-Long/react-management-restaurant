@@ -1,6 +1,6 @@
 import { Result } from "antd";
 import { useEffect, useState } from 'react';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '@/redux/hooks';
 
 interface IProps {
     hideChildren?: boolean;

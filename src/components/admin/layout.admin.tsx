@@ -12,14 +12,14 @@ import {
     ShopOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import { useAppSelector, useAppDispatch } from '../../redux/hooks';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { Avatar, Button, Dropdown, Flex, Layout, Menu, message, Space, theme } from 'antd';
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from 'antd';
-import { authApi } from '../../config/api';
-import { setLogoutAction } from '../../redux/slice/accountSlide';
+import { authApi } from '@/config/api';
+import { setLogoutAction } from '@/redux/slice/accountSlide';
 import { isMobile } from 'react-device-detect';
-import { ALL_PERMISSIONS } from '../../config/permissions';
+import { ALL_PERMISSIONS } from '@/config/permissions';
 
 const { Header, Sider, Content } = Layout;
 

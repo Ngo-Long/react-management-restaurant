@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { orderApi } from '../../config/api';
-import { IOrder } from '../../types/backend';
+import { orderApi } from '@/config/api';
+import { IOrder } from '@/types/backend';
 
 interface IState {
     isFetching: boolean;

@@ -6,8 +6,8 @@ import { isMobile } from 'react-device-detect';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useEffect, useState } from "react";
-import { restaurantApi, callUploadSingleFile } from "../../../config/api";
-import { IRestaurant } from "../../../types/backend";
+import { restaurantApi, callUploadSingleFile } from "@/config/api";
+import { IRestaurant } from "@/types/backend";
 import { v4 as uuidv4 } from 'uuid';
 import enUS from 'antd/lib/locale/en_US';
 

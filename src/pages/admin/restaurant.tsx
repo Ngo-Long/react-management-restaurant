@@ -1,17 +1,17 @@
-import ModalRestaurant from "../../components/admin/restaurant/modal.restaurant";
+import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";
 import DataTable from "@/components/client/data-table";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { fetchRestaurant } from "../../redux/slice/restaurantSlide";
-import { IRestaurant } from "../../types/backend";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchRestaurant } from "@/redux/slice/restaurantSlide";
+import { IRestaurant } from "@/types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { Button, Popconfirm, Space, message, notification } from "antd";
 import { useState, useRef } from 'react';
 import dayjs from 'dayjs';
-import { restaurantApi } from "../../config/api";
+import { restaurantApi } from "@/config/api";
 import queryString from 'query-string';
-import Access from "../../components/share/access";
-import { ALL_PERMISSIONS } from "../../config/permissions";
+import Access from "@/components/share/access";
+import { ALL_PERMISSIONS } from "@/config/permissions";
 import { sfLike } from "spring-filter-query-builder";
 
 const RestaurantPage = () => {

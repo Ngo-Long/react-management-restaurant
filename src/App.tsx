@@ -16,7 +16,7 @@ import { useAppDispatch } from './redux/hooks';
 import { setLogoutAction } from './redux/slice/accountSlide';
 import PermissionPage from './pages/admin/permission';
 import RolePage from './pages/admin/role';
-import RestaurantPage from './pages/admin/restaurant.tsx';
+import RestaurantPage from './pages/admin/restaurant';
 
 const LayoutClient = () => {
   const location = useLocation();

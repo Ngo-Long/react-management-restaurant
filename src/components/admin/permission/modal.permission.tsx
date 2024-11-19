@@ -2,9 +2,9 @@ import { ModalForm, ProFormSelect, ProFormText } from "@ant-design/pro-component
 import { Col, Form, Row, message, notification } from "antd";
 import { isMobile } from 'react-device-detect';
 import { useEffect } from "react";
-import { permissionApi } from '../../../config/api';
-import { IPermission } from "../../../types/backend";
-import { ALL_MODULES } from "../../../config/permissions";
+import { permissionApi } from '@/config/api';
+import { IPermission } from "@/types/backend";
+import { ALL_MODULES } from "@/config/permissions";
 
 interface IProps {
     openModal: boolean;

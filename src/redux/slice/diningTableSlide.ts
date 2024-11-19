@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { diningTableApi } from '../../config/api';
-import { IDiningTable } from '../../types/backend';
+import { diningTableApi } from '@/config/api';
+import { IDiningTable } from '@/types/backend';
 
 interface IState {
     isFetching: boolean;

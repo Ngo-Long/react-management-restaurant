@@ -1,19 +1,19 @@
-import DataTable from "../../components/client/data-table";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { IPermission, IRole } from "../../types/backend";
+import DataTable from "@/components/client/data-table";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { IPermission, IRole } from "@/types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { useState, useRef, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { roleApi, permissionApi } from "../../config/api";
+import { roleApi, permissionApi } from "@/config/api";
 import queryString from 'query-string';
-import { fetchRole } from "../../redux/slice/roleSlide";
-import ModalRole from "../../components/admin/role/modal.role";
-import { ALL_PERMISSIONS } from "../../config/permissions";
-import Access from "../../components/share/access";
+import { fetchRole } from "@/redux/slice/roleSlide";
+import ModalRole from "@/components/admin/role/modal.role";
+import { ALL_PERMISSIONS } from "@/config/permissions";
+import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
-import { groupByPermission } from "../../config/utils";
+import { groupByPermission } from "@/config/utils";
 
 const RolePage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);

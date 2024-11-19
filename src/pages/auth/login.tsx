@@ -1,11 +1,11 @@
 import { Button, Divider, Form, Input, message, notification } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { authApi } from '../../config/api';
+import { authApi } from '@/config/api';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUserLoginInfo } from '../../redux/slice/accountSlide';
+import { setUserLoginInfo } from '@/redux/slice/accountSlide';
 import styles from 'styles/auth.module.scss';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '@/redux/hooks';
 
 const LoginPage = () => {
     const navigate = useNavigate();

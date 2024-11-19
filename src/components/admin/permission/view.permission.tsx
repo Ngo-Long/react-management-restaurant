@@ -1,6 +1,6 @@
 import { Descriptions, Drawer } from "antd";
 import dayjs from 'dayjs';
-import { IPermission } from "../../../types/backend";
+import { IPermission } from "@/types/backend";
 
 interface IProps {
     onClose: (v: boolean) => void;
