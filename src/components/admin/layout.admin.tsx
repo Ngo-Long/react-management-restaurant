@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react';
 import {
     ApiOutlined,
-    AppstoreOutlined,
     BugOutlined,
-    DashboardOutlined,
-    ExceptionOutlined,
-    HomeOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    PieChartOutlined,
     ShopOutlined,
     UserOutlined,
+    GatewayOutlined,
+    MenuFoldOutlined,
+    DashboardOutlined,
+    ExceptionOutlined,
+    MenuUnfoldOutlined,
 } from '@ant-design/icons';
-import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { Avatar, Button, Dropdown, Flex, Layout, Menu, message, Space, theme } from 'antd';
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { MenuProps } from 'antd';
-import { authApi } from '@/config/api';
-import { setLogoutAction } from '@/redux/slice/accountSlide';
+const { Header, Sider, Content } = Layout;
+import { Button, Dropdown, Layout, Menu, message, Space, theme } from 'antd';
+
 import { isMobile } from 'react-device-detect';
+import React, { useState, useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+
+import { authApi } from '@/config/api';
 import { ALL_PERMISSIONS } from '@/config/permissions';
 
-const { Header, Sider, Content } = Layout;
+import { setLogoutAction } from '@/redux/slice/accountSlide';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 
 const LayoutAdmin: React.FC = () => {
     const location = useLocation();
@@ -36,7 +36,6 @@ const LayoutAdmin: React.FC = () => {
     const user = useAppSelector(state => state.account.user);
     const permissions = useAppSelector(state => state.account.user.role.permissions);
 
-
     useEffect(() => {
         const ACL_ENABLE = import.meta.env.VITE_ACL_ENABLE;
         if (permissions?.length || ACL_ENABLE === 'false') {
@@ -49,6 +48,11 @@ const LayoutAdmin: React.FC = () => {
             const viewUser = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.USERS.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
+            )
+
+            const viewDiningTable = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE.method
             )
 
             const viewRole = permissions?.find(item =>
@@ -165,6 +169,11 @@ const LayoutAdmin: React.FC = () => {
                                 key: '/admin/user',
                                 icon: <UserOutlined />,
                                 label: <Link to='/admin/user'>Người dùng</Link>,
+                            },
+                            {
+                                key: '/admin/dining-table',
+                                icon: <GatewayOutlined />,
+                                label: <Link to='/admin/dining-table'>Bàn ăn</Link>,
                             },
                             {
                                 key: '/admin/role',

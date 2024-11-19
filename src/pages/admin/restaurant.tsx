@@ -15,28 +15,34 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import { sfLike } from "spring-filter-query-builder";
 
 const RestaurantPage = () => {
+    const tableRef = useRef<ActionType>();
+    const dispatch = useAppDispatch();
+
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IRestaurant | null>(null);
 
-    const tableRef = useRef<ActionType>();
-
-    const isFetching = useAppSelector(state => state.restaurant.isFetching);
     const meta = useAppSelector(state => state.restaurant.meta);
+    const isFetching = useAppSelector(state => state.restaurant.isFetching);
     const restaurants = useAppSelector(state => state.restaurant.result);
-    const dispatch = useAppDispatch();
 
     const handleDeleteRestaurant = async (id: string | undefined) => {
-        if (id) {
+        if (!id) {
+            message.warning('ID nhà hàng không hợp lệ!');
+            return;
+        }
+
+        try {
             const res = await restaurantApi.callDelete(id);
+
             if (res && +res.statusCode === 200) {
                 message.success('Xóa nhà hàng thành công');
                 reloadTable();
             } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra!',
-                    description: res.message
-                });
+                notification.error({ message: 'Có lỗi xảy ra!' });
             }
+        } catch (error) {
+            console.error('Error while deleting restaurant:', error);
+            notification.error({ message: 'Có lỗi xảy ra!' });
         }
     }
 
@@ -54,7 +60,8 @@ const RestaurantPage = () => {
                 return (
                     <>
                         {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>)
+                    </>
+                )
             },
             hideInSearch: true,
         },
@@ -76,7 +83,9 @@ const RestaurantPage = () => {
             sorter: true,
             render: (text, record, index, action) => {
                 return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>
+                        {record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}
+                    </>
                 )
             },
             hideInSearch: true,
@@ -88,7 +97,9 @@ const RestaurantPage = () => {
             sorter: true,
             render: (text, record, index, action) => {
                 return (
-                    <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>
+                        {record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}
+                    </>
                 )
             },
             hideInSearch: true,

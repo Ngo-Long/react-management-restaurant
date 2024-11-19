@@ -3,13 +3,6 @@ import { grey, green, blue, red, orange } from '@ant-design/colors';
 import groupBy from 'lodash/groupBy';
 import map from 'lodash/map';
 
-export const LOCATION_LIST = [
-    { label: "Hà Nội", value: "HANOI" },
-    { label: "Hồ Chí Minh", value: "HOCHIMINH" },
-    { label: "Đà Nẵng", value: "DANANG" },
-    { label: "Khác", value: "KHAC" },
-];
-
 export const nonAccentVietnamese = (str: string) => {
     str = str.replace(/A|Á|À|Ã|Ạ|Â|Ấ|Ầ|Ẫ|Ậ|Ă|Ắ|Ằ|Ẵ|Ặ/g, "A");
     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");

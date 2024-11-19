@@ -1,53 +1,69 @@
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchUser } from "@/redux/slice/userSlide";
-import { IUser } from "@/types/backend";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, message, notification } from "antd";
-import { useState, useRef } from 'react';
 import dayjs from 'dayjs';
-import { userApi } from "@/config/api";
+import { useState, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import queryString from 'query-string';
-import ModalUser from "@/components/admin/user/modal.user";
-import ViewDetailUser from "@/components/admin/user/view.user";
+import { IDiningTable } from "@/types/backend";
+import { sfIn } from "spring-filter-query-builder";
+
 import Access from "@/components/share/access";
-import { ALL_PERMISSIONS } from "@/config/permissions";
-import { sfLike } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
 
-const UserPage = () => {
+import { diningTableApi } from "@/config/api";
+import { ALL_PERMISSIONS } from "@/config/permissions";
+
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchDiningTable } from "@/redux/slice/diningTableSlide";
+
+import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
+
+const DiningTablePage = () => {
     const tableRef = useRef<ActionType>();
 
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IUser | null>(null);
+    const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
-    const users = useAppSelector(state => state.user.result);
+    const diningTables = useAppSelector(state => state.diningTable.result);
 
-    const meta = useAppSelector(state => state.user.meta);
-    const isFetching = useAppSelector(state => state.user.isFetching);
+    const meta = useAppSelector(state => state.diningTable.meta);
+    const isFetching = useAppSelector(state => state.diningTable.isFetching);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
-    const handleDeleteUser = async (id: string | undefined) => {
-        if (id) {
-            const res = await userApi.callDelete(id);
-            if (+res.statusCode === 200) {
-                message.success('Xóa người dùng thành công');
+    const showErrorNotification = (description: string) => {
+        notification.error({
+            message: 'Có lỗi xảy ra!',
+            description,
+        });
+    };
+
+    const handleDeleteDiningTable = async (id: string | undefined) => {
+        if (!id) {
+            message.warning('ID bàn ăn không hợp lệ!');
+            return;
+        }
+
+        try {
+            const res = await diningTableApi.callDelete(id);
+            if (res && res.data) {
+                message.success('Xóa bàn ăn thành công');
                 reloadTable();
             } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra!',
-                    description: res.message
-                });
+                showErrorNotification(res.message || 'Có lỗi xảy ra!');
             }
+        } catch (error) {
+            showErrorNotification('Không thể xóa nhà hàng. Vui lòng thử lại sau!');
         }
     }
 
-    const columns: ProColumns<IUser>[] = [
+    const columns: ProColumns<IDiningTable>[] = [
         {
             title: 'STT',
             key: 'index',
@@ -62,34 +78,60 @@ const UserPage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Họ tên',
+            title: 'Tên bàn ăn',
             dataIndex: 'name',
             sorter: true,
         },
         {
-            title: 'Email',
-            dataIndex: 'email',
-            sorter: true,
-        },
-
-        {
-            title: 'Vị trí',
-            dataIndex: ["role", "name"],
-            sorter: true,
-            hideInSearch: true
-        },
-
-        {
             title: 'Nhà hàng',
             dataIndex: ["restaurant", "name"],
             sorter: true,
-            hideInSearch: true
+            hideInSearch: false,
+        },
+        {
+            title: 'Số ghế',
+            width: 80,
+            dataIndex: 'seats',
+            hideInSearch: true,
+            render(dom, entity, index, action, schema) {
+                const str = "" + entity.seats;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+            },
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            renderFormItem: (item, props, form) => (
+                <ProFormSelect
+                    showSearch
+                    mode="multiple"
+                    allowClear
+                    valueEnum={{
+                        AVAILABLE: 'Còn trống',
+                        OCCUPIED: 'Đã có khách',
+                        RESERVED: 'Đã đặt trước'
+                    }}
+                    placeholder="Chọn trạng thái"
+                />
+            ),
+        },
+        {
+            title: 'Hoạt động',
+            dataIndex: 'active',
+            render(dom, entity, index, action, schema) {
+                return <>
+                    <Tag color={entity.active ? "lime" : "red"} >
+                        {entity.active ? "ACTIVE" : "INACTIVE"}
+                    </Tag>
+                </>
+            },
+            hideInSearch: true,
         },
 
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 200,
+            width: 150,
             sorter: true,
             render: (text, record, index, action) => {
                 return (
@@ -101,7 +143,7 @@ const UserPage = () => {
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
-            width: 200,
+            width: 150,
             sorter: true,
             render: (text, record, index, action) => {
                 return (
@@ -118,7 +160,7 @@ const UserPage = () => {
             render: (_value, entity, _index, _action) => (
                 <Space>
                     < Access
-                        permission={ALL_PERMISSIONS.USERS.UPDATE}
+                        permission={ALL_PERMISSIONS.DININGTABLES.UPDATE}
                         hideChildren
                     >
                         <EditOutlined
@@ -135,14 +177,14 @@ const UserPage = () => {
                     </Access >
 
                     <Access
-                        permission={ALL_PERMISSIONS.USERS.DELETE}
+                        permission={ALL_PERMISSIONS.DININGTABLES.DELETE}
                         hideChildren
                     >
                         <Popconfirm
                             placement="leftTop"
-                            title={"Xác nhận xóa người dùng"}
-                            description={"Bạn có chắc chắn muốn xóa người dùng này ?"}
-                            onConfirm={() => handleDeleteUser(entity.id)}
+                            title={"Xác nhận xóa bàn ăn"}
+                            description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
+                            onConfirm={() => handleDeleteDiningTable(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
@@ -163,35 +205,36 @@ const UserPage = () => {
     ];
 
     const buildQuery = (params: any, sort: any, filter: any) => {
-        const q: any = {
-            page: params.current,
-            size: params.pageSize,
-            filter: ""
-        }
 
         const clone = { ...params };
-        if (clone.name) q.filter = `${sfLike("name", clone.name)}`;
-        if (clone.email) {
-            q.filter = clone.name ?
-                q.filter + " and " + `${sfLike("email", clone.email)}`
-                : `${sfLike("email", clone.email)}`;
+        let parts = [];
+        if (clone.name) parts.push(`name ~ '${clone.name}'`);
+        if (clone?.status?.length) {
+            parts.push(`${sfIn("status", clone.status).toString()}`);
         }
 
-        if (!q.filter) delete q.filter;
-        let temp = queryString.stringify(q);
+        clone.filter = parts.join(' and ');
+        if (!clone.filter) delete clone.filter;
+
+        clone.page = clone.current;
+        clone.size = clone.pageSize;
+
+        delete clone.current;
+        delete clone.pageSize;
+        delete clone.name;
+        delete clone.status;
+
+        let temp = queryString.stringify(clone);
 
         let sortBy = "";
-        if (sort && sort.name) {
-            sortBy = sort.name === 'ascend' ? "sort=name,asc" : "sort=name,desc";
-        }
-        if (sort && sort.email) {
-            sortBy = sort.email === 'ascend' ? "sort=email,asc" : "sort=email,desc";
-        }
-        if (sort && sort.createdDate) {
-            sortBy = sort.createdDate === 'ascend' ? "sort=createdDate,asc" : "sort=createdDate,desc";
-        }
-        if (sort && sort.lastModifiedDate) {
-            sortBy = sort.lastModifiedDate === 'ascend' ? "sort=lastModifiedDate,asc" : "sort=lastModifiedDate,desc";
+        const fields = ["name", "createdDate", "lastModifiedDate"];
+        if (sort) {
+            for (const field of fields) {
+                if (sort[field]) {
+                    sortBy = `sort=${field},${sort[field] === 'ascend' ? 'asc' : 'desc'}`;
+                    break;  // Remove this if you want to handle multiple sort parameters
+                }
+            }
         }
 
         //mặc định sort theo lastModifiedDate
@@ -206,18 +249,18 @@ const UserPage = () => {
 
     return (
         <div>
-            <Access permission={ALL_PERMISSIONS.USERS.GET_PAGINATE}>
-                <DataTable<IUser>
+            <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
+                <DataTable<IDiningTable>
                     actionRef={tableRef}
-                    headerTitle="Danh sách người dùng"
+                    headerTitle="Danh sách bàn ăn"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
-                    dataSource={users}
+                    dataSource={diningTables}
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            dispatch(fetchUser({ query }))
+                            dispatch(fetchDiningTable({ query }))
                         }
                     }
                     scroll={{ x: true }}
@@ -245,17 +288,10 @@ const UserPage = () => {
                 />
             </Access>
 
-            <ModalUser
+            <ModalDiningTable
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-            />
-
-            <ViewDetailUser
-                onClose={setOpenViewDetail}
-                open={openViewDetail}
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
@@ -263,4 +299,4 @@ const UserPage = () => {
     )
 }
 
-export default UserPage;
+export default DiningTablePage;

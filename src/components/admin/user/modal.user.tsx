@@ -55,6 +55,14 @@ const ModalUser = (props: IProps) => {
         }
     }, [dataInit]);
 
+    const handleReset = async () => {
+        form.resetFields();
+        setDataInit(null);
+        setRestaurants([]);
+        setRoles([]);
+        setOpenModal(false);
+    }
+
     const submitUser = async (valuesForm: any) => {
         const { name, email, password, age, gender, address, role, restaurant } = valuesForm;
         if (dataInit?.id) {
@@ -83,7 +91,10 @@ const ModalUser = (props: IProps) => {
             //create
             const user = {
                 name, email, password, age, gender, address,
-                role: { id: role.value, name: "" },
+                role: {
+                    id: role.value,
+                    name: ""
+                },
                 restaurant: {
                     id: restaurant.value,
                     name: restaurant.label
@@ -102,14 +113,6 @@ const ModalUser = (props: IProps) => {
                 });
             }
         }
-    }
-
-    const handleReset = async () => {
-        form.resetFields();
-        setDataInit(null);
-        setRestaurants([]);
-        setRoles([]);
-        setOpenModal(false);
     }
 
     // Usage of DebounceSelect
