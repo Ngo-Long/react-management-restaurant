@@ -12,7 +12,7 @@
     overflow: hidden;
 }
 
-.modal-company {
+.modal-restaurant {
     &.close {
         transform: scale(0);
         opacity: 0;
@@ -22,7 +22,7 @@
     }
 }
 
-.modal-company-root {
+.modal-restaurant-root {
     &.close {
         .ant-modal-mask {
             background-color: unset !important;

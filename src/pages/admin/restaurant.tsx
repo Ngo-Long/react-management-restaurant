@@ -1,42 +1,40 @@
+import ModalRestaurant from "../../components/admin/restaurant/modal.restaurant";
 import DataTable from "../../components/client/data-table";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { IPermission } from "../../types/backend";
+import { fetchRestaurant } from "../../redux/slice/restaurantSlide";
+import { IRestaurant } from "../../types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { Button, Popconfirm, Space, message, notification } from "antd";
 import { useState, useRef } from 'react';
 import dayjs from 'dayjs';
-import { permissionApi } from "../../config/api";
+import { restaurantApi } from "../../config/api";
 import queryString from 'query-string';
-import { fetchPermission } from "../../redux/slice/permissionSlide";
-import ViewDetailPermission from "../../components/admin/permission/view.permission";
-import ModalPermission from "../../components/admin/permission/modal.permission";
-import { colorMethod } from "../../config/utils";
 import Access from "../../components/share/access";
 import { ALL_PERMISSIONS } from "../../config/permissions";
+import { sfLike } from "spring-filter-query-builder";
 
-const PermissionPage = () => {
+const RestaurantPage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IPermission | null>(null);
-    const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
+    const [dataInit, setDataInit] = useState<IRestaurant | null>(null);
 
     const tableRef = useRef<ActionType>();
 
-    const isFetching = useAppSelector(state => state.permission.isFetching);
-    const meta = useAppSelector(state => state.permission.meta);
-    const permissions = useAppSelector(state => state.permission.result);
+    const isFetching = useAppSelector(state => state.restaurant.isFetching);
+    const meta = useAppSelector(state => state.restaurant.meta);
+    const restaurants = useAppSelector(state => state.restaurant.result);
     const dispatch = useAppDispatch();
 
-    const handleDeletePermission = async (id: string | undefined) => {
+    const handleDeleteRestaurant = async (id: string | undefined) => {
         if (id) {
-            const res = await permissionApi.callDelete(id);
-            if (res && res.statusCode === 200) {
-                message.success('Xóa Permission thành công');
+            const res = await restaurantApi.callDelete(id);
+            if (res && +res.statusCode === 200) {
+                message.success('Xóa nhà hàng thành công');
                 reloadTable();
             } else {
                 notification.error({
                     message: 'Có lỗi xảy ra!',
-                    description: res.error
+                    description: res.message
                 });
             }
         }
@@ -46,20 +44,17 @@ const PermissionPage = () => {
         tableRef?.current?.reload();
     }
 
-    const columns: ProColumns<IPermission>[] = [
+    const columns: ProColumns<IRestaurant>[] = [
         {
-            title: 'Id',
-            dataIndex: 'id',
+            title: 'STT',
+            key: 'index',
             width: 50,
-            render: (text, record, index, action) => {
+            align: "center",
+            render: (text, record, index) => {
                 return (
-                    <a href="#" onClick={() => {
-                        setOpenViewDetail(true);
-                        setDataInit(record);
-                    }}>
-                        {record.id}
-                    </a>
-                )
+                    <>
+                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
+                    </>)
             },
             hideInSearch: true,
         },
@@ -69,25 +64,11 @@ const PermissionPage = () => {
             sorter: true,
         },
         {
-            title: 'API',
-            dataIndex: 'apiPath',
+            title: 'Địa  chỉ',
+            dataIndex: 'address',
             sorter: true,
         },
-        {
-            title: 'Method',
-            dataIndex: 'method',
-            sorter: true,
-            render(dom, entity, index, action, schema) {
-                return (
-                    <p style={{ paddingLeft: 10, fontWeight: 'bold', marginBottom: 0, color: colorMethod(entity?.method as string) }}>{entity?.method || ''}</p>
-                )
-            },
-        },
-        {
-            title: 'Module',
-            dataIndex: 'module',
-            sorter: true,
-        },
+
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
@@ -119,8 +100,8 @@ const PermissionPage = () => {
             width: 50,
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    <Access
-                        permission={ALL_PERMISSIONS.PERMISSIONS.UPDATE}
+                    < Access
+                        permission={ALL_PERMISSIONS.RESTAURANTS.UPDATE}
                         hideChildren
                     >
                         <EditOutlined
@@ -134,16 +115,16 @@ const PermissionPage = () => {
                                 setDataInit(entity);
                             }}
                         />
-                    </Access>
+                    </Access >
                     <Access
-                        permission={ALL_PERMISSIONS.PERMISSIONS.DELETE}
+                        permission={ALL_PERMISSIONS.RESTAURANTS.DELETE}
                         hideChildren
                     >
                         <Popconfirm
                             placement="leftTop"
-                            title={"Xác nhận xóa quyền hạn"}
-                            description={"Bạn có chắc chắn muốn xóa quyền hạn này ?"}
-                            onConfirm={() => handleDeletePermission(entity.id)}
+                            title={"Xác nhận xóa nhà hàng"}
+                            description={"Bạn có chắc chắn muốn xóa nhà hàng này?"}
+                            onConfirm={() => handleDeleteRestaurant(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
@@ -157,46 +138,42 @@ const PermissionPage = () => {
                             </span>
                         </Popconfirm>
                     </Access>
-                </Space>
+                </Space >
             ),
-
         },
     ];
 
     const buildQuery = (params: any, sort: any, filter: any) => {
         const clone = { ...params };
+        const q: any = {
+            page: params.current,
+            size: params.pageSize,
+            filter: ""
+        }
 
-        let parts = [];
-        if (clone.name) parts.push(`name ~ '${clone.name}'`);
-        if (clone.apiPath) parts.push(`apiPath ~ '${clone.apiPath}'`);
-        if (clone.method) parts.push(`method ~ '${clone.method}'`);
-        if (clone.module) parts.push(`module ~ '${clone.module}'`);
+        if (clone.name) q.filter = `${sfLike("name", clone.name)}`;
+        if (clone.address) {
+            q.filter = clone.name ?
+                q.filter + " and " + `${sfLike("address", clone.address)}`
+                : `${sfLike("address", clone.address)}`;
+        }
 
-        clone.filter = parts.join(' and ');
-        if (!clone.filter) delete clone.filter;
+        if (!q.filter) delete q.filter;
 
-        clone.page = clone.current;
-        clone.size = clone.pageSize;
-
-        delete clone.current;
-        delete clone.pageSize;
-        delete clone.name;
-        delete clone.apiPath;
-        delete clone.method;
-        delete clone.module;
-
-        let temp = queryString.stringify(clone);
+        let temp = queryString.stringify(q);
 
         let sortBy = "";
-        const fields = ["name", "apiPath", "method", "module", "createdAt", "lastModifiedDate"];
-
-        if (sort) {
-            for (const field of fields) {
-                if (sort[field]) {
-                    sortBy = `sort=${field},${sort[field] === 'ascend' ? 'asc' : 'desc'}`;
-                    break;  // Remove this if you want to handle multiple sort parameters
-                }
-            }
+        if (sort && sort.name) {
+            sortBy = sort.name === 'ascend' ? "sort=name,asc" : "sort=name,desc";
+        }
+        if (sort && sort.address) {
+            sortBy = sort.address === 'ascend' ? "sort=address,asc" : "sort=address,desc";
+        }
+        if (sort && sort.createdDate) {
+            sortBy = sort.createdDate === 'ascend' ? "sort=createdDate,asc" : "sort=createdDate,desc";
+        }
+        if (sort && sort.lastModifiedDate) {
+            sortBy = sort.lastModifiedDate === 'ascend' ? "sort=lastModifiedDate,asc" : "sort=lastModifiedDate,desc";
         }
 
         //mặc định sort theo lastModifiedDate
@@ -212,19 +189,21 @@ const PermissionPage = () => {
     return (
         <div>
             <Access
-                permission={ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE}
+                permission={ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE}
             >
-                <DataTable<IPermission>
+                <DataTable<IRestaurant>
                     actionRef={tableRef}
-                    headerTitle="Danh sách quyền hạn"
+                    headerTitle="Danh sách nhà hàng"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
-                    dataSource={permissions}
-                    request={async (params, sort, filter): Promise<any> => {
-                        const query = buildQuery(params, sort, filter);
-                        dispatch(fetchPermission({ query }))
-                    }}
+                    dataSource={restaurants}
+                    request={
+                        async (params, sort, filter): Promise<any> => {
+                            const query = buildQuery(params, sort, filter);
+                            dispatch(fetchRestaurant({ query }))
+                        }
+                    }
                     scroll={{ x: true }}
                     pagination={
                         {
@@ -232,40 +211,38 @@ const PermissionPage = () => {
                             pageSize: meta.pageSize,
                             showSizeChanger: true,
                             total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
+                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                         }
                     }
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
+                            <Access
+                                permission={ALL_PERMISSIONS.RESTAURANTS.CREATE}
+                                hideChildren
                             >
-                                Thêm mới
-                            </Button>
+                                <Button
+                                    icon={<PlusOutlined />}
+                                    type="primary"
+                                    onClick={() => setOpenModal(true)}
+                                >
+                                    Thêm mới
+                                </Button>
+                            </Access>
                         );
                     }}
                 />
             </Access>
 
-            <ModalPermission
+            <ModalRestaurant
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-
-            <ViewDetailPermission
-                onClose={setOpenViewDetail}
-                open={openViewDetail}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-            />
-        </div>
+        </div >
     )
 }
 
-export default PermissionPage;
+export default RestaurantPage;

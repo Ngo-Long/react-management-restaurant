@@ -97,7 +97,7 @@ const ModalUser = (props: IProps) => {
                 reloadTable();
             } else {
                 notification.error({
-                    message: 'Có lỗi xảy ra',
+                    message: 'Có lỗi xảy ra!',
                     description: res.message
                 });
             }

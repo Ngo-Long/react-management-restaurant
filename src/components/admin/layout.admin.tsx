@@ -3,10 +3,13 @@ import {
     ApiOutlined,
     AppstoreOutlined,
     BugOutlined,
+    DashboardOutlined,
     ExceptionOutlined,
     HomeOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
+    PieChartOutlined,
+    ShopOutlined,
     UserOutlined,
 } from '@ant-design/icons';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
@@ -37,6 +40,11 @@ const LayoutAdmin: React.FC = () => {
     useEffect(() => {
         const ACL_ENABLE = import.meta.env.VITE_ACL_ENABLE;
         if (permissions?.length || ACL_ENABLE === 'false') {
+
+            const viewRestaurant = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE.method
+            )
 
             const viewUser = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.USERS.GET_PAGINATE.apiPath
@@ -145,8 +153,13 @@ const LayoutAdmin: React.FC = () => {
                         items={[
                             {
                                 key: '/admin',
-                                icon: <HomeOutlined />,
+                                icon: <DashboardOutlined />,
                                 label: <Link to='/admin'>Trang chủ</Link>,
+                            },
+                            {
+                                key: '/admin/restaurant',
+                                icon: <ShopOutlined />,
+                                label: <Link to='/admin/restaurant'>Nhà hàng</Link>,
                             },
                             {
                                 key: '/admin/user',

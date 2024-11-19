@@ -16,6 +16,7 @@ import { useAppDispatch } from './redux/hooks';
 import { setLogoutAction } from './redux/slice/accountSlide';
 import PermissionPage from './pages/admin/permission';
 import RolePage from './pages/admin/role';
+import RestaurantPage from './pages/admin/restaurant.tsx';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -103,6 +104,13 @@ const App = () => {
           element:
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "restaurant",
+          element:
+            <ProtectedRoute>
+              <RestaurantPage />
             </ProtectedRoute>
         },
         {
