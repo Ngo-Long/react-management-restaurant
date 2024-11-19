@@ -12,8 +12,10 @@ import { Header } from 'antd/es/layout/layout';
 import { Dropdown, message, Space, theme } from 'antd';
 import { authApi } from './config/api';
 import styles from './styles/app.module.scss';
-import { useAppDispatch } from './redux/hooks.ts';
+import { useAppDispatch } from './redux/hooks';
 import { setLogoutAction } from './redux/slice/accountSlide';
+import PermissionPage from './pages/admin/permission';
+import RolePage from './pages/admin/role';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -110,8 +112,23 @@ const App = () => {
               <UserPage />
             </ProtectedRoute>
         },
+        {
+          path: "permission",
+          element:
+            <ProtectedRoute>
+              <PermissionPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "role",
+          element:
+            <ProtectedRoute>
+              <RolePage />
+            </ProtectedRoute>
+        },
       ]
     },
+
     {
       path: "/login",
       element: <LoginPage />,

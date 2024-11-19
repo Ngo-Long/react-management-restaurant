@@ -38,25 +38,10 @@ const LayoutAdmin: React.FC = () => {
         const ACL_ENABLE = import.meta.env.VITE_ACL_ENABLE;
         if (permissions?.length || ACL_ENABLE === 'false') {
 
-            // const viewCompany = permissions?.find(item =>
-            //     item.apiPath === ALL_PERMISSIONS.COMPANIES.GET_PAGINATE.apiPath
-            //     && item.method === ALL_PERMISSIONS.COMPANIES.GET_PAGINATE.method
-            // )
-
             const viewUser = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.USERS.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
             )
-
-            // const viewJob = permissions?.find(item =>
-            //     item.apiPath === ALL_PERMISSIONS.JOBS.GET_PAGINATE.apiPath
-            //     && item.method === ALL_PERMISSIONS.JOBS.GET_PAGINATE.method
-            // )
-
-            // const viewResume = permissions?.find(item =>
-            //     item.apiPath === ALL_PERMISSIONS.RESUMES.GET_PAGINATE.apiPath
-            //     && item.method === ALL_PERMISSIONS.RESUMES.GET_PAGINATE.method
-            // )
 
             const viewRole = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.ROLES.GET_PAGINATE.apiPath
@@ -68,63 +53,33 @@ const LayoutAdmin: React.FC = () => {
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
             )
 
-            // const viewNews = permissions?.find(item =>
-            //     item.apiPath === ALL_PERMISSIONS.NEWS.GET_PAGINATE.apiPath
-            //     && item.method === ALL_PERMISSIONS.NEWS.GET_PAGINATE.method
-            // )
+            // const full = [
+            //     {
+            //         label: <Link to='/admin'>Dashboard</Link>,
+            //         key: '/admin',
+            //         icon: <AppstoreOutlined />
+            //     },
 
-            const full = [
-                {
-                    label: <Link to='/admin'>Dashboard</Link>,
-                    key: '/admin',
-                    icon: <AppstoreOutlined />
-                },
+            //     ...(viewUser || ACL_ENABLE === 'false' ? [{
+            //         label: <Link to='/admin/user'>User</Link>,
+            //         key: '/admin/user',
+            //         icon: <UserOutlined />
+            //     }] : []),
 
-                // ...(viewCompany || ACL_ENABLE === 'false' ? [{
-                //     label: <Link to='/admin/company'>Company</Link>,
-                //     key: '/admin/company',
-                //     icon: <BankOutlined />,
-                // }] : []),
+            //     ...(viewPermission || ACL_ENABLE === 'false' ? [{
+            //         label: <Link to='/admin/permission'>Permission</Link>,
+            //         key: '/admin/permission',
+            //         icon: <ApiOutlined />
+            //     }] : []),
 
-                ...(viewUser || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/user'>User</Link>,
-                    key: '/admin/user',
-                    icon: <UserOutlined />
-                }] : []),
+            //     ...(viewRole || ACL_ENABLE === 'false' ? [{
+            //         label: <Link to='/admin/role'>Role</Link>,
+            //         key: '/admin/role',
+            //         icon: <ExceptionOutlined />
+            //     }] : []),
+            // ];
 
-                // ...(viewJob || ACL_ENABLE === 'false' ? [{
-                //     label: <Link to='/admin/job'>Job</Link>,
-                //     key: '/admin/job',
-                //     icon: <ScheduleOutlined />
-                // }] : []),
-
-                // ...(viewResume || ACL_ENABLE === 'false' ? [{
-                //     label: <Link to='/admin/resume'>Resume</Link>,
-                //     key: '/admin/resume',
-                //     icon: <AliwangwangOutlined />
-                // }] : []),
-
-                ...(viewPermission || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/permission'>Permission</Link>,
-                    key: '/admin/permission',
-                    icon: <ApiOutlined />
-                }] : []),
-
-                ...(viewRole || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/role'>Role</Link>,
-                    key: '/admin/role',
-                    icon: <ExceptionOutlined />
-                }] : []),
-
-                // ...(viewNews || ACL_ENABLE === 'false' ? [{
-                //     label: <Link to='/admin/news'>News</Link>,
-                //     key: '/admin/news',
-                //     icon: <ContainerOutlined />
-                // }] : []),
-
-            ];
-
-            setMenuItems(full);
+            // setMenuItems(full);
         }
     }, [permissions]);
 
@@ -173,6 +128,13 @@ const LayoutAdmin: React.FC = () => {
                         <BugOutlined /> ADMIN
                     </div>
 
+                    {/* <Menu
+                        selectedKeys={[activeMenu]}
+                        mode="inline"
+                        items={menuItems}
+                        onClick={(e) => setActiveMenu(e.key)}
+                    /> */}
+
                     <Menu
                         theme="light"
                         mode="inline"
@@ -190,6 +152,16 @@ const LayoutAdmin: React.FC = () => {
                                 key: '/admin/user',
                                 icon: <UserOutlined />,
                                 label: <Link to='/admin/user'>Người dùng</Link>,
+                            },
+                            {
+                                key: '/admin/role',
+                                icon: <ExceptionOutlined />,
+                                label: <Link to='/admin/role'>Chức vụ</Link>,
+                            },
+                            {
+                                key: '/admin/permission',
+                                icon: <ApiOutlined />,
+                                label: <Link to='/admin/permission'>Quyền hạn</Link>,
                             }
                         ]}
                     />
