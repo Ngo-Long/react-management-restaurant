@@ -1,5 +1,5 @@
 import ModalRestaurant from "../../components/admin/restaurant/modal.restaurant";
-import DataTable from "../../components/client/data-table";
+import DataTable from "@/components/client/data-table";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { fetchRestaurant } from "../../redux/slice/restaurantSlide";
 import { IRestaurant } from "../../types/backend";
