@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { IUser } from '@/types/backend';
 import { userApi } from '@/config/api';
+import { IUser } from '@/types/backend';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 interface IState {
     isFetching: boolean;
@@ -20,7 +20,6 @@ export const fetchUser = createAsyncThunk(
         return response;
     }
 )
-
 
 const initialState: IState = {
     isFetching: true,

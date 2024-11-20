@@ -40,7 +40,7 @@ const Access = (props: IProps) => {
                         <Result
                             status="403"
                             title="Truy cập bị từ chối"
-                            subTitle="Xin lỗi, bạn không có quyền hạn (permission) truy cập thông tin này!"
+                            subTitle="Xin lỗi, bạn không có quyền hạn truy cập thông tin này!"
                         />
                         :
                         <>

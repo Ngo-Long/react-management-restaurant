@@ -116,8 +116,8 @@ const ModalPermission = (props: IProps) => {
 
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormSelect
-                            name="Phương thức gọi"
-                            label="Method"
+                            label="Phương thức gọi"
+                            name="method"
                             valueEnum={{
                                 GET: 'GET',
                                 POST: 'POST',
@@ -131,8 +131,8 @@ const ModalPermission = (props: IProps) => {
                     </Col>
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormSelect
+                            label="Thuộc mô hình"
                             name="module"
-                            label="Thuộc Module"
                             valueEnum={ALL_MODULES}
                             placeholder="Vui lòng chọn module"
                             rules={[{ required: true, message: 'Vui lòng chọn module!' }]}

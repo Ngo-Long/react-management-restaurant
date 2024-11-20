@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { restaurantApi } from '@/config/api';
 import { IRestaurant } from '@/types/backend';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 interface IState {
     isFetching: boolean;

@@ -3,16 +3,16 @@ import {
   configureStore,
   ThunkAction,
 } from '@reduxjs/toolkit';
-import accountReducer from './slice/accountSlide';
-import restaurantReducer from './slice/restaurantSlide';
+import roleReducer from './slice/roleSlide';
 import userReducer from './slice/userSlide';
-import diningTableReducer from './slice/diningTableSlide';
 import orderReducer from './slice/orderSlide';
 import invoiceReducer from './slice/invoiceSlide';
-import orderDetailReducer from './slice/orderDetailSlide';
+import accountReducer from './slice/accountSlide';
 import productReducer from './slice/productSlide';
-import roleReducer from './slice/roleSlide';
+import restaurantReducer from './slice/restaurantSlide';
 import permissionReducer from './slice/permissionSlide';
+import diningTableReducer from './slice/diningTableSlide';
+import orderDetailReducer from './slice/orderDetailSlide';
 
 // Configure the Redux store with various slice reducers
 export const store = configureStore({

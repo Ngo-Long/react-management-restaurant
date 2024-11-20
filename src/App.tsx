@@ -13,9 +13,22 @@ import LayoutAdmin from "./components/admin/layout.admin"
 import LayoutClient from './components/client/layout.client';
 import ProtectedRoute from "./components/share/protected-route.ts";
 
+import { useEffect } from 'react';
+import { fetchAccount } from './redux/slice/accountSlide';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
 const App = () => {
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(state => state.account.isLoading);
+
+  useEffect(() => {
+    if (window.location.pathname === '/login' || window.location.pathname === '/register') {
+      return;
+    }
+    dispatch(fetchAccount())
+  }, [])
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -57,19 +70,19 @@ const App = () => {
             </ProtectedRoute>
         },
         {
-          path: "permission",
-          element:
-            <ProtectedRoute>
-              <PermissionPage />
-            </ProtectedRoute>
-        },
-        {
           path: "role",
           element:
             <ProtectedRoute>
               <RolePage />
             </ProtectedRoute>
         },
+        {
+          path: "permission",
+          element:
+            <ProtectedRoute>
+              <PermissionPage />
+            </ProtectedRoute>
+        }
       ]
     },
 

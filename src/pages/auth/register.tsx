@@ -1,9 +1,14 @@
-import { Button, Divider, Form, Input, Row, Select, message, notification } from 'antd';
+import {
+    Button, Divider, Form, Input,
+    Select, message, notification
+} from 'antd';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { authApi } from '@/config/api';
-import styles from '@/styles/auth.module.scss';
 import { IUser } from '@/types/backend';
+import styles from '@/styles/auth.module.scss';
+
 const { Option } = Select;
 
 const RegisterPage = () => {

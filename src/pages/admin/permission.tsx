@@ -48,9 +48,10 @@ const PermissionPage = () => {
 
     const columns: ProColumns<IPermission>[] = [
         {
-            title: 'Id',
+            title: 'ID',
             dataIndex: 'id',
             width: 50,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <a href="#" onClick={() => {
@@ -64,19 +65,20 @@ const PermissionPage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Tên',
+            title: 'Tên quyền hạn',
             dataIndex: 'name',
             sorter: true,
         },
         {
-            title: 'API',
+            title: 'Đường dẫn API',
             dataIndex: 'apiPath',
             sorter: true,
         },
         {
-            title: 'Method',
+            title: 'Phương thức',
             dataIndex: 'method',
             sorter: true,
+            align: "center",
             render(dom, entity, index, action, schema) {
                 return (
                     <p style={{ paddingLeft: 10, fontWeight: 'bold', marginBottom: 0, color: colorMethod(entity?.method as string) }}>{entity?.method || ''}</p>
@@ -84,15 +86,17 @@ const PermissionPage = () => {
             },
         },
         {
-            title: 'Module',
+            title: 'Mô hình',
             dataIndex: 'module',
             sorter: true,
+            align: "center",
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 200,
+            width: 170,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -103,8 +107,9 @@ const PermissionPage = () => {
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
-            width: 200,
+            width: 170,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -117,6 +122,7 @@ const PermissionPage = () => {
             title: 'Actions',
             hideInSearch: true,
             width: 50,
+            align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
                     <Access

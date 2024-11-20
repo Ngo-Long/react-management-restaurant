@@ -65,33 +65,45 @@ const LayoutAdmin: React.FC = () => {
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
             )
 
-            // const full = [
-            //     {
-            //         label: <Link to='/admin'>Dashboard</Link>,
-            //         key: '/admin',
-            //         icon: <AppstoreOutlined />
-            //     },
+            const full = [
+                {
+                    label: <Link to='/admin'>Trang chủ</Link>,
+                    key: '/admin',
+                    icon: <DashboardOutlined />
+                },
 
-            //     ...(viewUser || ACL_ENABLE === 'false' ? [{
-            //         label: <Link to='/admin/user'>User</Link>,
-            //         key: '/admin/user',
-            //         icon: <UserOutlined />
-            //     }] : []),
+                ...(viewRestaurant || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/restaurant'>Nhà hàng</Link>,
+                    key: '/admin/restaurant',
+                    icon: <ShopOutlined />
+                }] : []),
 
-            //     ...(viewPermission || ACL_ENABLE === 'false' ? [{
-            //         label: <Link to='/admin/permission'>Permission</Link>,
-            //         key: '/admin/permission',
-            //         icon: <ApiOutlined />
-            //     }] : []),
+                ...(viewUser || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/user'>User</Link>,
+                    key: '/admin/user',
+                    icon: <UserOutlined />
+                }] : []),
 
-            //     ...(viewRole || ACL_ENABLE === 'false' ? [{
-            //         label: <Link to='/admin/role'>Role</Link>,
-            //         key: '/admin/role',
-            //         icon: <ExceptionOutlined />
-            //     }] : []),
-            // ];
+                ...(viewDiningTable || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/dining-table'>Bàn ăn</Link>,
+                    key: '/admin/dining-table',
+                    icon: <GatewayOutlined />
+                }] : []),
 
-            // setMenuItems(full);
+                ...(viewRole || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/role'>Role</Link>,
+                    key: '/admin/role',
+                    icon: <ExceptionOutlined />
+                }] : []),
+
+                ...(viewPermission || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/permission'>Permission</Link>,
+                    key: '/admin/permission',
+                    icon: <ApiOutlined />
+                }] : []),
+            ];
+
+            setMenuItems(full);
         }
     }, [permissions]);
 
@@ -140,52 +152,11 @@ const LayoutAdmin: React.FC = () => {
                         <BugOutlined /> ADMIN
                     </div>
 
-                    {/* <Menu
+                    <Menu
                         selectedKeys={[activeMenu]}
                         mode="inline"
                         items={menuItems}
                         onClick={(e) => setActiveMenu(e.key)}
-                    /> */}
-
-                    <Menu
-                        theme="light"
-                        mode="inline"
-                        defaultSelectedKeys={['1']}
-                        onClick={({ key }) => {
-                            navigate(key);
-                        }}
-                        items={[
-                            {
-                                key: '/admin',
-                                icon: <DashboardOutlined />,
-                                label: <Link to='/admin'>Trang chủ</Link>,
-                            },
-                            {
-                                key: '/admin/restaurant',
-                                icon: <ShopOutlined />,
-                                label: <Link to='/admin/restaurant'>Nhà hàng</Link>,
-                            },
-                            {
-                                key: '/admin/user',
-                                icon: <UserOutlined />,
-                                label: <Link to='/admin/user'>Người dùng</Link>,
-                            },
-                            {
-                                key: '/admin/dining-table',
-                                icon: <GatewayOutlined />,
-                                label: <Link to='/admin/dining-table'>Bàn ăn</Link>,
-                            },
-                            {
-                                key: '/admin/role',
-                                icon: <ExceptionOutlined />,
-                                label: <Link to='/admin/role'>Chức vụ</Link>,
-                            },
-                            {
-                                key: '/admin/permission',
-                                icon: <ApiOutlined />,
-                                label: <Link to='/admin/permission'>Quyền hạn</Link>,
-                            }
-                        ]}
                     />
 
                     <Button

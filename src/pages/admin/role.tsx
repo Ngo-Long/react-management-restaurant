@@ -67,9 +67,10 @@ const RolePage = () => {
 
     const columns: ProColumns<IRole>[] = [
         {
-            title: 'Id',
+            title: 'ID',
             dataIndex: 'id',
-            width: 250,
+            width: 50,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <span>
@@ -87,6 +88,7 @@ const RolePage = () => {
         {
             title: 'Trạng thái',
             dataIndex: 'active',
+            align: "center",
             render(dom, entity, index, action, schema) {
                 return <>
                     <Tag color={entity.active ? "lime" : "red"} >
@@ -101,6 +103,7 @@ const RolePage = () => {
             dataIndex: 'createdDate',
             width: 200,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -113,6 +116,7 @@ const RolePage = () => {
             dataIndex: 'lastModifiedDate',
             width: 200,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -123,8 +127,9 @@ const RolePage = () => {
         {
 
             title: 'Actions',
-            hideInSearch: true,
             width: 50,
+            align: "center",
+            hideInSearch: true,
             render: (_value, entity, _index, _action) => (
                 <Space>
                     <Access

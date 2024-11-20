@@ -8,6 +8,7 @@ import { sfIn } from "spring-filter-query-builder";
 
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
+import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
 
 import { diningTableApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
@@ -18,7 +19,6 @@ import { fetchDiningTable } from "@/redux/slice/diningTableSlide";
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
-import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
 
 const DiningTablePage = () => {
     const tableRef = useRef<ActionType>();
@@ -37,29 +37,18 @@ const DiningTablePage = () => {
         tableRef?.current?.reload();
     }
 
-    const showErrorNotification = (description: string) => {
-        notification.error({
-            message: 'Có lỗi xảy ra!',
-            description,
-        });
-    };
-
     const handleDeleteDiningTable = async (id: string | undefined) => {
-        if (!id) {
-            message.warning('ID bàn ăn không hợp lệ!');
-            return;
-        }
-
-        try {
+        if (id) {
             const res = await diningTableApi.callDelete(id);
-            if (res && res.data) {
+            if (res && +res.statusCode === 200) {
                 message.success('Xóa bàn ăn thành công');
                 reloadTable();
             } else {
-                showErrorNotification(res.message || 'Có lỗi xảy ra!');
+                notification.error({
+                    message: 'Có lỗi xảy ra!',
+                    description: res.message
+                });
             }
-        } catch (error) {
-            showErrorNotification('Không thể xóa nhà hàng. Vui lòng thử lại sau!');
         }
     }
 
@@ -91,6 +80,7 @@ const DiningTablePage = () => {
         {
             title: 'Số ghế',
             width: 80,
+            align: "center",
             dataIndex: 'seats',
             hideInSearch: true,
             render(dom, entity, index, action, schema) {
@@ -101,6 +91,7 @@ const DiningTablePage = () => {
         {
             title: 'Trạng thái',
             dataIndex: 'status',
+            align: "center",
             renderFormItem: (item, props, form) => (
                 <ProFormSelect
                     showSearch
@@ -117,6 +108,7 @@ const DiningTablePage = () => {
         },
         {
             title: 'Hoạt động',
+            align: "center",
             dataIndex: 'active',
             render(dom, entity, index, action, schema) {
                 return <>
@@ -133,6 +125,7 @@ const DiningTablePage = () => {
             dataIndex: 'createdDate',
             width: 150,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -145,6 +138,7 @@ const DiningTablePage = () => {
             dataIndex: 'lastModifiedDate',
             width: 150,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -157,6 +151,7 @@ const DiningTablePage = () => {
             title: 'Actions',
             hideInSearch: true,
             width: 50,
+            align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
                     < Access

@@ -1,11 +1,16 @@
-import { Button, Divider, Form, Input, message, notification } from 'antd';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { authApi } from '@/config/api';
-import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { setUserLoginInfo } from '@/redux/slice/accountSlide';
+import {
+    Button, Divider, Form,
+    Input, message, notification
+} from 'antd';
 import styles from 'styles/auth.module.scss';
+
+import { authApi } from '@/config/api';
 import { useAppSelector } from '@/redux/hooks';
+import { setUserLoginInfo } from '@/redux/slice/accountSlide';
+
+import { useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -28,21 +33,31 @@ const LoginPage = () => {
     const onFinish = async (values: any) => {
         const { username, password } = values;
         setIsSubmit(true);
-        const res = await authApi.callLogin(username, password);
-        setIsSubmit(false);
 
-        if (res?.data) {
-            localStorage.setItem('access_token', res.data.access_token);
-            dispatch(setUserLoginInfo(res.data.user))
-            message.success('Đăng nhập tài khoản thành công!');
-            window.location.href = callback ? callback : '/';
-        } else {
+        try {
+            const res = await authApi.callLogin(username, password);
+            setIsSubmit(false);
+
+            if (res?.data) {
+                localStorage.setItem("access_token", res.data.access_token);
+                dispatch(setUserLoginInfo(res.data.user)); // Lưu thông tin người dùng
+                message.success("Đăng nhập tài khoản thành công!");
+
+                navigate(callback || "/", { replace: true }); // Điều hướng sau khi đăng nhập thành công
+            } else {
+                notification.error({
+                    message: "Có lỗi xảy ra",
+                    description: res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+                    duration: 5,
+                });
+            }
+        } catch (error) {
+            setIsSubmit(false);
             notification.error({
-                message: "Có lỗi xảy ra",
-                description:
-                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-                duration: 5
-            })
+                message: "Đăng nhập thất bại",
+                description: "Vui lòng kiểm tra lại thông tin đăng nhập của bạn.",
+                duration: 5,
+            });
         }
     };
 

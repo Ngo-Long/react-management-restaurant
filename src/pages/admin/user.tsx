@@ -18,8 +18,8 @@ import DataTable from "@/components/client/data-table";
 const UserPage = () => {
     const tableRef = useRef<ActionType>();
 
-    const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IUser | null>(null);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
@@ -91,6 +91,7 @@ const UserPage = () => {
             dataIndex: 'createdDate',
             width: 200,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -103,6 +104,7 @@ const UserPage = () => {
             dataIndex: 'lastModifiedDate',
             width: 200,
             sorter: true,
+            align: "center",
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -115,12 +117,10 @@ const UserPage = () => {
             title: 'Actions',
             hideInSearch: true,
             width: 50,
+            align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    < Access
-                        permission={ALL_PERMISSIONS.USERS.UPDATE}
-                        hideChildren
-                    >
+                    < Access permission={ALL_PERMISSIONS.USERS.UPDATE} hideChildren>
                         <EditOutlined
                             style={{
                                 fontSize: 20,
@@ -134,10 +134,7 @@ const UserPage = () => {
                         />
                     </Access >
 
-                    <Access
-                        permission={ALL_PERMISSIONS.USERS.DELETE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.USERS.DELETE} hideChildren>
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa người dùng"}

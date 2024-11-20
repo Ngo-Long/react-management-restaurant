@@ -20,29 +20,23 @@ const ProtectedRoute = (props: any) => {
 
     return (
         <>
-            {props.children}
+            {isLoading === true ?
+                <Loading />
+                :
+                <>
+                    {isAuthenticated === true ?
+                        <>
+                            <RoleBaseRoute>
+                                {props.children}
+                            </RoleBaseRoute>
+                        </>
+                        :
+                        <Navigate to='/login' replace />
+                    }
+                </>
+            }
         </>
     )
-
-    // return (
-    //     <>
-    //         {isLoading === true ?
-    //             <Loading />
-    //             :
-    //             <>
-    //                 {isAuthenticated === true ?
-    //                     <>
-    //                         <RoleBaseRoute>
-    //                             {props.children}
-    //                         </RoleBaseRoute>
-    //                     </>
-    //                     :
-    //                     <Navigate to='/login' replace />
-    //                 }
-    //             </>
-    //         }
-    //     </>
-    // )
 }
 
 export default ProtectedRoute;
