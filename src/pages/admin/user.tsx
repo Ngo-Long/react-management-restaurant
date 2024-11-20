@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchUser } from "@/redux/slice/userSlide";
+import { fetchAllUser, fetchUserByRestaurant } from "@/redux/slice/userSlide";
 import { IUser } from "@/types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -16,13 +16,14 @@ import { sfLike } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
 
 const UserPage = () => {
+    const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
 
     const [dataInit, setDataInit] = useState<IUser | null>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
-    const dispatch = useAppDispatch();
+    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
     const users = useAppSelector(state => state.user.result);
 
     const meta = useAppSelector(state => state.user.meta);
@@ -89,7 +90,7 @@ const UserPage = () => {
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 200,
+            width: 170,
             sorter: true,
             align: "center",
             render: (text, record, index, action) => {
@@ -102,7 +103,7 @@ const UserPage = () => {
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
-            width: 200,
+            width: 170,
             sorter: true,
             align: "center",
             render: (text, record, index, action) => {
@@ -214,7 +215,7 @@ const UserPage = () => {
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            dispatch(fetchUser({ query }))
+                            userRoleId === 1 ? dispatch(fetchAllUser({ query })) : dispatch(fetchUserByRestaurant({ query }));
                         }
                     }
                     scroll={{ x: true }}

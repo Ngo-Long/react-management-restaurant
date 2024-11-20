@@ -55,9 +55,9 @@ export interface IUser {
     name: string;
     email: string;
     password?: string;
-    age: number;
-    gender: string;
-    address: string;
+    age?: number;
+    gender?: string;
+    address?: string;
     role?: {
         id: string;
         name: string;

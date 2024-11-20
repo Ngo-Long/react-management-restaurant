@@ -31,7 +31,6 @@ export const fetchRoleById = createAsyncThunk(
     }
 )
 
-
 const initialState: IState = {
     isFetching: true,
     isFetchSingle: true,
@@ -57,7 +56,6 @@ export const roleSlide = createSlice({
     initialState,
     // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-
         resetSingleRole: (state, action) => {
             state.singleRole = {
                 id: "",
@@ -66,8 +64,7 @@ export const roleSlide = createSlice({
                 active: false,
                 permissions: []
             }
-        },
-
+        }
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed

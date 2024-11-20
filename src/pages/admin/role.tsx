@@ -25,7 +25,6 @@ const RolePage = () => {
     const roles = useAppSelector(state => state.role.result);
     const dispatch = useAppDispatch();
 
-
     //all backend permissions
     const [listPermissions, setListPermissions] = useState<{
         module: string;

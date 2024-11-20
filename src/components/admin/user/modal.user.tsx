@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { userApi, roleApi, restaurantApi } from "@/config/api";
 import { IUser } from "@/types/backend";
 import { DebounceSelect } from "./debouce.select";
+import { useAppSelector } from "@/redux/hooks";
 
 interface IProps {
     openModal: boolean;
@@ -22,10 +23,12 @@ export interface IRestaurantSelect {
 
 const ModalUser = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
-    const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
+
     const [roles, setRoles] = useState<IRestaurantSelect[]>([]);
+    const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
 
     const [form] = Form.useForm();
+    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
 
     useEffect(() => {
         if (dataInit?.id) {
@@ -185,10 +188,10 @@ const ModalUser = (props: IProps) => {
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormText.Password
                             disabled={dataInit?.id ? true : false}
-                            label="Password"
+                            label="Mật khẩu"
                             name="password"
                             rules={[{ required: dataInit?.id ? false : true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập password"
+                            placeholder="Nhập mật khẩu"
                         />
                     </Col>
                     <Col lg={6} md={6} sm={24} xs={24}>
@@ -253,6 +256,7 @@ const ModalUser = (props: IProps) => {
                             <DebounceSelect
                                 allowClear
                                 showSearch
+                                disabled={userRoleId !== 1 ? true : false}
                                 defaultValue={restaurants}
                                 value={restaurants}
                                 placeholder="Chọn nhà hàng"

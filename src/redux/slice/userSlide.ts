@@ -13,10 +13,18 @@ interface IState {
     result: IUser[]
 }
 // First, create the thunk
-export const fetchUser = createAsyncThunk(
-    'user/fetchUser',
+export const fetchAllUser = createAsyncThunk(
+    'user/fetchAllUser',
     async ({ query }: { query: string }) => {
-        const response = await userApi.callFetch(query);
+        const response = await userApi.callFetchAll(query);
+        return response;
+    }
+)
+
+export const fetchUserByRestaurant = createAsyncThunk(
+    'user/fetchUserByRestaurant',
+    async ({ query }: { query: string }) => {
+        const response = await userApi.callFetchByRestaurant(query);
         return response;
     }
 )
@@ -32,49 +40,50 @@ const initialState: IState = {
     result: []
 };
 
-
 export const userSlide = createSlice({
     name: 'user',
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        // Use the PayloadAction type to declare the contents of `action.payload`
         setActiveMenu: (state, action) => {
             // state.activeMenu = action.payload;
         },
-
-
     },
     extraReducers: (builder) => {
-        // Add reducers for additional action types here, and handle loading state as needed
-        builder.addCase(fetchUser.pending, (state, action) => {
+        builder.addCase(fetchAllUser.pending, (state, action) => {
             state.isFetching = true;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
 
-        builder.addCase(fetchUser.rejected, (state, action) => {
+        builder.addCase(fetchAllUser.rejected, (state, action) => {
             state.isFetching = false;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
 
-        builder.addCase(fetchUser.fulfilled, (state, action) => {
+        builder.addCase(fetchAllUser.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;
                 state.result = action.payload.data.result;
             }
-            // Add user to the state array
+        })
 
-            // state.courseOrder = action.payload;
+        builder.addCase(fetchUserByRestaurant.pending, (state, action) => {
+            state.isFetching = true;
+        })
+
+        builder.addCase(fetchUserByRestaurant.rejected, (state, action) => {
+            state.isFetching = false;
+        })
+
+        builder.addCase(fetchUserByRestaurant.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+                state.meta = action.payload.data.meta;
+                state.result = action.payload.data.result;
+            }
         })
     },
 
 });
 
-export const {
-    setActiveMenu,
-} = userSlide.actions;
+export const { setActiveMenu } = userSlide.actions;
 
 export default userSlide.reducer;

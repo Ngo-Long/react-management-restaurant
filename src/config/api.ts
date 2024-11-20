@@ -10,8 +10,8 @@ import {
 Module Auth
  */
 export const authApi = {
-    callRegister(name: string, email: string, password: string, age: number, gender: string, address: string) {
-        return axios.post<IBackendRes<IUser>>('/api/v1/auth/register', { name, email, password, age, gender, address })
+    callRegister(name: string, email: string, password: string, restaurant: { name: string }) {
+        return axios.post<IBackendRes<IUser>>('/api/v1/auth/register', { name, email, password, restaurant })
     },
 
     callLogin(username: string, password: string) {
@@ -92,8 +92,12 @@ export const userApi = {
         return axios.delete<IBackendRes<IUser>>(`/api/v1/users/${id}`);
     },
 
-    callFetch(query: string) {
+    callFetchAll(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users/by-restaurant?${query}`);
     }
 }
 
