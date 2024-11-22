@@ -23,8 +23,8 @@ const UserPage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
+    const userList = useAppSelector(state => state.user.result);
     const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
-    const users = useAppSelector(state => state.user.result);
 
     const meta = useAppSelector(state => state.user.meta);
     const isFetching = useAppSelector(state => state.user.isFetching);
@@ -84,7 +84,8 @@ const UserPage = () => {
             title: 'Nhà hàng',
             dataIndex: ["restaurant", "name"],
             sorter: true,
-            hideInSearch: true
+            hideInSearch: true,
+            hidden: (userRoleId == 1 ? false : true)
         },
 
         {
@@ -211,11 +212,13 @@ const UserPage = () => {
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
-                    dataSource={users}
+                    dataSource={userList}
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            userRoleId === 1 ? dispatch(fetchAllUser({ query })) : dispatch(fetchUserByRestaurant({ query }));
+                            userRoleId == 1
+                                ? dispatch(fetchAllUser({ query }))
+                                : dispatch(fetchUserByRestaurant({ query }));
                         }
                     }
                     scroll={{ x: true }}

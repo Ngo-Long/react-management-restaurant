@@ -14,7 +14,7 @@ import { diningTableApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchDiningTable } from "@/redux/slice/diningTableSlide";
+import { fetchDiningTable, fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
 
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
@@ -32,6 +32,9 @@ const DiningTablePage = () => {
 
     const meta = useAppSelector(state => state.diningTable.meta);
     const isFetching = useAppSelector(state => state.diningTable.isFetching);
+
+    const currentUser = useAppSelector(state => state.account.user);
+    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
 
     const reloadTable = () => {
         tableRef?.current?.reload();
@@ -75,7 +78,8 @@ const DiningTablePage = () => {
             title: 'Nhà hàng',
             dataIndex: ["restaurant", "name"],
             sorter: true,
-            hideInSearch: false,
+            hidden: !isRoleOwner,
+            hideInSearch: true,
         },
         {
             title: 'Số ghế',
@@ -242,6 +246,7 @@ const DiningTablePage = () => {
         return temp;
     }
 
+
     return (
         <div>
             <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
@@ -255,7 +260,9 @@ const DiningTablePage = () => {
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            dispatch(fetchDiningTable({ query }))
+                            (isRoleOwner
+                                ? dispatch(fetchDiningTable({ query }))
+                                : dispatch(fetchDiningTableByRestaurant({ query })))
                         }
                     }
                     scroll={{ x: true }}

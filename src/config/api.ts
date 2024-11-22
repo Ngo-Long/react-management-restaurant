@@ -144,12 +144,12 @@ export const roleApi = {
         return axios.delete<IBackendRes<IRole>>(`/api/v1/roles/${id}`);
     },
 
-    callFetchFilter(query: string) {
-        return axios.get<IBackendRes<IModelPaginate<IRole>>>(`/api/v1/roles?${query}`);
-    },
-
     callFetchById(id: string) {
         return axios.get<IBackendRes<IRole>>(`/api/v1/roles/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IRole>>>(`/api/v1/roles?${query}`);
     }
 }
 
@@ -172,6 +172,10 @@ export const diningTableApi = {
 
     callFetchFilter(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IDiningTable>>>(`/api/v1/dining-tables?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IDiningTable>>>(`/api/v1/dining-tables/by-restaurant?${query}`);
     },
 
     callFetchById(id: string) {

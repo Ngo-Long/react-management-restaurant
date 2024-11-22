@@ -29,6 +29,10 @@ interface IState {
                 method: string;
                 module: string;
             }[]
+        };
+        restaurant: {
+            id?: string;
+            name?: string;
         }
     };
     activeMenu: string;
@@ -48,6 +52,10 @@ const initialState: IState = {
             name: "",
             permissions: [],
         },
+        restaurant: {
+            id: "",
+            name: ""
+        }
     },
 
     activeMenu: 'home'
@@ -69,9 +77,8 @@ export const accountSlide = createSlice({
             state.user.id = action?.payload?.id;
             state.user.email = action.payload.email;
             state.user.name = action.payload.name;
-            state.user.role = action?.payload?.role;
-
-            if (!action?.payload?.user?.role) state.user.role = {};
+            state.user.restaurant = action?.payload?.restaurant ?? {};
+            state.user.role = action?.payload?.role ?? {};
             state.user.role.permissions = action?.payload?.role?.permissions ?? [];
         },
         setLogoutAction: (state, action) => {
@@ -86,6 +93,10 @@ export const accountSlide = createSlice({
                     name: "",
                     permissions: [],
                 },
+                restaurant: {
+                    id: "",
+                    name: "",
+                }
             }
         },
         setRefreshTokenAction: (state, action) => {
@@ -110,9 +121,9 @@ export const accountSlide = createSlice({
                 state.user.id = action?.payload?.user?.id;
                 state.user.email = action.payload.user?.email;
                 state.user.name = action.payload.user?.name;
-                state.user.role = action?.payload?.user?.role;
-                if (!action?.payload?.user?.role) state.user.role = {};
+                state.user.role = action?.payload?.user?.role ?? {};
                 state.user.role.permissions = action?.payload?.user?.role?.permissions ?? [];
+                state.user.restaurant = action?.payload?.user?.restaurant;
             }
         })
 

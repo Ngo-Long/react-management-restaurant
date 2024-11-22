@@ -31,6 +31,10 @@ export interface IAccount {
                 method: string;
                 module: string;
             }[]
+        };
+        restaurant: {
+            id: string,
+            name: string
         }
     }
 }

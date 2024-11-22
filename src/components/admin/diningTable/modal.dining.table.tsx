@@ -1,5 +1,5 @@
 
-import { Col, Form, Row, message, notification } from "antd";
+import { Col, Form, Input, Row, message, notification } from "antd";
 import {
     ModalForm, ProForm, ProFormDigit,
     ProFormSelect, ProFormSwitch, ProFormText
@@ -14,6 +14,7 @@ import { DebounceSelect } from "../user/debouce.select";
 
 import { IDiningTable } from "@/types/backend";
 import { diningTableApi, restaurantApi } from "@/config/api";
+import { useAppSelector } from "@/redux/hooks";
 
 interface IProps {
     openModal: boolean;
@@ -33,6 +34,10 @@ const ModalDiningTable = (props: IProps) => {
     const [form] = Form.useForm();
     const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
+
+    const currentUser = useAppSelector(state => state.account.user);
+    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
+    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     useEffect(() => {
         if (dataInit?.id) {
@@ -59,59 +64,40 @@ const ModalDiningTable = (props: IProps) => {
     }
 
     const submitDiningTable = async (valuesForm: any) => {
-        if (dataInit?.id) {
-            //update
-            const diningTable = {
-                id: dataInit.id,
-                name: valuesForm.name,
-                location: valuesForm.location,
-                seats: valuesForm.seats,
-                status: valuesForm.status,
-                description: valuesForm.description,
-                active: valuesForm.active,
-                restaurant: {
-                    id: valuesForm.restaurant.value,
-                    name: valuesForm.restaurant.label
-                }
-            }
+        const { name, location, seats, status, description, active, restaurant } = valuesForm;
 
-            const res = await diningTableApi.callUpdate(diningTable);
-            if (res.data) {
-                message.success("Cập nhật bàn ăn thành công");
-                handleReset();
-                reloadTable();
-            } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra',
-                    description: res.message
-                });
+        const restaurantValue = isRoleOwner ? restaurant : {
+            value: currentRestaurant?.id,
+            label: currentRestaurant?.name
+        };
+
+        const diningTable = {
+            id: dataInit?.id,
+            name,
+            location,
+            seats,
+            status,
+            description,
+            active,
+            restaurant: {
+                id: restaurantValue?.value,
+                name: restaurantValue?.label
             }
+        };
+
+        const res = dataInit?.id
+            ? await diningTableApi.callUpdate(diningTable)
+            : await diningTableApi.callCreate(diningTable);
+
+        if (res.data) {
+            message.success(`${dataInit?.id ? 'Cập nhật' : 'Tạo mới'} bàn ăn thành công`);
+            handleReset();
+            reloadTable();
         } else {
-            //create
-            const diningTable = {
-                name: valuesForm.name,
-                location: valuesForm.location,
-                seats: valuesForm.seats,
-                status: valuesForm.status,
-                description: valuesForm.description,
-                active: valuesForm.active,
-                restaurant: {
-                    id: valuesForm.restaurant.value,
-                    name: valuesForm.restaurant.label
-                }
-            }
-
-            const res = await diningTableApi.callCreate(diningTable);
-            if (res.data) {
-                message.success("Tạo mới bàn ăn thành công");
-                handleReset();
-                reloadTable();
-            } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra',
-                    description: res.message
-                });
-            }
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description: res.message,
+            });
         }
     }
 
@@ -151,7 +137,9 @@ const ModalDiningTable = (props: IProps) => {
                 onFinish={submitDiningTable}
                 initialValues={dataInit?.id ? {
                     ...dataInit,
-                    restaurant: { label: dataInit.restaurant?.name, value: dataInit.restaurant?.id },
+                    restaurant: isRoleOwner
+                        ? { label: dataInit?.restaurant?.name, value: dataInit?.restaurant?.id }
+                        : { label: currentRestaurant?.name, value: currentRestaurant?.id }
                 } : {}}
 
             >
@@ -197,35 +185,51 @@ const ModalDiningTable = (props: IProps) => {
                         />
                     </Col>
 
-                    <Col span={24} md={12}>
-                        <ProForm.Item
-                            label="Thuộc nhà hàng"
-                            name="restaurant"
-                            rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
-                        >
-                            <DebounceSelect
-                                allowClear
-                                showSearch
-                                defaultValue={restaurants}
-                                value={restaurants}
-                                placeholder="Chọn nhà hàng"
-                                fetchOptions={fetchRestaurantList}
-                                onChange={(newValue: any) => {
-                                    if (newValue?.length === 0 || newValue?.length === 1) {
-                                        setRestaurants(newValue as IRestaurantSelect[]);
-                                    }
-                                }}
-                                style={{ width: '100%' }}
-                            />
-                        </ProForm.Item>
-                    </Col>
+                    {isRoleOwner && (
+                        <Col span={24} md={12}>
+                            <ProForm.Item
+                                label="Thuộc nhà hàng"
+                                name="restaurant"
+                                rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
+                            >
+                                {isRoleOwner ? (
+                                    <DebounceSelect
+                                        allowClear
+                                        showSearch
+                                        defaultValue={restaurants}
+                                        value={restaurants}
+                                        placeholder="Chọn nhà hàng"
+                                        fetchOptions={fetchRestaurantList}
+                                        onChange={(newValue: any) => {
+                                            if (newValue?.length === 0 || newValue?.length === 1) {
+                                                setRestaurants(newValue as IRestaurantSelect[]);
+                                            }
+                                        }}
+                                        style={{ width: '100%' }}
+                                    />
+                                ) : (
+                                    <>
+                                        <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
+                                        <ProFormText
+                                            hidden
+                                            name="restaurant"
+                                            initialValue={{
+                                                label: currentRestaurant?.name,
+                                                value: currentRestaurant?.id,
+                                            }}
+                                        />
+                                    </>
+                                )}
+                            </ProForm.Item>
+                        </Col>
+                    )}
 
                     <Col span={24} md={12}>
                         <ProFormText
                             label="Mô tả"
                             name="description"
                             rules={[{ required: false, message: '' }]}
-                            placeholder=""
+                            placeholder="Nhập mô tả"
                         />
                     </Col>
 
