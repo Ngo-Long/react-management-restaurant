@@ -66,16 +66,15 @@ const RolePage = () => {
 
     const columns: ProColumns<IRole>[] = [
         {
-            title: 'ID',
-            dataIndex: 'id',
+            title: 'STT',
+            key: 'index',
             width: 50,
             align: "center",
-            render: (text, record, index, action) => {
+            render: (text, record, index) => {
                 return (
-                    <span>
-                        {record.id}
-                    </span>
-                )
+                    <>
+                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
+                    </>)
             },
             hideInSearch: true,
         },
@@ -95,7 +94,7 @@ const RolePage = () => {
                     </Tag>
                 </>
             },
-            hideInSearch: true,
+            hideInSearch: false,
         },
         {
             title: 'Ngày tạo',
@@ -147,6 +146,7 @@ const RolePage = () => {
                             }}
                         />
                     </Access>
+
                     <Access
                         permission={ALL_PERMISSIONS.ROLES.DELETE}
                         hideChildren
@@ -239,17 +239,23 @@ const RolePage = () => {
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
+                            <Access
+                                permission={ALL_PERMISSIONS.ROLES.CREATE}
+                                hideChildren
                             >
-                                Thêm mới
-                            </Button>
+                                <Button
+                                    icon={<PlusOutlined />}
+                                    type="primary"
+                                    onClick={() => setOpenModal(true)}
+                                >
+                                    Thêm mới
+                                </Button>
+                            </Access>
                         );
                     }}
                 />
             </Access>
+
             <ModalRole
                 openModal={openModal}
                 setOpenModal={setOpenModal}

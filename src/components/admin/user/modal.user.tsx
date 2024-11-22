@@ -1,5 +1,5 @@
 import { ModalForm, ProForm, ProFormDigit, ProFormSelect, ProFormText } from "@ant-design/pro-components";
-import { Col, Form, Row, message, notification } from "antd";
+import { Col, Form, Input, Row, message, notification } from "antd";
 import { isMobile } from 'react-device-detect';
 import { useState, useEffect } from "react";
 import { userApi, roleApi, restaurantApi } from "@/config/api";
@@ -22,13 +22,15 @@ export interface IRestaurantSelect {
 }
 
 const ModalUser = (props: IProps) => {
+    const [form] = Form.useForm();
+    const [roles, setRoles] = useState<IRestaurantSelect[]>([]);
+
+    const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
 
-    const [roles, setRoles] = useState<IRestaurantSelect[]>([]);
-    const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
-
-    const [form] = Form.useForm();
-    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
+    const currentUser = useAppSelector(state => state.account.user);
+    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
+    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     useEffect(() => {
         if (dataInit?.id) {
@@ -68,57 +70,43 @@ const ModalUser = (props: IProps) => {
 
     const submitUser = async (valuesForm: any) => {
         const { name, email, password, age, gender, address, role, restaurant } = valuesForm;
-        if (dataInit?.id) {
-            //update
-            const user = {
-                id: dataInit.id, name, email, password, age, gender, address,
-                role: { id: role.value, name: "" },
-                restaurant: {
-                    id: restaurant.value,
-                    name: restaurant.label
-                }
-            }
 
-            const res = await userApi.callUpdate(user);
-            if (res.data) {
-                message.success("Cập nhật người dùng thành công");
-                handleReset();
-                reloadTable();
-            } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra!',
-                    description: res.message
-                });
+        const restaurantValue = isRoleOwner ? restaurant : {
+            value: currentRestaurant?.id,
+            label: currentRestaurant?.name
+        };
+
+        const user = {
+            id: dataInit?.id,
+            name,
+            email,
+            password,
+            age,
+            gender,
+            address,
+            role: { id: role.value, name: "" },
+            restaurant: {
+                id: restaurantValue?.value,
+                name: restaurantValue?.label
             }
+        };
+
+        const res = dataInit?.id
+            ? await userApi.callUpdate(user)
+            : await userApi.callCreate(user);
+
+        if (res.data) {
+            message.success(dataInit?.id ? "Cập nhật người dùng thành công" : "Thêm mới người dùng thành công");
+            handleReset();
+            reloadTable();
         } else {
-            //create
-            const user = {
-                name, email, password, age, gender, address,
-                role: {
-                    id: role.value,
-                    name: ""
-                },
-                restaurant: {
-                    id: restaurant.value,
-                    name: restaurant.label
-                }
-            }
-
-            const res = await userApi.callCreate(user);
-            if (res.data) {
-                message.success("Thêm mới người dùng thành công");
-                handleReset();
-                reloadTable();
-            } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra!',
-                    description: res.message
-                });
-            }
+            notification.error({
+                message: 'Có lỗi xảy ra!',
+                description: res.message
+            });
         }
     }
 
-    // Usage of DebounceSelect
     async function fetchRestaurantList(name: string): Promise<IRestaurantSelect[]> {
         const res = await restaurantApi.callFetchFilter(`page=1&size=100&name=/${name}/i`);
         if (res && res.data) {
@@ -137,14 +125,19 @@ const ModalUser = (props: IProps) => {
         const res = await roleApi.callFetchFilter(`page=1&size=100&name=/${name}/i`);
         if (res && res.data) {
             const list = res.data.result;
-            const temp = list.map(item => {
+
+            const filteredList = isRoleOwner ? list : list.filter(item => Number(item.id) != 1);
+
+            const temp = filteredList.map(item => {
                 return {
                     label: item.name as string,
                     value: item.id as string
-                }
-            })
+                };
+            });
             return temp;
-        } else return [];
+        } else {
+            return [];
+        }
     }
 
     return (
@@ -169,13 +162,16 @@ const ModalUser = (props: IProps) => {
                 initialValues={dataInit?.id ? {
                     ...dataInit,
                     role: { label: dataInit.role?.name, value: dataInit.role?.id },
-                    restaurant: { label: dataInit.restaurant?.name, value: dataInit.restaurant?.id },
+                    restaurant: isRoleOwner
+                        ? { label: dataInit?.restaurant?.name, value: dataInit?.restaurant?.id }
+                        : { label: currentRestaurant?.name, value: currentRestaurant?.id }
                 } : {}}
 
             >
                 <Row gutter={16}>
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormText
+                            disabled={dataInit?.id ? true : false}
                             label="Email"
                             name="email"
                             rules={[
@@ -204,10 +200,10 @@ const ModalUser = (props: IProps) => {
                     </Col>
                     <Col lg={6} md={6} sm={24} xs={24}>
                         <ProFormDigit
-                            label="Số điện thoại"
-                            name="phone"
+                            label="Số tuổi"
+                            name="age"
                             rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập số điện thoại"
+                            placeholder="Nhập số tuổi"
                         />
                     </Col>
                     <Col lg={6} md={6} sm={24} xs={24}>
@@ -223,6 +219,7 @@ const ModalUser = (props: IProps) => {
                             rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
                         />
                     </Col>
+
                     <Col lg={6} md={6} sm={24} xs={24}>
                         <ProForm.Item
                             name="role"
@@ -247,29 +244,44 @@ const ModalUser = (props: IProps) => {
                         </ProForm.Item>
                     </Col>
 
-                    <Col lg={12} md={12} sm={24} xs={24}>
-                        <ProForm.Item
-                            label="Thuộc nhà hàng"
-                            name="restaurant"
-                            rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
-                        >
-                            <DebounceSelect
-                                allowClear
-                                showSearch
-                                disabled={userRoleId !== 1 ? true : false}
-                                defaultValue={restaurants}
-                                value={restaurants}
-                                placeholder="Chọn nhà hàng"
-                                fetchOptions={fetchRestaurantList}
-                                onChange={(newValue: any) => {
-                                    if (newValue?.length === 0 || newValue?.length === 1) {
-                                        setRestaurants(newValue as IRestaurantSelect[]);
-                                    }
-                                }}
-                                style={{ width: '100%' }}
-                            />
-                        </ProForm.Item>
-                    </Col>
+                    {isRoleOwner && (
+                        <Col lg={12} md={12} sm={24} xs={24}>
+                            <ProForm.Item
+                                label="Thuộc nhà hàng"
+                                name="restaurant"
+                                rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
+                            >
+                                {isRoleOwner ? (
+                                    <DebounceSelect
+                                        allowClear
+                                        showSearch
+                                        defaultValue={restaurants}
+                                        value={restaurants}
+                                        placeholder="Chọn nhà hàng"
+                                        fetchOptions={fetchRestaurantList}
+                                        onChange={(newValue: any) => {
+                                            if (newValue?.length === 0 || newValue?.length === 1) {
+                                                setRestaurants(newValue as IRestaurantSelect[]);
+                                            }
+                                        }}
+                                        style={{ width: '100%' }}
+                                    />
+                                ) : (
+                                    <>
+                                        <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
+                                        <ProFormText
+                                            hidden
+                                            name="restaurant"
+                                            initialValue={{
+                                                label: currentRestaurant?.name,
+                                                value: currentRestaurant?.id,
+                                            }}
+                                        />
+                                    </>
+                                )}
+                            </ProForm.Item>
+                        </Col>
+                    )}
 
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormText

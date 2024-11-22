@@ -16,22 +16,23 @@ import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 
 const PermissionPage = () => {
+    const tableRef = useRef<ActionType>();
+
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IPermission | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
-    const tableRef = useRef<ActionType>();
-
-    const isFetching = useAppSelector(state => state.permission.isFetching);
-    const meta = useAppSelector(state => state.permission.meta);
-    const permissions = useAppSelector(state => state.permission.result);
     const dispatch = useAppDispatch();
+    const meta = useAppSelector(state => state.permission.meta);
+
+    const permissions = useAppSelector(state => state.permission.result);
+    const isFetching = useAppSelector(state => state.permission.isFetching);
 
     const handleDeletePermission = async (id: string | undefined) => {
         if (id) {
             const res = await permissionApi.callDelete(id);
             if (res && res.statusCode === 200) {
-                message.success('Xóa Permission thành công');
+                message.success('Xóa quyền hạn thành công');
                 reloadTable();
             } else {
                 notification.error({
@@ -70,7 +71,7 @@ const PermissionPage = () => {
             sorter: true,
         },
         {
-            title: 'Đường dẫn API',
+            title: 'API',
             dataIndex: 'apiPath',
             sorter: true,
         },
@@ -118,7 +119,6 @@ const PermissionPage = () => {
             hideInSearch: true,
         },
         {
-
             title: 'Actions',
             hideInSearch: true,
             width: 50,
@@ -164,9 +164,8 @@ const PermissionPage = () => {
                         </Popconfirm>
                     </Access>
                 </Space>
-            ),
-
-        },
+            )
+        }
     ];
 
     const buildQuery = (params: any, sort: any, filter: any) => {
@@ -244,13 +243,18 @@ const PermissionPage = () => {
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
+                            <Access
+                                permission={ALL_PERMISSIONS.PERMISSIONS.CREATE}
+                                hideChildren
                             >
-                                Thêm mới
-                            </Button>
+                                <Button
+                                    icon={<PlusOutlined />}
+                                    type="primary"
+                                    onClick={() => setOpenModal(true)}
+                                >
+                                    Thêm mới
+                                </Button>
+                            </Access>
                         );
                     }}
                 />
