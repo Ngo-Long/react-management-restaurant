@@ -17,10 +17,11 @@ import { useEffect } from 'react';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import ProductPage from './pages/admin/product';
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(state => state.account.isLoading);
+  // const isLoading = useAppSelector(state => state.account.isLoading);
 
   useEffect(() => {
     if (window.location.pathname === '/login' || window.location.pathname === '/register') {
@@ -67,6 +68,13 @@ const App = () => {
           element:
             <ProtectedRoute>
               <DiningTablePage />
+            </ProtectedRoute>
+        },
+        {
+          path: "product",
+          element:
+            <ProtectedRoute>
+              <ProductPage />
             </ProtectedRoute>
         },
         {

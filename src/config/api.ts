@@ -226,13 +226,17 @@ export const productApi = {
         return axios.delete<IBackendRes<IProduct>>(`/api/v1/products/${id}`);
     },
 
-    callFetch(query: string) {
-        return axios.get<IBackendRes<IModelPaginate<IProduct>>>(`/api/v1/products?${query}`);
-    },
-
     callFetchById(id: string) {
         return axios.get<IBackendRes<IProduct>>(`/api/v1/products/${id}`);
     },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IProduct>>>(`/api/v1/products?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IProduct>>>(`/api/v1/products/by-restaurant?${query}`);
+    }
 }
 
 /**

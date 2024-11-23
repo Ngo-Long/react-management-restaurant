@@ -3,35 +3,36 @@ import { useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import queryString from 'query-string';
-import { IDiningTable } from "@/types/backend";
+import { IProduct } from "@/types/backend";
 import { sfIn } from "spring-filter-query-builder";
 
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
-import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
+import ModalProduct from '@/components/admin/product/modal.product';
 
-import { diningTableApi } from "@/config/api";
+import { productApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchDiningTable, fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
+import { fetchProduct, fetchProductByRestaurant } from "@/redux/slice/productSlide";
 
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
-const DiningTablePage = () => {
+
+const ProductPage = () => {
     const tableRef = useRef<ActionType>();
 
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
+    const [dataInit, setDataInit] = useState<IProduct | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
-    const diningTables = useAppSelector(state => state.diningTable.result);
+    const products = useAppSelector(state => state.product.result);
 
-    const meta = useAppSelector(state => state.diningTable.meta);
-    const isFetching = useAppSelector(state => state.diningTable.isFetching);
+    const meta = useAppSelector(state => state.product.meta);
+    const isFetching = useAppSelector(state => state.product.isFetching);
 
     const currentUser = useAppSelector(state => state.account.user);
     const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
@@ -40,11 +41,11 @@ const DiningTablePage = () => {
         tableRef?.current?.reload();
     }
 
-    const handleDeleteDiningTable = async (id: string | undefined) => {
+    const handleDeleteProduct = async (id: string | undefined) => {
         if (id) {
-            const res = await diningTableApi.callDelete(id);
+            const res = await productApi.callDelete(id);
             if (res && +res.statusCode === 200) {
-                message.success('Xóa bàn ăn thành công');
+                message.success('Xóa món ăn thành công');
                 reloadTable();
             } else {
                 notification.error({
@@ -55,7 +56,7 @@ const DiningTablePage = () => {
         }
     }
 
-    const columns: ProColumns<IDiningTable>[] = [
+    const columns: ProColumns<IProduct>[] = [
         {
             title: 'STT',
             key: 'index',
@@ -70,7 +71,8 @@ const DiningTablePage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Tên bàn ăn',
+            title: 'Tên hàng',
+            width: '190px',
             dataIndex: 'name',
             sorter: true,
         },
@@ -82,48 +84,35 @@ const DiningTablePage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Số ghế',
-            width: 80,
+            title: 'Giá bán',
             align: "center",
-            dataIndex: 'seats',
+            dataIndex: 'sellingPrice',
             hideInSearch: true,
             render(dom, entity, index, action, schema) {
-                const str = "" + entity.seats;
+                const str = "" + entity.sellingPrice;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
+            },
+        },
+        {
+            title: 'Giá vốn',
+            align: "center",
+            dataIndex: 'costPrice',
+            hideInSearch: true,
+            render(dom, entity, index, action, schema) {
+                const str = "" + entity.costPrice;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
+            },
+        },
+        {
+            title: 'Tồn kho',
+            align: "center",
+            dataIndex: 'quantity',
+            hideInSearch: true,
+            render(dom, entity, index, action, schema) {
+                const str = "" + entity.quantity;
                 return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
             },
         },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            align: "center",
-            renderFormItem: (item, props, form) => (
-                <ProFormSelect
-                    showSearch
-                    mode="multiple"
-                    allowClear
-                    valueEnum={{
-                        AVAILABLE: 'Còn trống',
-                        OCCUPIED: 'Đã có khách',
-                        RESERVED: 'Đã đặt trước'
-                    }}
-                    placeholder="Chọn trạng thái"
-                />
-            ),
-        },
-        {
-            title: 'Hoạt động',
-            align: "center",
-            dataIndex: 'active',
-            render(dom, entity, index, action, schema) {
-                return <>
-                    <Tag color={entity.active ? "lime" : "red"} >
-                        {entity.active ? "ACTIVE" : "INACTIVE"}
-                    </Tag>
-                </>
-            },
-            hideInSearch: true,
-        },
-
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
@@ -151,7 +140,6 @@ const DiningTablePage = () => {
             hideInSearch: true,
         },
         {
-
             title: 'Actions',
             hideInSearch: true,
             width: 50,
@@ -159,7 +147,7 @@ const DiningTablePage = () => {
             render: (_value, entity, _index, _action) => (
                 <Space>
                     < Access
-                        permission={ALL_PERMISSIONS.DININGTABLES.UPDATE}
+                        permission={ALL_PERMISSIONS.PRODUCTS.UPDATE}
                         hideChildren
                     >
                         <EditOutlined
@@ -176,14 +164,14 @@ const DiningTablePage = () => {
                     </Access >
 
                     <Access
-                        permission={ALL_PERMISSIONS.DININGTABLES.DELETE}
+                        permission={ALL_PERMISSIONS.PRODUCTS.DELETE}
                         hideChildren
                     >
                         <Popconfirm
                             placement="leftTop"
-                            title={"Xác nhận xóa bàn ăn"}
-                            description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
-                            onConfirm={() => handleDeleteDiningTable(entity.id)}
+                            title={"Xác nhận xóa hàng hóa"}
+                            description={"Bạn có chắc chắn muốn xóa hàng hóa này ?"}
+                            onConfirm={() => handleDeleteProduct(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
@@ -204,7 +192,6 @@ const DiningTablePage = () => {
     ];
 
     const buildQuery = (params: any, sort: any, filter: any) => {
-
         const clone = { ...params };
         let parts = [];
         if (clone.name) parts.push(`name ~ '${clone.name}'`);
@@ -248,20 +235,20 @@ const DiningTablePage = () => {
 
     return (
         <div>
-            <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
-                <DataTable<IDiningTable>
+            <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
+                <DataTable<IProduct>
                     actionRef={tableRef}
-                    headerTitle="Danh sách bàn ăn"
+                    headerTitle="Danh sách hàng hóa"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
-                    dataSource={diningTables}
+                    dataSource={products}
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
                             (isRoleOwner
-                                ? dispatch(fetchDiningTable({ query }))
-                                : dispatch(fetchDiningTableByRestaurant({ query })))
+                                ? dispatch(fetchProduct({ query }))
+                                : dispatch(fetchProductByRestaurant({ query })))
                         }
                     }
                     scroll={{ x: true }}
@@ -289,7 +276,7 @@ const DiningTablePage = () => {
                 />
             </Access>
 
-            <ModalDiningTable
+            <ModalProduct
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
@@ -300,4 +287,4 @@ const DiningTablePage = () => {
     )
 }
 
-export default DiningTablePage;
+export default ProductPage;

@@ -92,7 +92,6 @@ const ModalRole = (props: IProps) => {
                     width: isMobile ? "100%" : 900,
                     keyboard: false,
                     maskClosable: false,
-
                 }}
                 scrollToFirstError={true}
                 preserve={false}

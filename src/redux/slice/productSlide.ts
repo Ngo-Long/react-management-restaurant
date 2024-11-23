@@ -1,6 +1,6 @@
-import { restaurantApi } from '@/config/api';
-import { IRestaurant } from '@/types/backend';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { productApi } from '@/config/api';
+import { IProduct } from '@/types/backend';
 
 interface IState {
     isFetching: boolean;
@@ -10,13 +10,21 @@ interface IState {
         pages: number;
         total: number;
     },
-    result: IRestaurant[]
+    result: IProduct[]
 }
 // First, create the thunk
-export const fetchRestaurant = createAsyncThunk(
-    'restaurant/fetchRestaurant',
+export const fetchProduct = createAsyncThunk(
+    'product/fetchProduct',
     async ({ query }: { query: string }) => {
-        const response = await restaurantApi.callFetchFilter(query);
+        const response = await productApi.callFetchFilter(query);
+        return response;
+    }
+)
+
+export const fetchProductByRestaurant = createAsyncThunk(
+    'product/fetchProductByRestaurant',
+    async ({ query }: { query: string }) => {
+        const response = await productApi.callFetchByRestaurant(query);
         return response;
     }
 )
@@ -34,48 +42,49 @@ const initialState: IState = {
 };
 
 
-export const restaurantSlide = createSlice({
-    name: 'restaurant',
+export const productSlide = createSlice({
+    name: 'product',
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        // Use the PayloadAction type to declare the contents of `action.payload`
         setActiveMenu: (state, action) => {
             // state.activeMenu = action.payload;
         },
-
-
     },
     extraReducers: (builder) => {
-        // Add reducers for additional action types here, and handle loading state as needed
-        builder.addCase(fetchRestaurant.pending, (state, action) => {
+        // Handle fetchProduct actions
+        builder.addCase(fetchProduct.pending, (state, action) => {
             state.isFetching = true;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
-
-        builder.addCase(fetchRestaurant.rejected, (state, action) => {
+        builder.addCase(fetchProduct.rejected, (state, action) => {
             state.isFetching = false;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
-
-        builder.addCase(fetchRestaurant.fulfilled, (state, action) => {
+        builder.addCase(fetchProduct.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;
                 state.result = action.payload.data.result;
             }
-            // Add user to the state array
-
-            // state.courseOrder = action.payload;
         })
-    },
 
+        // Handle fetchProductByRestaurant actions
+        builder.addCase(fetchProductByRestaurant.pending, (state) => {
+            state.isFetching = true;
+        });
+
+        builder.addCase(fetchProductByRestaurant.rejected, (state) => {
+            state.isFetching = false;
+        });
+
+        builder.addCase(fetchProductByRestaurant.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+                state.meta = action.payload.data.meta;
+                state.result = action.payload.data.result;
+            }
+        });
+    }
 });
 
-export const {
-    setActiveMenu,
-} = restaurantSlide.actions;
+export const { setActiveMenu } = productSlide.actions;
 
-export default restaurantSlide.reducer;
+export default productSlide.reducer;

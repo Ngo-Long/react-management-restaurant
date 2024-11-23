@@ -191,13 +191,20 @@ interface IInvoice {
 export interface IProduct {
     id?: string;
     name: string;
-    price: number;
+    sellingPrice?: number;
+    costPrice?: number;
+    category?: string;
+    unit?: string;
     quantity?: number;
     sold?: number;
     image: string;
     shortDesc?: string;
     detailDesc?: string;
     active?: boolean;
+    restaurant?: {
+        id: string;
+        name: string;
+    }
 
     createdBy?: string;
     isDeleted?: boolean;

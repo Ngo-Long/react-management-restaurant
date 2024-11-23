@@ -8,6 +8,9 @@ import {
     DashboardOutlined,
     ExceptionOutlined,
     MenuUnfoldOutlined,
+    AuditOutlined,
+    AppstoreAddOutlined,
+    ContainerOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 const { Header, Sider, Content } = Layout;
@@ -55,6 +58,11 @@ const LayoutAdmin: React.FC = () => {
                 && item.method === ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE.method
             )
 
+            const viewProduct = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE.method
+            )
+
             const viewRole = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.ROLES.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.ROLES.GET_PAGINATE.method
@@ -88,6 +96,12 @@ const LayoutAdmin: React.FC = () => {
                     label: <Link to='/admin/dining-table'>Bàn ăn</Link>,
                     key: '/admin/dining-table',
                     icon: <GatewayOutlined />
+                }] : []),
+
+                ...(viewProduct || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/product'>Thực đơn</Link>,
+                    key: '/admin/product',
+                    icon: <ContainerOutlined />
                 }] : []),
 
                 ...(viewRole || ACL_ENABLE === 'false' ? [{
