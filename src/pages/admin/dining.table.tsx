@@ -123,7 +123,6 @@ const DiningTablePage = () => {
             },
             hideInSearch: true,
         },
-
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
@@ -151,7 +150,6 @@ const DiningTablePage = () => {
             hideInSearch: true,
         },
         {
-
             title: 'Actions',
             hideInSearch: true,
             width: 50,

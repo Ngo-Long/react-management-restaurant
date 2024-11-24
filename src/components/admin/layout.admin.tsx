@@ -198,7 +198,7 @@ const LayoutAdmin: React.FC = () => {
                         </Dropdown>
                     </Header>
 
-                    <Content style={{ margin: '16px 16px', height: "calc(100vh - 100px)" }}>
+                    <Content style={{ margin: '16px 16px', height: "calc(100vh - 10%)" }}>
                         <Outlet />
                     </Content>
                 </Layout>

@@ -339,68 +339,18 @@ const ModalProduct = (props: IProps) => {
                         />
                     </Col>
 
-                    {isRoleOwner && (
-                        <Col span={24} md={12}>
-                            <ProForm.Item
-                                label="Thuộc nhà hàng"
-                                name="restaurant"
-                                rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
-                            >
-                                {isRoleOwner ? (
-                                    <DebounceSelect
-                                        allowClear
-                                        showSearch
-                                        defaultValue={restaurants}
-                                        value={restaurants}
-                                        placeholder="Chọn nhà hàng"
-                                        fetchOptions={fetchRestaurantList}
-                                        onChange={(newValue: any) => {
-                                            if (newValue?.length === 0 || newValue?.length === 1) {
-                                                setRestaurants(newValue as IRestaurantSelect[]);
-                                            }
-                                        }}
-                                        style={{ width: '100%' }}
-                                    />
-                                ) : (
-                                    <>
-                                        <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
-                                        <ProFormText
-                                            hidden
-                                            name="restaurant"
-                                            initialValue={{
-                                                label: currentRestaurant?.name,
-                                                value: currentRestaurant?.id,
-                                            }}
-                                        />
-                                    </>
-                                )}
-                            </ProForm.Item>
-                        </Col>
-                    )}
-
-                    <Col span={24} md={12}>
-                        <ProFormSwitch
-                            label="Hoạt động"
-                            name="active"
-                            checkedChildren="ACTIVE"
-                            unCheckedChildren="INACTIVE"
-                            initialValue={true}
-                            fieldProps={{ defaultChecked: true }}
-                        />
-                    </Col>
-
                     <Col span={24} md={12}>
                         <ProFormTextArea
                             label="Mô tả ngắn"
                             name="shortDesc"
-                            placeholder="Nhập loại hàng"
+                            placeholder="Nhập mô tả ngắn"
                             fieldProps={{
                                 autoSize: { minRows: 4 }
                             }}
                         />
                     </Col>
 
-                    <Col span={24} md={12}>
+                    <Col span={24} md={8}>
                         <Form.Item
                             labelCol={{ span: 24 }}
                             label="Ảnh hàng hóa"
@@ -445,6 +395,56 @@ const ModalProduct = (props: IProps) => {
                             </ConfigProvider>
                         </Form.Item>
                     </Col>
+
+                    <Col span={24} md={4}>
+                        <ProFormSwitch
+                            label="Hoạt động"
+                            name="active"
+                            checkedChildren="ACTIVE"
+                            unCheckedChildren="INACTIVE"
+                            initialValue={true}
+                            fieldProps={{ defaultChecked: true }}
+                        />
+                    </Col>
+
+                    {isRoleOwner && (
+                        <Col span={24} md={12}>
+                            <ProForm.Item
+                                label="Thuộc nhà hàng"
+                                name="restaurant"
+                                rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
+                            >
+                                {isRoleOwner ? (
+                                    <DebounceSelect
+                                        allowClear
+                                        showSearch
+                                        defaultValue={restaurants}
+                                        value={restaurants}
+                                        placeholder="Chọn nhà hàng"
+                                        fetchOptions={fetchRestaurantList}
+                                        onChange={(newValue: any) => {
+                                            if (newValue?.length === 0 || newValue?.length === 1) {
+                                                setRestaurants(newValue as IRestaurantSelect[]);
+                                            }
+                                        }}
+                                        style={{ width: '100%' }}
+                                    />
+                                ) : (
+                                    <>
+                                        <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
+                                        <ProFormText
+                                            hidden
+                                            name="restaurant"
+                                            initialValue={{
+                                                label: currentRestaurant?.name,
+                                                value: currentRestaurant?.id,
+                                            }}
+                                        />
+                                    </>
+                                )}
+                            </ProForm.Item>
+                        </Col>
+                    )}
 
                     <Col span={24}>
                         <ProForm.Item

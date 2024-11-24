@@ -1,0 +1,170 @@
+.container {
+    height: 82vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    &-content {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        margin-bottom: 20px;
+        flex-direction: column;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .table-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+
+            height: 120px;
+            background-color: #fff;
+            border: 2px solid #707070;
+            border-radius: 12px;
+            transition: all 0.3s ease-in-out;
+
+            &:hover {
+                cursor: pointer;
+                background-color: #d4d4d4;
+            }
+
+            .item-card {
+                width: 100%;
+                height: 78%;
+                margin: 0;
+                background-color: while;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+
+                &__title {
+                    color: #333;
+                    font-size: 17px;
+                    font-weight: 600;
+                    margin: 10px 14px;
+                }
+            }
+
+            .item-info {
+                width: 100%;
+                height: 22%;
+                // background: #0066cc;
+                background: while;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+
+            height: 200px;
+            background-color: #fff;
+            border: 1px solid #bdbdbd;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+
+            &:hover {
+                cursor: pointer;
+                box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.3);
+            }
+
+            &:hover .item-img img {
+                transform: scale(1.1);
+            }
+
+            .item-img {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                position: relative;
+                border-bottom: 1px solid #ccc;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.3s ease-in-out;
+                }
+            }
+
+            .item-card {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                margin: 0;
+                height: auto;
+                width: 100%;
+                background: #f4f4f4;
+
+                &__title {
+                    color: #333;
+                    font-size: 16px;
+                    font-weight: 550;
+                    margin: 4px 0 0px;
+                }
+
+                &__price {
+                    color: #f82222;
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin: 2px ;
+                }
+            }
+        }
+    }
+
+    &-category {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        width: 100%;
+        height: 74px;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        gap: 12px;
+        transition: background-color 0.3s ease;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 160px;
+            height: 70px;
+            flex-shrink: 0;
+            border: 1.5px solid #777;
+            border-radius: 4px;
+
+            &:hover {
+                cursor: pointer;
+                background-color: #d4d4d4;
+            }
+
+            &.active {
+                border-color: #f82222;
+
+                .category-card__name {
+                    color: #f82222;
+                }
+            }
+
+            &__name {
+                font-size: 16px;
+                color: #777;
+            }
+        }
+    }
+}
