@@ -1,5 +1,5 @@
 .container {
-    height: 82vh;
+    height: calc(100vh - 105px);
     display: flex;
     flex-direction: column;
     overflow: hidden;

@@ -1,19 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { Card, Col, message, Row, Skeleton } from 'antd';
+import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
-import { Card, Col, message, Row } from 'antd';
-import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
-
+import '@/styles/client.table.scss';
 import { authApi } from '@/config/api';
-
 import { useAppDispatch } from '@/redux/hooks';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
-import '@/styles/client.table.scss';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
+import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 
 const OrderClient: React.FC = () => {
     const location = useLocation();
@@ -22,11 +20,11 @@ const OrderClient: React.FC = () => {
     const dispatch = useAppDispatch();
     const rootRef = useRef<HTMLDivElement>(null);
 
-    const diningTables = useSelector((state: RootState) => state.diningTable.result);
-    const isTableFetching = useSelector((state: RootState) => state.diningTable.isFetching);
-
     const products = useSelector((state: RootState) => state.product.result);
-    const isProductFetching = useSelector((state: RootState) => state.product.isFetching);
+    const diningTables = useSelector((state: RootState) => state.diningTable.result);
+
+    const [isLoadingTab, setIsLoadingTab] = useState<boolean>(true);
+    const [isLoadingContent, setIsLoadingContent] = useState<boolean>(false);
 
     const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -43,6 +41,22 @@ const OrderClient: React.FC = () => {
         dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100' }));
     }, [dispatch]);
 
+    useEffect(() => {
+        if (activeTabKey === 'tab1' || activeTabKey === 'tab2') {
+            setIsLoadingTab(true);
+            setTimeout(() => setIsLoadingTab(false), 900);
+        }
+    }, [activeTabKey]);
+
+    useEffect(() => {
+        setIsLoadingContent(true);
+        const timer = setTimeout(() => {
+            setIsLoadingContent(false);
+        }, 600);
+
+        return () => clearTimeout(timer);
+    }, [selectedLocation, selectedCategory]);
+
     const handleLogout = async () => {
         const res = await authApi.callLogout();
         if (res && +res.statusCode === 200) {
@@ -58,10 +72,13 @@ const OrderClient: React.FC = () => {
             key: 'home',
         },
         {
-            label: <label
-                style={{ cursor: 'pointer' }}
-                onClick={() => handleLogout()}
-            >Đăng xuất</label>,
+            label:
+                <label
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleLogout()}
+                >
+                    Đăng xuất
+                </label>,
             key: 'logout',
         },
     ];
@@ -80,38 +97,62 @@ const OrderClient: React.FC = () => {
             <div className="container">
                 <div className="container-content">
                     <Row gutter={[20, 22]}>
-                        {filteredTables.map((table) => (
-                            <Col span={6} key={table.id}>
-                                <div className="table-item">
-                                    <div className="item-card">
-                                        <p className="item-card__title">{table.name}</p>
-                                    </div>
+                        {isLoadingTab || isLoadingContent ? (
+                            filteredTables.map((table, index) => (
+                                <Col span={6} key={index}>
+                                    <Skeleton active paragraph={{ rows: 2 }} />
+                                </Col>
+                            ))
+                        ) : (
+                            filteredTables.map((table) => (
+                                <Col span={6} key={table.id}>
+                                    <div className="table-item">
+                                        <div className="item-card">
+                                            <p className="item-card__title">{table.name}</p>
+                                        </div>
 
-                                    <div className="item-info">
+                                        <div className="item-info">
+                                        </div>
                                     </div>
-                                </div>
-                            </Col>
-                        ))}
+                                </Col>
+                            ))
+                        )}
                     </Row>
                 </div>
 
                 <div className="container-category">
-                    <div
-                        className={`category-card ${selectedLocation === null ? 'active' : ''}`}
-                        onClick={() => setSelectedLocation(null)}
-                    >
-                        <p className="category-card__name">Tất cả</p>
-                    </div>
+                    {isLoadingTab ? (
+                        <>
+                            <Col span={6} >
+                                <Skeleton active paragraph={{ rows: 1 }} />
+                            </Col>
 
-                    {uniqueLocations.map((location, index) => (
-                        <div
-                            key={index}
-                            className={`category-card ${selectedLocation === location ? 'active' : ''}`}
-                            onClick={() => setSelectedLocation(location || null)}
-                        >
-                            <p className="category-card__name">{location}</p>
-                        </div>
-                    ))}
+                            {uniqueLocations.map((table, index) => (
+                                <Col span={6} key={index}>
+                                    <Skeleton active paragraph={{ rows: 1 }} />
+                                </Col>
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            <div
+                                className={`category-card ${selectedLocation === null ? 'active' : ''}`}
+                                onClick={() => setSelectedLocation(null)}
+                            >
+                                <p className="category-card__name">Tất cả</p>
+                            </div>
+
+                            {uniqueLocations.map((location, index) => (
+                                <div
+                                    key={index}
+                                    className={`category-card ${selectedLocation === location ? 'active' : ''}`}
+                                    onClick={() => setSelectedLocation(location || null)}
+                                >
+                                    <p className="category-card__name">{location}</p>
+                                </div>
+                            ))}
+                        </>
+                    )}
                 </div>
             </div>
         );
@@ -130,49 +171,73 @@ const OrderClient: React.FC = () => {
             <div className="container">
                 <div className="container-content">
                     <Row gutter={[20, 22]}>
-                        {filteredProducts.map((product) => (
-                            <Col span={6} key={product.id}>
-                                <div className="product-item">
-                                    <div className="item-img">
-                                        <img
-                                            alt="${product.shortDesc}"
-                                            src={`${import.meta.env.VITE_BACKEND_URL}/storage/product/${product?.image}`}
-                                        />
-                                    </div>
+                        {isLoadingTab || isLoadingContent ? (
+                            filteredProducts.map((product, index) => (
+                                <Col span={6} key={index}>
+                                    <Skeleton active paragraph={{ rows: 5 }} />
+                                </Col>
+                            ))
+                        ) : (
+                            filteredProducts.map((product, index) => (
+                                <Col span={6} key={product.id}>
+                                    <div className="product-item">
+                                        <div className="item-img">
+                                            <img
+                                                alt={`${product.name}`}
+                                                src={`${import.meta.env.VITE_BACKEND_URL}/storage/product/${product?.image}`}
+                                            />
+                                        </div>
 
-                                    <div className="item-card">
-                                        <p className="item-card__title">{product.name}</p>
-                                        <p className="item-card__price">
-                                            {(product.sellingPrice + "")?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                            đ
-                                        </p>
+                                        <div className="item-card">
+                                            <p className="item-card__title">{product.name}</p>
+                                            <p className="item-card__price">
+                                                {(product.sellingPrice + "")?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                đ
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </Col>
-                        ))}
+                                </Col>
+                            ))
+                        )}
                     </Row>
                 </div>
 
                 <div className="container-category">
-                    <div
-                        className={`category-card ${selectedCategory === null ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(null)}
-                    >
-                        <p className="category-card__name">Tất cả</p>
-                    </div>
+                    {isLoadingTab ? (
+                        <>
+                            <Col span={6} >
+                                <Skeleton active paragraph={{ rows: 1 }} />
+                            </Col>
 
-                    {uniqueCategories.map((category, index) => (
-                        <div
-                            key={index}
-                            className={`category-card ${selectedCategory === category ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory(category || null)}
-                        >
-                            <p className="category-card__name">
-                                {category === 'FOOD' ? "Đồ ăn"
-                                    : category === 'DRINK' ? 'Đồ uống' : 'Khác'}
-                            </p>
-                        </div>
-                    ))}
+                            {uniqueCategories.map((category, index) => (
+                                <Col span={6} key={index}>
+                                    <Skeleton active paragraph={{ rows: 1 }} />
+                                </Col>
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            <div
+                                className={`category-card ${selectedCategory === null ? 'active' : ''}`}
+                                onClick={() => setSelectedCategory(null)}
+                            >
+                                <p className="category-card__name">Tất cả</p>
+                            </div>
+
+                            {uniqueCategories.map((category, index) => (
+                                <div
+                                    key={index}
+                                    className={`category-card ${selectedCategory === category ? 'active' : ''}`}
+                                    onClick={() => setSelectedCategory(category || null)}
+                                >
+                                    <p className="category-card__name">
+                                        {category === 'FOOD' ? "Đồ ăn"
+                                            : category === 'DRINK' ? 'Đồ uống' : 'Khác'}
+                                    </p>
+                                </div>
+                            ))}
+                        </>
+                    )}
                 </div>
             </div>
         );
@@ -209,10 +274,10 @@ const OrderClient: React.FC = () => {
                 </Space>
             </Dropdown> */}
 
-            <Row gutter={8}>
+            <Row>
                 <Col span={16}>
                     <Card
-                        style={{ width: '100%', height: '97vh' }}
+                        style={{ height: '100vh' }}
                         tabList={tabList}
                         activeTabKey={activeTabKey}
                         bordered={true}
@@ -224,10 +289,11 @@ const OrderClient: React.FC = () => {
 
                 <Col span={8}>
                     <Card
-                        style={{ width: '100%', height: '97vh' }}
+                        style={{ height: '100vh' }}
                         title="Đơn hàng"
                         bordered={true}
                     >
+                        red
                     </Card>
                 </Col>
             </Row>

@@ -18,6 +18,7 @@ import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
 import OrderClient from './components/client/order.client';
+import Loading from './components/share/loading';
 
 const LayoutClient = () => {
   const location = useLocation();

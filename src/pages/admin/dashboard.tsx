@@ -20,6 +20,7 @@ const DashboardPage = () => {
 
                 </Card>
             </Col>
+
             <Col span={24} md={6}>
                 <Card title="Đơn hàng" bordered={false} >
                     <Statistic
@@ -29,6 +30,7 @@ const DashboardPage = () => {
                     />
                 </Card>
             </Col>
+
             <Col span={24} md={6}>
                 <Card title="Khách hàng" bordered={false} >
                     <Statistic
@@ -38,6 +40,7 @@ const DashboardPage = () => {
                     />
                 </Card>
             </Col>
+
             <Col span={24} md={6}>
                 <Card title="Bàn ăn" bordered={false} >
                     <Statistic

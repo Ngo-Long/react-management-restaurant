@@ -40,7 +40,7 @@ const RegisterPage = () => {
                 <div className={styles.container} >
                     <section className={styles.wrapper} >
                         <div className={styles.heading} >
-                            <h2 className={`${styles.text} ${styles["text-large"]}`}> Đăng Ký Tài Khoản </h2>
+                            <h2 className={`${styles.text} ${styles["text-large"]}`}> Đăng Ký Nhà Hàng </h2>
                             < Divider />
                         </div>
                         < Form

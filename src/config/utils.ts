@@ -43,11 +43,11 @@ export const convertSlug = (str: string) => {
     return str;
 }
 
-export const getLocationName = (value: string) => {
-    const locationFilter = LOCATION_LIST.filter(item => item.value === value);
-    if (locationFilter.length) return locationFilter[0].label;
-    return 'unknown'
-}
+// export const getLocationName = (value: string) => {
+//     const locationFilter = LOCATION_LIST.filter(item => item.value === value);
+//     if (locationFilter.length) return locationFilter[0].label;
+//     return 'unknown'
+// }
 
 export function colorMethod(method: "POST" | "PUT" | "GET" | "DELETE" | string) {
     switch (method) {
