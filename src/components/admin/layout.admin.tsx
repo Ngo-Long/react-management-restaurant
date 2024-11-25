@@ -136,7 +136,7 @@ const LayoutAdmin: React.FC = () => {
 
     const itemsDropdown = [
         {
-            label: <Link to={'/'}>Trang chủ</Link>,
+            label: <Link to={'/'}>Bán hàng</Link>,
             key: 'home',
         },
         {

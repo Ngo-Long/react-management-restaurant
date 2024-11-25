@@ -1,8 +1,9 @@
 .container {
     height: calc(100vh - 105px);
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
-    overflow: hidden;
+    // background: red;
 
     &-content {
         flex: 1;

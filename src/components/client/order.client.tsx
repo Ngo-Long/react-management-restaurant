@@ -1,5 +1,5 @@
-import { Card, Col, message, Row, Skeleton } from 'antd';
-import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
+import { Badge, Button, Card, Col, Input, message, Row, Skeleton, Table } from 'antd';
+import { CoffeeOutlined, DeleteOutlined, GatewayOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom"
 
@@ -12,6 +12,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
+import styles from 'styles/auth.module.scss';
+import { colorMethod } from '../../config/utils';
+import { colorMethod } from '@/config/utils';
+import TextArea from 'antd/es/input/TextArea';
 
 const OrderClient: React.FC = () => {
     const location = useLocation();
@@ -266,6 +270,60 @@ const OrderClient: React.FC = () => {
     ];
     // end -->
 
+    // <-- Table
+    const dataSource = [
+        {
+            key: '1',
+            name: 'Trà lài nhãn sen',
+            age: 1,
+            address: '50,000',
+        },
+        {
+            key: '2',
+            name: 'Trà vải khúc bạch',
+            age: 2,
+            address: '60,000',
+        },
+    ];
+
+    const columns = [
+        {
+            title: 'Tên dịch vụ',
+            dataIndex: 'name',
+            key: 'name',
+            render: (value: string, record: any, index: number) => (
+                <>
+                    <DeleteOutlined />
+                    &nbsp; {value}
+                </>
+            )
+        },
+        {
+            title: 'Số lượng',
+            dataIndex: 'age',
+            key: 'age',
+            align: "center" as const,
+            width: 90,
+            render: (value: string, record: any, index: number) => (
+                <>
+                    <MinusOutlined style={{ background: 'red', color: 'white', padding: '2px', borderRadius: '4px', cursor: 'pointer' }} />
+                    &nbsp;  &nbsp;
+                    {value}
+                    &nbsp;  &nbsp;
+                    <PlusOutlined style={{ background: 'red', color: 'white', padding: '2px', borderRadius: '4px', cursor: 'pointer' }} />
+                </>
+            )
+        },
+        {
+            title: 'T.Tiền',
+            dataIndex: 'address',
+            key: 'address',
+            align: "center" as const,
+            width: 80,
+        }
+    ];
+    // end -->
+
     return (
         <div className='layout-app' ref={rootRef}>
             {/* <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
@@ -275,7 +333,7 @@ const OrderClient: React.FC = () => {
             </Dropdown> */}
 
             <Row>
-                <Col span={16}>
+                <Col span={15}>
                     <Card
                         style={{ height: '100vh' }}
                         tabList={tabList}
@@ -287,13 +345,55 @@ const OrderClient: React.FC = () => {
                     </Card>
                 </Col>
 
-                <Col span={8}>
+                <Col span={9}>
                     <Card
                         style={{ height: '100vh' }}
                         title="Đơn hàng"
                         bordered={true}
                     >
-                        red
+                        <div className="container">
+                            <Table
+                                dataSource={dataSource}
+                                columns={columns}
+                                pagination={false}
+                                size='small'
+                                showHeader={false}
+                            />
+
+                            <div style={{ height: '167px' }}>
+                                <div>
+                                    <div style={{ fontSize: '15px', marginBottom: '4px' }}>
+                                        Ghi chú
+                                        <span style={{ color: '#acacac', fontSize: '14px' }}>&nbsp; (Tối đa 100 kí tự)</span>
+                                    </div>
+
+                                    <TextArea
+                                        // value={value}
+                                        // onChange={(e) => setValue(e.target.value)}
+                                        maxLength={100}
+                                        autoSize={{ minRows: 2, maxRows: 2 }}
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', margin: '10px 0', fontWeight: 600 }}>
+                                    <div style={{ fontSize: '16px', color: '#393939' }}>
+                                        Tổng tiền
+                                        <span style={{ color: '#393939', fontSize: '15px' }}>&nbsp;(2 món)</span>
+                                    </div>
+                                    <div style={{ color: 'red', fontSize: '18px' }}>105,000</div>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', marginTop: '12px', fontWeight: 600 }}>
+                                    <Button danger style={{ width: '40%', height: '36px', fontWeight: 600, fontSize: '14px', border: '1.8px solid #ff4d4f' }}>
+                                        THÔNG BÁO
+                                    </Button>
+
+                                    <Button type="primary" style={{ width: '60%', height: '36px', background: '#439f14', fontSize: '14px', fontWeight: 600 }}>
+                                        THANH TOÁN
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
                     </Card>
                 </Col>
             </Row>
