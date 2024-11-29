@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
 import OrderClient from './components/client/order.client';
 import Loading from './components/share/loading';
+import SaleClient from './components/client/sale.client';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -54,7 +55,7 @@ export default function App() {
       element: (<LayoutApp><LayoutClient /></LayoutApp>),
       errorElement: <NotFound />,
       children: [
-        { index: true, element: <OrderClient /> }
+        { index: true, element: <SaleClient /> }
       ],
     },
 
