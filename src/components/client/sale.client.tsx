@@ -7,9 +7,21 @@ import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
 
 const SaleClient: React.FC = () => {
     const [orderItems, setOrderItems] = useState<any[]>([]);
-    const [activeTabKey, setActiveTabKey] = useState<string>('1');
+    const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
+
+    const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(true);
+    const [currentDiningTable, setCurrentDiningTable] = useState<{
+        id: string | null; name: string;
+    }>({
+        id: null, name: 'Mang về',
+    });
 
     const onTabChange = (key: string) => setActiveTabKey(key);
+
+    const handleTableSelect = (tableId: string, tableName: string) => {
+        setCurrentDiningTable({ id: tableId, name: tableName });
+        if (isCheckboxChecked) setActiveTabKey('tab2');
+    };
 
     const handleAddItem = (item: any) => {
         setOrderItems(prevItems => {
@@ -51,8 +63,15 @@ const SaleClient: React.FC = () => {
     ];
 
     const contentList: Record<string, React.ReactNode> = {
-        tab1: <DiningTableCard activeTabKey={activeTabKey} onTabChange={onTabChange} />,
-        tab2: <ProductCard onAddItem={handleAddItem} activeTabKey={activeTabKey} />
+        tab1: <DiningTableCard
+            activeTabKey={activeTabKey}
+            onTabChange={onTabChange}
+            handleTableSelect={(id, name) => handleTableSelect(id, name)}
+        />,
+        tab2: <ProductCard
+            onAddItem={handleAddItem}
+            activeTabKey={activeTabKey}
+        />
     };
 
     return (
@@ -66,7 +85,8 @@ const SaleClient: React.FC = () => {
                     onTabChange={onTabChange}
                     tabBarExtraContent={
                         <Checkbox
-                            defaultChecked
+                            checked={isCheckboxChecked}
+                            onChange={(e) => setIsCheckboxChecked(e.target.checked)}
                             style={{ fontWeight: 500 }}
                         >
                             Mở thực đơn khi chọn bàn
@@ -75,9 +95,6 @@ const SaleClient: React.FC = () => {
                 >
                     {contentList[activeTabKey]}
                 </Card>
-
-                <DiningTableCard activeTabKey={activeTabKey} onTabChange={onTabChange} />
-                <ProductCard onAddItem={handleAddItem} activeTabKey={activeTabKey} />
             </Col>
 
             <Col span={9}>
@@ -85,6 +102,7 @@ const SaleClient: React.FC = () => {
                     orderItems={orderItems}
                     onRemoveItem={handleRemoveItem}
                     onChangeQuantity={handleChangeQuantity}
+                    currentDiningTable={currentDiningTable}
                 />
             </Col>
         </Row>

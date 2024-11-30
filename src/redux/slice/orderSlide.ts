@@ -22,6 +22,14 @@ export const fetchOrder = createAsyncThunk(
     }
 )
 
+export const fetchOrderByRestaurant = createAsyncThunk(
+    'Order/fetchOrderByRestaurant',
+    async ({ query }: { query: string }) => {
+        const response = await orderApi.callFetchByRestaurant(query);
+        return response;
+    }
+)
+
 const initialState: IState = {
     isFetching: true,
     meta: {
@@ -36,45 +44,49 @@ const initialState: IState = {
 export const orderSlide = createSlice({
     name: 'order',
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        // Use the PayloadAction type to declare the contents of `action.payload`
         setActiveMenu: (state, action) => {
             // state.activeMenu = action.payload;
         },
-
-
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed
         builder.addCase(fetchOrder.pending, (state, action) => {
             state.isFetching = true;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
 
         builder.addCase(fetchOrder.rejected, (state, action) => {
             state.isFetching = false;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
-
         builder.addCase(fetchOrder.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;
                 state.result = action.payload.data.result;
             }
-            // Add user to the state array
-
-            // state.courseOrder = action.payload;
         })
+
+
+        // Handle fetchOrderByRestaurant actions
+        builder.addCase(fetchOrderByRestaurant.pending, (state) => {
+            state.isFetching = true;
+        });
+
+        builder.addCase(fetchOrderByRestaurant.rejected, (state) => {
+            state.isFetching = false;
+        });
+
+        builder.addCase(fetchOrderByRestaurant.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+                state.meta = action.payload.data.meta;
+                state.result = action.payload.data.result;
+            }
+        });
     },
 
 });
 
-export const {
-    setActiveMenu,
-} = orderSlide.actions;
+export const { setActiveMenu } = orderSlide.actions;
 
 export default orderSlide.reducer;

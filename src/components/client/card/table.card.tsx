@@ -9,9 +9,10 @@ import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 interface DiningTableCardProps {
     activeTabKey: string;
     onTabChange: (key: string) => void;
+    handleTableSelect: (id: string, name: string) => void;
 }
 
-const DiningTableCard: React.FC<DiningTableCardProps> = ({ activeTabKey, onTabChange }) => {
+const DiningTableCard: React.FC<DiningTableCardProps> = ({ activeTabKey, onTabChange, handleTableSelect }) => {
     const dispatch = useAppDispatch();
     const diningTables = useSelector((state: RootState) => state.diningTable.result);
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -32,9 +33,26 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ activeTabKey, onTabCh
         <div className="container">
             <div className="container-content">
                 <Row gutter={[20, 22]}>
+                    <Col span={6}>
+                        <div
+                            className="table-item"
+                            onClick={() => handleTableSelect('', 'Mang về')}
+                        >
+                            <div className="item-card">
+                                <p className="item-card__title">Mang về</p>
+                            </div>
+
+                            <div className="item-info">
+                            </div>
+                        </div>
+                    </Col>
+
                     {filteredTables.map((table) => (
                         <Col span={6} key={table.id}>
-                            <div className="table-item">
+                            <div
+                                className="table-item"
+                                onClick={() => handleTableSelect(table.id || '', table.name || '')}
+                            >
                                 <div className="item-card">
                                     <p className="item-card__title">{table.name}</p>
                                 </div>

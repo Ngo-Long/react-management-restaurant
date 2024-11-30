@@ -63,6 +63,11 @@ const LayoutAdmin: React.FC = () => {
                 && item.method === ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE.method
             )
 
+            const viewOrder = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.ORDERS.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.ORDERS.GET_PAGINATE.method
+            )
+
             const viewRole = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.ROLES.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.ROLES.GET_PAGINATE.method
@@ -101,6 +106,12 @@ const LayoutAdmin: React.FC = () => {
                 ...(viewProduct || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/product'>Thực đơn</Link>,
                     key: '/admin/product',
+                    icon: <ContainerOutlined />
+                }] : []),
+
+                ...(viewOrder || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/order'>Đơn hàng</Link>,
+                    key: '/admin/order',
                     icon: <ContainerOutlined />
                 }] : []),
 

@@ -135,10 +135,13 @@ export interface IOrder {
         name: string;
     };
     diningTable?: {
-        id: string;
-        name: string;
-    }
-
+        id: string | null;
+        name: string | null;
+    },
+    orderDetails?: {
+        productId: string | number;
+        quantity: number;
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

@@ -87,7 +87,7 @@
                 width: 100%;
                 overflow: hidden;
                 position: relative;
-                border-bottom: 1px solid #ccc;
+                // border-bottom: 1px solid #ccc;
 
                 img {
                     width: 100%;
@@ -104,7 +104,7 @@
                 margin: 0;
                 height: auto;
                 width: 100%;
-                background: #f4f4f4;
+                // background: #f4f4f4;
 
                 &__title {
                     color: #333;
@@ -129,7 +129,7 @@
         justify-content: flex-start;
         flex-wrap: nowrap;
         width: 100%;
-        height: 74px;
+        height: 66px;
         overflow-x: scroll;
         overflow-y: hidden;
         gap: 12px;
@@ -143,8 +143,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 160px;
-            height: 70px;
+            width: 146px;
+            height: 60px;
             flex-shrink: 0;
             border: 1.5px solid #777;
             border-radius: 4px;
@@ -166,6 +166,85 @@
                 font-size: 16px;
                 color: #777;
             }
+        }
+    }
+
+    &-order {
+        height: calc(100vh - 96.5px);
+    
+        .order-table {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100%;
+            font-size: 16px;
+            font-weight: 400;
+            color: #8c8c8c;
+        }
+
+        .order-note {
+            font-size: 15px;
+            margin-top: 4px;
+
+            span {
+                color: #acacac;
+                font-size: 14px;
+            }
+        }
+
+        .order-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            color: #393939;
+            font-weight: 600;
+
+            &__desc {
+                font-size: 16px;
+            }
+
+            span {
+                font-size: 15px;
+            }
+
+            &__price {
+                font-size: 18px;
+                color: #ff1115;
+            }
+        }
+
+        .order-btn {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-top: 12px;
+            font-weight: 600;
+
+            &__alert {
+                width: 40%;
+                height: 36px;
+                font-weight: 600;
+                font-size: 14px;
+                border: 1.8px solid #ff4d4f
+            }
+
+            &__pay {
+                width: 60%;
+                height: 36px;
+                background: #439f14;
+                font-size: 14px;
+                font-weight: 600;
+            }
+        }
+
+        .order-icon {
+            color: white;
+            padding: 2px;
+            background: #ff2c30;
+            border-radius: 4px;
+            cursor: pointer;
         }
     }
 }

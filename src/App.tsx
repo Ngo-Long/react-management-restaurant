@@ -20,6 +20,7 @@ import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-
 import OrderClient from './components/client/order.client';
 import Loading from './components/share/loading';
 import SaleClient from './components/client/sale.client';
+import OrderPage from './pages/admin/order';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -97,6 +98,13 @@ export default function App() {
           element:
             <ProtectedRoute>
               <ProductPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "order",
+          element:
+            <ProtectedRoute>
+              <OrderPage />
             </ProtectedRoute>
         },
         {

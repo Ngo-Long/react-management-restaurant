@@ -204,6 +204,10 @@ export const orderApi = {
         return axios.get<IBackendRes<IModelPaginate<IOrder>>>(`/api/v1/orders?${query}`);
     },
 
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IOrder>>>(`/api/v1/orders/by-restaurant?${query}`);
+    },
+
     callFetchById(id: string) {
         return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
     },
