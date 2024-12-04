@@ -17,10 +17,10 @@ import { useEffect, useRef } from 'react';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
-import OrderClient from './components/client/order.client';
 import Loading from './components/share/loading';
 import SaleClient from './components/client/sale.client';
 import OrderPage from './pages/admin/order';
+import './styles/reset.scss';
 
 const LayoutClient = () => {
   const location = useLocation();

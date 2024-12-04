@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import {
+import React, { useEffect, useState } from 'react';
+import Icon, {
     AlertOutlined, DeleteOutlined, PlusOutlined,
-    MenuOutlined, MinusOutlined, DollarOutlined
+    MenuOutlined, MinusOutlined, DollarOutlined,
+    RedoOutlined,
+    HourglassOutlined
 } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { Card, Table, Dropdown, Space, Button, message, notification } from 'antd';
@@ -11,6 +13,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import { orderApi, orderDetailApi } from "@/config/api";
 import { IOrder } from '@/types/backend';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface OrderCardProps {
     orderItems: {
@@ -22,14 +26,31 @@ interface OrderCardProps {
     onRemoveItem: (id: number) => void;
     onChangeQuantity: (id: number, delta: number) => void;
     currentDiningTable: { id: string | null; name: string | null };
+    orderItemsByTable: Record<string, any[]>;
+    setOrderItemsByTable: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
+    onTabChange: (key: string) => void;
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({ orderItems, onRemoveItem, onChangeQuantity, currentDiningTable }) => {
+const OrderCard: React.FC<OrderCardProps> = ({
+    orderItems,
+    onRemoveItem,
+    onChangeQuantity,
+    currentDiningTable,
+    orderItemsByTable,
+    setOrderItemsByTable,
+    onTabChange
+}) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const [note, setNote] = useState<string>('');
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
+
+    const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
+
+    // useEffect(() => {
+    //     dispatch(fetchOrderDetailByOrder({ query: '?page=1&size=100' }));
+    // }, [dispatch]);
 
     const handleLogout = async () => {
         const res = await authApi.callLogout();
@@ -65,13 +86,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ orderItems, onRemoveItem, onChang
             dataIndex: 'name',
             key: 'name',
             render: (value: string, record: any) => (
-                <>
+                <span style={{ fontSize: '15px' }}>
                     <DeleteOutlined
-                        style={{ cursor: 'pointer', color: 'red' }}
+                        style={{ cursor: 'pointer', color: 'red', fontSize: '17px' }}
                         onClick={() => onRemoveItem(record.id)}
                     />
+                    <HourglassOutlined style={{ cursor: 'pointer', color: 'green', fontSize: '16px' }} />
                     &nbsp; {value}
-                </>
+                </span>
             )
         },
         {
@@ -81,31 +103,34 @@ const OrderCard: React.FC<OrderCardProps> = ({ orderItems, onRemoveItem, onChang
             align: "center" as const,
             width: 100,
             render: (value: number, record: any) => (
-                <>
+                <span style={{ fontSize: '15px' }}>
                     <MinusOutlined className='order-icon' onClick={() => onChangeQuantity(record.id, -1)} />
                     &nbsp;  &nbsp;
                     {value}
                     &nbsp;  &nbsp;
                     <PlusOutlined className='order-icon' onClick={() => onChangeQuantity(record.id, 1)} />
-                </>
+                </span>
             )
         },
         {
             title: 'T.Tiền',
             dataIndex: 'sellingPrice',
             key: 'sellingPrice',
-            width: 80,
+            width: 90,
             align: "center" as const,
             render: (value: number, record: any) => {
-                return `${(record.quantity * value).toLocaleString()} đ`
+                return <span style={{ fontSize: '15px' }}>
+                    {(record.quantity * value).toLocaleString()} đ
+                </span>
             }
         }
     ];
 
-    const handleSubmitOrder = async () => {
+    const handleSubmitOrder = async (status: 'PENDING' | 'COMPLETED') => {
         const order = {
             id: currentOrder?.id || undefined,
             note,
+            status,
             diningTable: currentDiningTable,
             orderDetails: orderItems.map(item => ({
                 productId: item.id,
@@ -119,12 +144,31 @@ const OrderCard: React.FC<OrderCardProps> = ({ orderItems, onRemoveItem, onChang
 
         if (res.data) {
             message.success(`${currentOrder?.id ? 'Cập nhật' : 'Tạo mới'} đơn hàng thành công`);
-            setCurrentOrder(res.data);
+
+            // delete dish and config new status
+            if (status === 'COMPLETED') {
+                // delete info dish of dining table current
+                setOrderItemsByTable(prevState => ({
+                    ...prevState,
+                    [currentDiningTable.id!]: [],
+                }));
+
+                // update localStorage
+                localStorage.setItem(
+                    'orderItemsByTable',
+                    JSON.stringify({
+                        ...orderItemsByTable,
+                        [currentDiningTable.id!]: [],
+                    })
+                );
+
+                onTabChange('tab1');    // back to tab 1
+                setCurrentOrder(null);  // update order
+            }
+
+            (status === 'PENDING') && setCurrentOrder(res.data);  // update order
         } else {
-            notification.error({
-                message: 'Có lỗi xảy ra',
-                description: res.message,
-            });
+            notification.error({ message: 'Có lỗi xảy ra', description: res.message });
         }
     }
 
@@ -191,9 +235,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ orderItems, onRemoveItem, onChang
                         <Button
                             danger
                             className='order-btn__alert'
-                            onClick={handleSubmitOrder}
-                            icon={<AlertOutlined style={{ fontSize: '18px' }} />}
                             disabled={orderItems.length === 0}
+                            onClick={() => handleSubmitOrder('PENDING')}
+                            icon={<AlertOutlined style={{ fontSize: '18px' }} />}
                         >
                             THÔNG BÁO
                         </Button>
@@ -201,8 +245,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ orderItems, onRemoveItem, onChang
                         <Button
                             type="primary"
                             className='order-btn__pay'
-                            icon={<DollarOutlined style={{ fontSize: '18px' }} />}
                             disabled={orderItems.length === 0}
+                            onClick={() => handleSubmitOrder('COMPLETED')}
+                            icon={<DollarOutlined style={{ fontSize: '18px' }} />}
                         >
                             THANH TOÁN
                         </Button>

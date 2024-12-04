@@ -11,15 +11,6 @@ interface ProductCardProps {
     activeTabKey: string;
 }
 
-interface Product {
-    id: number;
-    name: string;
-    category: string;
-    sellingPrice: number;
-    image: string;
-    quantity: number;
-}
-
 const ProductCard: React.FC<ProductCardProps> = ({ onAddItem, activeTabKey }) => {
     const dispatch = useAppDispatch();
     const products = useSelector((state: RootState) => state.product.result);

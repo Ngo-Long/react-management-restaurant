@@ -1,4 +1,8 @@
 import { Col, Row } from 'antd';
+import {
+    ShoppingCartOutlined
+} from '@ant-design/icons'
+
 import '@/styles/client.table.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
@@ -9,13 +13,19 @@ import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 interface DiningTableCardProps {
     activeTabKey: string;
     onTabChange: (key: string) => void;
+    currentDiningTable: { id: string | null; name: string };
     handleTableSelect: (id: string, name: string) => void;
 }
 
-const DiningTableCard: React.FC<DiningTableCardProps> = ({ activeTabKey, onTabChange, handleTableSelect }) => {
+const DiningTableCard: React.FC<DiningTableCardProps> = ({ activeTabKey, onTabChange, currentDiningTable, handleTableSelect }) => {
     const dispatch = useAppDispatch();
     const diningTables = useSelector((state: RootState) => state.diningTable.result);
+
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+
+    const handleClickTable = (id: string, name: string) => {
+        handleTableSelect(id, name);
+    };
 
     const uniqueLocations = Array.from(
         new Set(diningTables.map(table => table.location))
@@ -33,32 +43,43 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ activeTabKey, onTabCh
         <div className="container">
             <div className="container-content">
                 <Row gutter={[20, 22]}>
-                    <Col span={6}>
+                    {/* <Col span={6}>
                         <div
-                            className="table-item"
-                            onClick={() => handleTableSelect('', 'Mang về')}
+                            className={`table-item ${currentDiningTable.id === '' ? 'active' : ''}`}
+                            onClick={() => handleClickTable('', 'Mang về')}
                         >
                             <div className="item-card">
-                                <p className="item-card__title">Mang về</p>
+                                <p className="item-card__title">
+                                    <ShoppingCartOutlined style={{ fontSize: '18px', marginRight: '6px' }} />
+                                    Mang về
+                                </p>
                             </div>
 
                             <div className="item-info">
+                                <div className="time">1g7p</div>
+                                <div className="time">60,000</div>
                             </div>
                         </div>
-                    </Col>
+                    </Col> */}
 
                     {filteredTables.map((table) => (
                         <Col span={6} key={table.id}>
                             <div
-                                className="table-item"
-                                onClick={() => handleTableSelect(table.id || '', table.name || '')}
+                                className={`table-item ${currentDiningTable.id === table.id ? 'active' : ''}`}
+                                onClick={() => handleClickTable(table.id || '', table.name || '')}
                             >
                                 <div className="item-card">
                                     <p className="item-card__title">{table.name}</p>
                                 </div>
 
-                                <div className="item-info">
-                                </div>
+                                {table.status == 'OCCUPIED' && (
+                                    <>
+                                        <div className={`item-info ${currentDiningTable.id === table.id ? 'active' : ''}`}>
+                                            <div className="item-info__time">0g0p</div>
+                                            <div className="item-info__price">0,000</div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </Col>
                     ))}

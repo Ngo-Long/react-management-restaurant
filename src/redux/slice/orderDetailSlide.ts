@@ -12,6 +12,7 @@ interface IState {
     },
     result: IOrderDetail[]
 }
+
 // First, create the thunk
 export const fetchOrderDetail = createAsyncThunk(
     'orderDetail/fetchOrderDetail',
@@ -20,7 +21,6 @@ export const fetchOrderDetail = createAsyncThunk(
         return response;
     }
 )
-
 
 const initialState: IState = {
     isFetching: true,
@@ -33,31 +33,20 @@ const initialState: IState = {
     result: []
 };
 
-
 export const orderDetailSlide = createSlice({
     name: 'orderDetail',
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        // Use the PayloadAction type to declare the contents of `action.payload`
         setActiveMenu: (state, action) => {
-            // state.activeMenu = action.payload;
         },
-
-
     },
     extraReducers: (builder) => {
-        // Add reducers for additional action types here, and handle loading state as needed
         builder.addCase(fetchOrderDetail.pending, (state, action) => {
             state.isFetching = true;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
 
         builder.addCase(fetchOrderDetail.rejected, (state, action) => {
             state.isFetching = false;
-            // Add user to the state array
-            // state.courseOrder = action.payload;
         })
 
         builder.addCase(fetchOrderDetail.fulfilled, (state, action) => {
@@ -66,9 +55,6 @@ export const orderDetailSlide = createSlice({
                 state.meta = action.payload.data.meta;
                 state.result = action.payload.data.result;
             }
-            // Add user to the state array
-
-            // state.courseOrder = action.payload;
         })
     },
 
