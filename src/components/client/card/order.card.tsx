@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Icon, {
+import {
     AlertOutlined, DeleteOutlined, PlusOutlined,
     MenuOutlined, MinusOutlined, DollarOutlined,
-    RedoOutlined,
     HourglassOutlined
 } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
@@ -12,9 +11,10 @@ import { useAppDispatch } from '@/redux/hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import { orderApi, orderDetailApi } from "@/config/api";
-import { IOrder } from '@/types/backend';
+import { IOrder, IOrderDetail } from '@/types/backend';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
 
 interface OrderCardProps {
     orderItems: {
@@ -46,11 +46,14 @@ const OrderCard: React.FC<OrderCardProps> = ({
     const [note, setNote] = useState<string>('');
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
 
+    const [orderDetail, setOrderDetail] = useState<IOrderDetail | null>(null);
     const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
 
-    // useEffect(() => {
-    //     dispatch(fetchOrderDetailByOrder({ query: '?page=1&size=100' }));
-    // }, [dispatch]);
+    useEffect(() => {
+        if (currentOrder?.id) {
+            dispatch(fetchOrderDetailsByOrderId(currentOrder.id));
+        }
+    }, [dispatch, currentOrder?.id]);
 
     const handleLogout = async () => {
         const res = await authApi.callLogout();
@@ -81,6 +84,14 @@ const OrderCard: React.FC<OrderCardProps> = ({
     }, 0);
 
     const columns = [
+        {
+            title: 'Mã chi tiết',
+            key: 'id',
+            dataIndex: 'id',
+            // hidden: true,
+            width: 20,
+            // render: (text, record, index, action) => { record.id },
+        },
         {
             title: 'Tên dịch vụ',
             dataIndex: 'name',
@@ -153,15 +164,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
                     [currentDiningTable.id!]: [],
                 }));
 
-                // update localStorage
-                localStorage.setItem(
-                    'orderItemsByTable',
-                    JSON.stringify({
-                        ...orderItemsByTable,
-                        [currentDiningTable.id!]: [],
-                    })
-                );
-
                 onTabChange('tab1');    // back to tab 1
                 setCurrentOrder(null);  // update order
             }
@@ -175,7 +177,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
     return (
         <Card
             type="inner"
-            title={`Đơn hàng ─ ${currentDiningTable?.name}`}
+            title={`Đơn hàng [${currentOrder?.id}] ─ ${currentDiningTable?.name}`}
             bordered={true}
             style={{ height: '100vh' }}
             extra={

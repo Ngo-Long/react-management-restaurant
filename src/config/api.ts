@@ -267,6 +267,10 @@ export const orderDetailApi = {
     callFetchById(id: string) {
         return axios.get<IBackendRes<IOrderDetail>>(`/api/v1/order-details/${id}`);
     },
+
+    callFetchByOrderId(id: string) {
+        return axios.get<IBackendRes<IOrderDetail>>(`/api/v1/order-details/by-order/${id}`);
+    },
 }
 
 /**

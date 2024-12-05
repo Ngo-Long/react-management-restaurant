@@ -29,7 +29,6 @@ export const fetchDiningTableByRestaurant = createAsyncThunk(
     }
 )
 
-
 const initialState: IState = {
     isFetching: true,
     meta: {

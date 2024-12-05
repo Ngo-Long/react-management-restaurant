@@ -22,6 +22,14 @@ export const fetchOrderDetail = createAsyncThunk(
     }
 )
 
+export const fetchOrderDetailsByOrderId = createAsyncThunk(
+    'orderDetail/fetchOrderDetailsByOrderId',
+    async (id: string) => {
+        const response = await orderDetailApi.callFetchByOrderId(id);
+        return response;
+    }
+)
+
 const initialState: IState = {
     isFetching: true,
     meta: {
@@ -56,6 +64,21 @@ export const orderDetailSlide = createSlice({
                 state.result = action.payload.data.result;
             }
         })
+
+        // Handle fetchOrderDetailsByOrderId actions
+        builder.addCase(fetchOrderDetailsByOrderId.pending, (state) => {
+            state.isFetching = true;
+        });
+
+        builder.addCase(fetchOrderDetailsByOrderId.rejected, (state) => {
+            state.isFetching = false;
+        });
+
+        builder.addCase(fetchOrderDetailsByOrderId.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+            }
+        });
     },
 
 });
