@@ -128,6 +128,7 @@
                 width: 100%;
                 overflow: hidden;
                 position: relative;
+                cursor: pointer;
                 // border-bottom: 1px solid #ccc;
 
                 img {
@@ -295,8 +296,8 @@
 }
 
 .no-select {
-    user-select: none;  /* Ngừng cho phép người dùng chọn văn bản */
-    -webkit-user-select: none;  /* Đối với trình duyệt WebKit (Safari, Chrome) */
-    -moz-user-select: none;  /* Đối với Firefox */
-    -ms-user-select: none;  /* Đối với Internet Explorer */
+    user-select: none;  
+    -webkit-user-select: none;  
+    -moz-user-select: none; 
+    -ms-user-select: none;  
 }

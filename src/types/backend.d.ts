@@ -131,17 +131,13 @@ export interface IOrder {
     optional?: string;
     status?: string;
     user?: {
-        id: string;
-        name: string;
+        id?: string;
+        name?: string;
     };
     diningTable?: {
-        id: string | null;
-        name: string | null;
-    },
-    orderDetails?: {
-        productId: string | number;
-        quantity: number;
-    }[];
+        id?: string | null;
+        name?: string | null;
+    };
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -155,12 +151,12 @@ export interface IOrderDetail {
     price?: number;
     status?: string;
     product?: {
-        id: string;
-        name: string;
+        id?: string | null;
+        name?: string;
     };
-    order: {
-        id: string;
-        tableName: string;
+    order?: {
+        id?: string | null;
+        tableName?: string;
     };
     createdBy?: string;
     isDeleted?: boolean;

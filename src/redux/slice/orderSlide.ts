@@ -10,7 +10,8 @@ interface IState {
         pages: number;
         total: number;
     },
-    result: IOrder[]
+    result: IOrder[],
+    singleOrder: IOrder
 }
 
 // First, create the thunk
@@ -30,6 +31,14 @@ export const fetchOrderByRestaurant = createAsyncThunk(
     }
 )
 
+export const fetchLatestPendingOrderByTableId = createAsyncThunk(
+    'Order/fetchLatestPendingOrderByTableId',
+    async (id: string) => {
+        const response = await orderApi.callFetchByTable(id);
+        return response?.data;
+    }
+)
+
 const initialState: IState = {
     isFetching: true,
     meta: {
@@ -38,16 +47,29 @@ const initialState: IState = {
         pages: 0,
         total: 0
     },
-    result: []
+    result: [],
+    singleOrder: {
+        id: "",
+        note: "",
+        totalPrice: 0,
+        optional: "",
+        status: ""
+    }
 };
 
 export const orderSlide = createSlice({
     name: 'order',
     initialState,
     reducers: {
-        setActiveMenu: (state, action) => {
-            // state.activeMenu = action.payload;
-        },
+        resetSingleOrder: (state, action) => {
+            state.singleOrder = {
+                id: "",
+                note: "",
+                totalPrice: 0,
+                optional: "",
+                status: ""
+            }
+        }
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed
@@ -66,7 +88,6 @@ export const orderSlide = createSlice({
             }
         })
 
-
         // Handle fetchOrderByRestaurant actions
         builder.addCase(fetchOrderByRestaurant.pending, (state) => {
             state.isFetching = true;
@@ -83,10 +104,40 @@ export const orderSlide = createSlice({
                 state.result = action.payload.data.result;
             }
         });
+
+        // Handle fetchOrderByTable actions
+        builder.addCase(fetchLatestPendingOrderByTableId.pending, (state) => {
+            state.isFetching = true;
+            state.singleOrder = {
+                id: "",
+                note: "",
+                totalPrice: 0,
+                optional: "",
+                status: ""
+            }
+        });
+
+        builder.addCase(fetchLatestPendingOrderByTableId.rejected, (state) => {
+            state.isFetching = false;
+            state.singleOrder = {
+                id: "",
+                note: "",
+                totalPrice: 0,
+                optional: "",
+                status: ""
+            }
+        });
+
+        builder.addCase(fetchLatestPendingOrderByTableId.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+                state.singleOrder = action.payload.data;
+            }
+        });
     },
 
 });
 
-export const { setActiveMenu } = orderSlide.actions;
+export const { resetSingleOrder } = orderSlide.actions;
 
 export default orderSlide.reducer;

@@ -211,6 +211,10 @@ export const orderApi = {
     callFetchById(id: string) {
         return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
     },
+
+    callFetchByTable(id: string) {
+        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/by-table/${id}`)
+    }
 }
 
 /**
@@ -260,16 +264,16 @@ export const orderDetailApi = {
         return axios.delete<IBackendRes<IOrderDetail>>(`/api/v1/order-details/${id}`);
     },
 
-    callFetchFilter(query: string) {
-        return axios.get<IBackendRes<IModelPaginate<IOrderDetail>>>(`/api/v1/order-details?${query}`);
-    },
-
     callFetchById(id: string) {
         return axios.get<IBackendRes<IOrderDetail>>(`/api/v1/order-details/${id}`);
     },
 
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IOrderDetail>>>(`/api/v1/order-details?${query}`);
+    },
+
     callFetchByOrderId(id: string) {
-        return axios.get<IBackendRes<IOrderDetail>>(`/api/v1/order-details/by-order/${id}`);
+        return axios.get<IBackendRes<IModelPaginate<IOrderDetail>>>(`/api/v1/order-details/by-order/${id}`);
     },
 }
 

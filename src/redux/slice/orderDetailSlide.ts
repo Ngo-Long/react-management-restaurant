@@ -45,7 +45,9 @@ export const orderDetailSlide = createSlice({
     name: 'orderDetail',
     initialState,
     reducers: {
-        setActiveMenu: (state, action) => {
+        setActiveMenu: (state, action) => { },
+        resetOrderDetails: (state) => {
+            state.result = [];
         },
     },
     extraReducers: (builder) => {
@@ -77,6 +79,8 @@ export const orderDetailSlide = createSlice({
         builder.addCase(fetchOrderDetailsByOrderId.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
+                state.meta = action.payload.data.meta;
+                state.result = action.payload.data.result;
             }
         });
     },
@@ -84,7 +88,7 @@ export const orderDetailSlide = createSlice({
 });
 
 export const {
-    setActiveMenu,
+    setActiveMenu, resetOrderDetails
 } = orderDetailSlide.actions;
 
 export default orderDetailSlide.reducer;

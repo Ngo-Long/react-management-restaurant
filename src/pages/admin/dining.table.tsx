@@ -199,12 +199,10 @@ const DiningTablePage = () => {
                     </Access>
                 </Space >
             ),
-
         },
     ];
 
     const buildQuery = (params: any, sort: any, filter: any) => {
-
         const clone = { ...params };
         let parts = [];
         if (clone.name) parts.push(`name ~ '${clone.name}'`);

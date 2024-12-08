@@ -1,19 +1,28 @@
-import { Col, Row } from 'antd';
+import { Col, InputNumber, Modal, Row } from 'antd';
 import '@/styles/client.table.scss';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
 import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
+import { IOrderDetail, IProduct } from '@/types/backend';
+import TextArea from 'antd/es/input/TextArea';
 
 interface ProductCardProps {
-    onAddItem: (item: any) => void;
-    activeTabKey: string;
+    handleItemSelect: (item: IOrderDetail) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ onAddItem, activeTabKey }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
     const dispatch = useAppDispatch();
     const products = useSelector((state: RootState) => state.product.result);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+
+    const [quantity, setQuantity] = useState<number>(1);
+    const [totalPrice, setTotalPrice] = useState<number>(0);
+
+    const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     useEffect(() => {
@@ -28,18 +37,57 @@ const ProductCard: React.FC<ProductCardProps> = ({ onAddItem, activeTabKey }) =>
         ? products.filter(product => product.category === selectedCategory)
         : products;
 
+    const showModal = (product: IProduct) => {
+        // reset product
+        setSelectedProduct(product);
+        setQuantity(1);
+        setTotalPrice(product.sellingPrice!);
+
+        setIsModalOpen(true);
+    };
+
+    const handleOk = () => {
+        if (selectedProduct) {
+            handleItemSelect({
+                quantity,
+                price: totalPrice,
+                status: 'CONFIRMED',
+                product: {
+                    id: selectedProduct.id,
+                    name: selectedProduct.name,
+                }
+            });
+        }
+
+        setConfirmLoading(true);
+        setTimeout(() => {
+            setIsModalOpen(false);
+            setConfirmLoading(false);
+        }, 500);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleQuantityChange = (value: number | null) => {
+        setQuantity(value || 1);
+        if (selectedProduct) {
+            setTotalPrice(selectedProduct.sellingPrice! * (value || 1));
+        }
+    };
+
     return (
         <div className="container">
             <div className="container-content">
                 <Row gutter={[20, 22]}>
                     {filteredProducts.map((product, index) => (
                         <Col span={6} key={product.id}>
-                            <div className="product-item">
-                                <div
-                                    className="item-img"
-                                    onClick={() => onAddItem(product)}
-                                    style={{ cursor: 'pointer' }}
-                                >
+                            <div
+                                className="product-item"
+                                onClick={() => showModal(product)}
+                            >
+                                <div className="item-img" >
                                     {product?.image ?
                                         <img src={`${import.meta.env.VITE_BACKEND_URL}/storage/product/${product?.image}`} />
                                         :
@@ -53,7 +101,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ onAddItem, activeTabKey }) =>
                                     <p className="item-card__title">{product.name}</p>
                                     <p className="item-card__price">
                                         {(product.sellingPrice + "")?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                        đ
                                     </p>
                                 </div>
                             </div>
@@ -85,6 +132,41 @@ const ProductCard: React.FC<ProductCardProps> = ({ onAddItem, activeTabKey }) =>
                     ))}
                 </>
             </div>
+
+            <Modal
+                title={selectedProduct?.name || 'Sản phẩm'}
+                width={400}
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                confirmLoading={confirmLoading}
+            >
+                <div>
+                    Số lượng: &nbsp; &nbsp;
+                    <InputNumber
+                        min={1}
+                        max={100}
+                        defaultValue={1}
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                    />
+                </div>
+
+                <div>
+                    Thành tiền: &nbsp;
+                    <span>
+                        {new Intl.NumberFormat().format(totalPrice)} đ
+                    </span>
+                </div>
+
+                <div>
+                    Ghi chú:
+                    <TextArea
+                        maxLength={100}
+                        autoSize={{ minRows: 2, maxRows: 2 }}
+                    />
+                </div>
+            </Modal>
         </div>
     );
 };
