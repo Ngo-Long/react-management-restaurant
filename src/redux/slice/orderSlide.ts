@@ -31,8 +31,8 @@ export const fetchOrderByRestaurant = createAsyncThunk(
     }
 )
 
-export const fetchLatestPendingOrderByTableId = createAsyncThunk(
-    'Order/fetchLatestPendingOrderByTableId',
+export const fetchLatestUnpaidOrderByTableId = createAsyncThunk(
+    'Order/fetchLatestUnpaidOrderByTableId',
     async (id: string) => {
         const response = await orderApi.callFetchByTable(id);
         return response?.data;
@@ -106,7 +106,7 @@ export const orderSlide = createSlice({
         });
 
         // Handle fetchOrderByTable actions
-        builder.addCase(fetchLatestPendingOrderByTableId.pending, (state) => {
+        builder.addCase(fetchLatestUnpaidOrderByTableId.pending, (state) => {
             state.isFetching = true;
             state.singleOrder = {
                 id: "",
@@ -117,7 +117,7 @@ export const orderSlide = createSlice({
             }
         });
 
-        builder.addCase(fetchLatestPendingOrderByTableId.rejected, (state) => {
+        builder.addCase(fetchLatestUnpaidOrderByTableId.rejected, (state) => {
             state.isFetching = false;
             state.singleOrder = {
                 id: "",
@@ -128,11 +128,11 @@ export const orderSlide = createSlice({
             }
         });
 
-        builder.addCase(fetchLatestPendingOrderByTableId.fulfilled, (state, action) => {
-            if (action.payload && action.payload.data) {
-                state.isFetching = false;
-                state.singleOrder = action.payload.data;
-            }
+        builder.addCase(fetchLatestUnpaidOrderByTableId.fulfilled, (state, action) => {
+            // if (action.payload && action.payload.data) {
+            state.isFetching = false;
+            // state.singleOrder = action.payload.data;
+            // }
         });
     },
 

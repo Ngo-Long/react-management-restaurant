@@ -1,25 +1,25 @@
 import { Col, Row } from 'antd';
-import '@/styles/client.table.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { IOrder } from '@/types/backend';
-import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
+import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
 import dayjs from 'dayjs';
 
 interface DiningTableCardProps {
-    currentDiningTable: { id?: string | null; name: string };
+    currentTable: { id?: string | null; name: string };
     handleTableSelect: (id: string, name: string) => void;
 }
 
 const DiningTableCard: React.FC<DiningTableCardProps> = ({
-    currentDiningTable,
+    currentTable,
     handleTableSelect
 }) => {
     const dispatch = useAppDispatch();
     const diningTables = useSelector((state: RootState) => state.diningTable.result);
+
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
     const [currentOrders, setCurrentOrders] = useState<{ [key: string]: IOrder }>({});
 
@@ -28,7 +28,6 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({
     }, [dispatch]);
 
     useEffect(() => {
-        // fetch the latest orders for occupied tables
         const fetchOrders = async () => {
             const ordersMap: { [key: string]: IOrder } = {};
 
@@ -37,7 +36,7 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({
 
             // fetch the latest order
             for (const table of occupiedTables) {
-                const order = await dispatch(fetchLatestPendingOrderByTableId(table.id!)).unwrap();
+                const order = await dispatch(fetchLatestUnpaidOrderByTableId(table.id!)).unwrap();
                 if (order) ordersMap[table.id!] = order;
             }
 
@@ -46,10 +45,6 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({
         };
         fetchOrders();
     }, [dispatch, diningTables]);
-
-    const handleClickTable = (id: string, name: string) => {
-        handleTableSelect(id, name);
-    };
 
     const uniqueLocations = Array.from(new Set(diningTables.map(table => table.location)));
 
@@ -63,18 +58,19 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({
                 <Row gutter={[20, 22]}>
                     {filteredTables.map((table) => {
                         const currentOrder = currentOrders[table.id || ''];
+
                         return (
                             <Col span={6} key={table.id}>
                                 <div
-                                    className={`table-item ${currentDiningTable.id === table.id ? 'active' : ''}`}
-                                    onClick={() => handleClickTable(table.id || '', table.name || '')}
+                                    className={`table-item ${currentTable.id === table.id ? 'active' : ''}`}
+                                    onClick={() => handleTableSelect(table.id || '', table.name || '')}
                                 >
                                     <div className="item-card">
                                         <p className="item-card__title">{table.name}</p>
                                     </div>
 
                                     {currentOrder && (
-                                        <div className={`item-info ${currentDiningTable.id === table.id ? 'active' : ''}`}>
+                                        <div className={`item-info ${currentTable.id === table.id ? 'active' : ''}`}>
                                             <div className="item-info__time">
                                                 {currentOrder.createdDate &&
                                                     `${dayjs().diff(dayjs(currentOrder.createdDate), 'hour')}g${dayjs().diff(dayjs(currentOrder.createdDate), 'minute') % 60}p`}
@@ -93,24 +89,22 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({
             </div>
 
             <div className="container-category">
-                <>
-                    <div
-                        className={`category-card ${selectedLocation === null ? 'active' : ''}`}
-                        onClick={() => setSelectedLocation(null)}
-                    >
-                        <p className="category-card__name">Tất cả</p>
-                    </div>
+                <div
+                    className={`category-card ${selectedLocation === null ? 'active' : ''}`}
+                    onClick={() => setSelectedLocation(null)}
+                >
+                    <p className="category-card__name">Tất cả</p>
+                </div>
 
-                    {uniqueLocations.map((location, index) => (
-                        <div
-                            key={index}
-                            className={`category-card ${selectedLocation === location ? 'active' : ''}`}
-                            onClick={() => setSelectedLocation(location || null)}
-                        >
-                            <p className="category-card__name">{location}</p>
-                        </div>
-                    ))}
-                </>
+                {uniqueLocations.map((location, index) => (
+                    <div
+                        key={index}
+                        className={`category-card ${selectedLocation === location ? 'active' : ''}`}
+                        onClick={() => setSelectedLocation(location || null)}
+                    >
+                        <p className="category-card__name">{location}</p>
+                    </div>
+                ))}
             </div>
         </div>
     );

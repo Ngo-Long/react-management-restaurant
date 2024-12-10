@@ -167,19 +167,19 @@ export interface IOrderDetail {
 
 interface IInvoice {
     id?: string;
-    user: {
-        id: string;
-        name: string;
+    user?: {
+        id?: string;
+        name?: string;
     };
-    order: {
-        id: string;
-        tableName: string;
+    order?: {
+        id?: string;
+        tableName?: string;
     };
-    totalAmount: number;
-    customerPaid: number;
-    returnAmount: number;
-    method: string;
-    status: string;
+    totalAmount?: number;
+    customerPaid?: number;
+    returnAmount?: number;
+    method?: string;
+    status?: string;
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

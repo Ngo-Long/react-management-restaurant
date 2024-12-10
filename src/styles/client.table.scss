@@ -3,7 +3,6 @@
     display: flex;
     justify-content: space-between;
     flex-direction: column;
-    // background: red;
 
     &-content {
         flex: 1;
@@ -129,7 +128,6 @@
                 overflow: hidden;
                 position: relative;
                 cursor: pointer;
-                // border-bottom: 1px solid #ccc;
 
                 img {
                     width: 100%;
@@ -146,20 +144,18 @@
                 margin: 0;
                 height: auto;
                 width: 100%;
-                // background: #f4f4f4;
 
                 &__title {
                     color: #333;
                     font-size: 16px;
-                    font-weight: 550;
-                    margin: 4px 0 0px;
+                    margin: 2px 0 0px;
                 }
 
                 &__price {
                     color: #f82222;
-                    font-size: 18px;
+                    font-size: 16px;
                     font-weight: 600;
-                    margin: 2px ;
+                    margin: 0 0 4px;
                 }
             }
         }
@@ -171,7 +167,7 @@
         justify-content: flex-start;
         flex-wrap: nowrap;
         width: 100%;
-        height: 66px;
+        height: 63px;
         overflow-x: scroll;
         overflow-y: hidden;
         gap: 12px;
@@ -185,7 +181,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 146px;
+            width: 130px;
             height: 60px;
             flex-shrink: 0;
             border: 1.5px solid #999;
@@ -218,15 +214,59 @@
     &-order {
         height: calc(100vh - 96.5px);
 
-        .order-table {
+        .order-title {
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             height: 100%;
-            font-size: 16px;
             font-weight: 400;
             color: #8c8c8c;
+        }
+
+        .order-table {
+
+            & .ant-table-thead > tr > th {
+                background-color: #fff;
+                color: #333;
+                font-size: 15px;
+                border-bottom: 1.34px solid #d7d7d7;
+            }
+
+            &-row {
+
+                &:hover {
+                    cursor: pointer;
+                    // color: #bd0407;
+                }
+            }
+
+            .btn-delete {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #555;
+                font-size: 14px;
+                padding: 5px 4px;
+
+                &:hover {
+                    color: #ff0004;
+                    cursor: pointer;
+                    background: #e5e5e5;
+                    border-radius: 4px;
+                }
+            }
+
+            .btn-name {
+                font-size: 15px;
+
+                &:hover {
+                    color: #ff0004;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    text-decoration: underline;
+                }
+            }
         }
 
         .order-note {
@@ -248,7 +288,7 @@
             font-weight: 600;
 
             &__desc {
-                font-size: 16px;
+                font-size: 15px;
             }
 
             span {
@@ -279,9 +319,9 @@
             &__pay {
                 width: 60%;
                 height: 36px;
-                background: #439f14;
                 font-size: 14px;
                 font-weight: 600;
+                border-width: 1.8px;
             }
         }
 
@@ -293,11 +333,131 @@
             cursor: pointer;
         }
     }
+
+    &-modal {
+        .modal-content {
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        .modal-card {
+            margin-top: 16px;
+        }
+    }
+
+    &-pay {
+
+        .pay-search {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 12px 0;
+
+            &__card {
+                display: flex;
+                align-items: flex-end;
+                justify-content: flex-end;
+            }
+
+            &__title {
+                font-size: 16px;
+                margin-left: 6px;
+                font-weight: 500;
+            }
+        }
+
+        .pay-col {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            & span {
+                font-size: 16px !important;
+            }
+        }
+
+        .pay-title {
+            margin: 12px 0;
+            font-size: 16px;
+        }
+
+        .pay-price {
+            margin: 12px 0;
+            font-size: 17px;
+            font-weight: 500;
+
+            &__input {
+                border: none;
+                outline: none;
+                border-bottom: 2px solid #ff4d4f;
+                text-align: right;
+            }
+        }
+
+        .pay-btn {
+            position: static;
+            bottom: 0;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+            font-weight: 600;
+
+            &__alert {
+                width: 40%;
+                height: 36px;
+                font-weight: 600;
+                font-size: 14px;
+                border: 1.8px solid #ff4d4f
+            }
+
+            &__pay {
+                width: 60%;
+                height: 36px;
+                font-size: 14px;
+                font-weight: 600;
+                border-width: 1.8px;
+            }
+        }
+
+        .pay-wrap {
+            padding: 14px 0;
+
+            Button {
+                width: 80px;
+                border-color: #999;
+            }
+        }
+    }
 }
 
 .no-select {
-    user-select: none;  
-    -webkit-user-select: none;  
-    -moz-user-select: none; 
-    -ms-user-select: none;  
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
+
+.ant {
+    &-card {
+        border-radius: 0;
+
+        &_head {
+            background-color: #fff !important;
+        }
+
+        &-form-item {
+            margin-bottom: 16px !important;
+        }
+    }
+
+    &-form {
+        .ant-form-item {
+            margin-bottom: 10px !important;
+        }
+    }
+
+}
+
+
+

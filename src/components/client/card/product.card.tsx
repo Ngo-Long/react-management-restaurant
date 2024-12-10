@@ -1,5 +1,4 @@
-import { Col, InputNumber, Modal, Row } from 'antd';
-import '@/styles/client.table.scss';
+import { Col, Form, InputNumber, Modal, Row } from 'antd';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@/redux/hooks';
@@ -50,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         if (selectedProduct) {
             handleItemSelect({
                 quantity,
-                price: totalPrice,
+                price: selectedProduct.sellingPrice,
                 status: 'CONFIRMED',
                 product: {
                     id: selectedProduct.id,
@@ -66,14 +65,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         }, 500);
     };
 
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
-
     const handleQuantityChange = (value: number | null) => {
-        setQuantity(value || 1);
+        const num = value || 1;
+        setQuantity(num);
+
         if (selectedProduct) {
-            setTotalPrice(selectedProduct.sellingPrice! * (value || 1));
+            setTotalPrice(selectedProduct.sellingPrice! * num);
         }
     };
 
@@ -110,61 +107,70 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
             </div>
 
             <div className="container-category">
-                <>
-                    <div
-                        className={`category-card ${selectedCategory === null ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(null)}
-                    >
-                        <p className="category-card__name">Tất cả</p>
-                    </div>
+                <div
+                    className={`category-card ${selectedCategory === null ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(null)}
+                >
+                    <p className="category-card__name">Tất cả</p>
+                </div>
 
-                    {uniqueCategories.map((category, index) => (
-                        <div
-                            key={index}
-                            className={`category-card ${selectedCategory === category ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory(category || null)}
-                        >
-                            <p className="category-card__name">
-                                {category === 'FOOD' ? "Đồ ăn"
-                                    : category === 'DRINK' ? 'Đồ uống' : 'Khác'}
-                            </p>
-                        </div>
-                    ))}
-                </>
+                {uniqueCategories.map((category, index) => (
+                    <div
+                        key={index}
+                        className={`category-card ${selectedCategory === category ? 'active' : ''}`}
+                        onClick={() => setSelectedCategory(category || null)}
+                    >
+                        <p className="category-card__name">
+                            {category === 'FOOD' ? "Đồ ăn"
+                                : category === 'DRINK' ? 'Đồ uống' : 'Khác'}
+                        </p>
+                    </div>
+                ))}
             </div>
 
             <Modal
-                title={selectedProduct?.name || 'Sản phẩm'}
+                className='container-modal'
+                title={`Thêm món: ${selectedProduct?.name}`}
                 width={400}
                 open={isModalOpen}
                 onOk={handleOk}
-                onCancel={handleCancel}
+                onCancel={() => setIsModalOpen(false)}
+                cancelText={'Hủy bỏ'}
+                okText={'Thêm món ăn'}
                 confirmLoading={confirmLoading}
             >
-                <div>
-                    Số lượng: &nbsp; &nbsp;
-                    <InputNumber
-                        min={1}
-                        max={100}
-                        defaultValue={1}
-                        value={quantity}
-                        onChange={handleQuantityChange}
-                    />
-                </div>
+                <div className='modal-content'>
+                    <div>
+                        Số lượng: &nbsp;
+                        <InputNumber
+                            size="large"
+                            style={{ width: 60 }}
+                            min={1}
+                            max={100}
+                            defaultValue={1}
+                            value={quantity}
+                            onChange={handleQuantityChange}
+                        />
+                        &nbsp; x &nbsp;
+                        {new Intl.NumberFormat().format(selectedProduct?.sellingPrice!)} ₫
+                    </div>
 
-                <div>
-                    Thành tiền: &nbsp;
-                    <span>
-                        {new Intl.NumberFormat().format(totalPrice)} đ
-                    </span>
-                </div>
+                    <div className='modal-card'>
+                        Thành tiền: &nbsp;
+                        <span style={{ fontSize: '17px' }}>
+                            {new Intl.NumberFormat().format(totalPrice)} ₫
+                        </span>
+                    </div>
 
-                <div>
-                    Ghi chú:
-                    <TextArea
-                        maxLength={100}
-                        autoSize={{ minRows: 2, maxRows: 2 }}
-                    />
+                    <div className='modal-card'>
+                        <div>Ghi chú:</div>
+                        <TextArea
+                            maxLength={100}
+                            style={{ marginTop: '4px' }}
+                            placeholder='Tối đa 100 kí tự'
+                            autoSize={{ minRows: 2, maxRows: 2 }}
+                        />
+                    </div>
                 </div>
             </Modal>
         </div>
