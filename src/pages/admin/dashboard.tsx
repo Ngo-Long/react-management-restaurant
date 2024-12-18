@@ -1,7 +1,13 @@
+import { useAppSelector } from "@/redux/hooks";
 import { Card, Col, Row, Statistic } from "antd";
 import CountUp from 'react-countup';
 
 const DashboardPage = () => {
+    const metaOrder = useAppSelector(state => state.order.meta);
+    const metaTable = useAppSelector(state => state.diningTable.meta);
+    const metaProduct = useAppSelector(state => state.product.meta);
+    const metaUser = useAppSelector(state => state.user.meta);
+
     const formatter = (value: number | string) => {
         return (
             <CountUp end={Number(value)} separator="," />
@@ -11,41 +17,80 @@ const DashboardPage = () => {
     return (
         <Row gutter={[20, 20]}>
             <Col span={24} md={6}>
-                <Card title="Doanh thu" bordered={false} >
+                <Card title="Doanh số" bordered={false} >
                     <Statistic
-                        title="Tổng doanh thu hôm nay"
-                        value={5394500}
+                        title="Tổng doanh số trong tháng"
+                        value={57400000}
                         formatter={formatter}
                     />
+                </Card>
+            </Col>
 
+            <Col span={24} md={6}>
+                <Card title="Doanh thu" bordered={false} >
+                    <Statistic
+                        title="Tổng doanh thu trong tháng"
+                        value={53945000}
+                        formatter={formatter}
+                    />
+                </Card>
+            </Col>
+
+            <Col span={24} md={6}>
+                <Card title="Chi phí" bordered={false} >
+                    <Statistic
+                        title="Tổng chi phí trong tháng"
+                        value={24900000}
+                        formatter={formatter}
+                    />
+                </Card>
+            </Col>
+
+            <Col span={24} md={6}>
+                <Card title="Lợi nhuận" bordered={false} >
+                    <Statistic
+                        title="Tổng lợi nhuận trong tháng"
+                        value={29045000}
+                        formatter={formatter}
+                    />
                 </Card>
             </Col>
 
             <Col span={24} md={6}>
                 <Card title="Đơn hàng" bordered={false} >
                     <Statistic
-                        title="Tổng đơn hàng hôm nay"
-                        value={95}
+                        title="Tổng đơn hàng đang có"
+                        value={metaOrder.total}
                         formatter={formatter}
                     />
                 </Card>
             </Col>
 
             <Col span={24} md={6}>
-                <Card title="Khách hàng" bordered={false} >
+                <Card title="Nhân viên" bordered={false} >
                     <Statistic
-                        title="Tổng khách hàng hôm nay"
-                        value={201}
+                        title="Tổng nhân viên đang có"
+                        value={metaUser.total}
                         formatter={formatter}
                     />
                 </Card>
             </Col>
 
             <Col span={24} md={6}>
-                <Card title="Bàn ăn" bordered={false} >
+                <Card title="Phòng bàn" bordered={false} >
                     <Statistic
-                        title="Đang hoạt động"
-                        value={20}
+                        title="Tổng phòng bàn đang có"
+                        value={metaTable.total}
+                        formatter={formatter}
+                    />
+                </Card>
+            </Col>
+
+            <Col span={24} md={6}>
+                <Card title="Hàng hóa" bordered={false} >
+                    <Statistic
+                        title="Tổng hàng hóa đang có"
+                        value={metaProduct.total}
                         formatter={formatter}
                     />
                 </Card>

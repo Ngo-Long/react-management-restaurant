@@ -106,7 +106,7 @@ const RestaurantPage = () => {
         },
         {
 
-            title: 'Actions',
+            title: 'Tác vụ',
             hideInSearch: true,
             width: 50,
             render: (_value, entity, _index, _action) => (

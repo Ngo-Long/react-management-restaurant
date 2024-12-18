@@ -21,7 +21,7 @@ const SaleClient: React.FC = () => {
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
     const [currentTable, setCurrentTable] = useState({ id: '', name: 'Mang về' });
 
-    const handleTableSelect = (id: string, name: string) => {
+    const handleSelectedTable = (id: string, name: string) => {
         // reset
         setCurrentTable({ id, name });
 
@@ -39,12 +39,12 @@ const SaleClient: React.FC = () => {
         if (currentOrder?.id) {
             await addProductToOrder(item, currentOrder);
         } else {
-            const newOrder = await createOrder();
+            const newOrder = await createPendingOrder();
             if (newOrder) await addProductToOrder(item, newOrder);
         }
     };
 
-    const createOrder = async () => {
+    const createPendingOrder = async () => {
         const order = {
             status: "PENDING",
             diningTable: {
@@ -53,17 +53,12 @@ const SaleClient: React.FC = () => {
             }
         };
 
-        try {
-            const res = await orderApi.callCreate(order);
-            if (res.data) {
-                setCurrentOrder(res.data);
-                return res.data;
-            } else {
-                notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
-                return null;
-            }
-        } catch (error: any) {
-            notification.error({ message: 'Lỗi kết nối', description: error.message });
+        const res = await orderApi.callCreate(order);
+        if (res.data) {
+            setCurrentOrder(res.data);
+            return res.data;
+        } else {
+            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
             return null;
         }
     }
@@ -91,15 +86,10 @@ const SaleClient: React.FC = () => {
         }
     }
 
-    const tabList = [
-        { key: 'tab1', tab: 'Phòng bàn', icon: <GatewayOutlined /> },
-        { key: 'tab2', tab: 'Thực đơn', icon: <CoffeeOutlined /> },
-    ];
-
     const contentList: Record<string, React.ReactNode> = {
         tab1: <DiningTableCard
             currentTable={currentTable}
-            handleTableSelect={(id, name) => handleTableSelect(id, name)}
+            handleSelectedTable={(id, name) => handleSelectedTable(id, name)}
         />,
         tab2: <ProductCard
             handleItemSelect={handleItemSelect}
@@ -111,7 +101,10 @@ const SaleClient: React.FC = () => {
             <Col span={15}>
                 <Card
                     style={{ height: '100vh' }}
-                    tabList={tabList}
+                    tabList={[
+                        { key: 'tab1', tab: 'Phòng bàn', icon: <GatewayOutlined /> },
+                        { key: 'tab2', tab: 'Thực đơn', icon: <CoffeeOutlined /> }
+                    ]}
                     activeTabKey={activeTabKey}
                     bordered={true}
                     onTabChange={(key) => setActiveTabKey(key)}

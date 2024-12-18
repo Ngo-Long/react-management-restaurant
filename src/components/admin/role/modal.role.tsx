@@ -46,7 +46,7 @@ const ModalRole = (props: IProps) => {
             }
             const res = await roleApi.callUpdate(role, singleRole.id);
             if (res.data) {
-                message.success("Cập nhật role thành công");
+                message.success("Cập nhật chức vụ thành công");
                 handleReset();
                 reloadTable();
             } else {
@@ -62,7 +62,7 @@ const ModalRole = (props: IProps) => {
             }
             const res = await roleApi.callCreate(role);
             if (res.data) {
-                message.success("Thêm mới role thành công");
+                message.success("Thêm mới chức vụ thành công");
                 handleReset();
                 reloadTable();
             } else {

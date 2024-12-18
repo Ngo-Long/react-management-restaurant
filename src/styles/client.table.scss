@@ -233,39 +233,34 @@
                 border-bottom: 1.34px solid #d7d7d7;
             }
 
-            &-row {
+            & .ant-table-row {
+                cursor: pointer;
 
                 &:hover {
-                    cursor: pointer;
-                    // color: #bd0407;
+                    box-shadow: 0px 2px 12px 0px rgba(182, 0, 0, 0.2);
+
+                    .ant-table-cell {
+                        background: #fff;
+                        border-bottom: 1.5px solid #ff6363;
+                    }
+
+                    .btn-icon {
+                        color: #f82222;
+                    }
+                }
+
+                & .ant-table-cell {
+                    border-bottom: 1.5px solid transparent;
                 }
             }
 
-            .btn-delete {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+            .btn-icon {
                 color: #555;
-                font-size: 14px;
-                padding: 5px 4px;
-
-                &:hover {
-                    color: #ff0004;
-                    cursor: pointer;
-                    background: #e5e5e5;
-                    border-radius: 4px;
-                }
+                font-size: 15px;
             }
 
             .btn-name {
                 font-size: 15px;
-
-                &:hover {
-                    color: #ff0004;
-                    cursor: pointer;
-                    border-radius: 4px;
-                    text-decoration: underline;
-                }
             }
         }
 
@@ -345,56 +340,40 @@
         }
     }
 
-    &-pay {
+    &-invoice {
 
-        .pay-search {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 0 0 12px 0;
+        .invoice-container {
+            padding: 0 20px;
+        }
 
-            &__card {
-                display: flex;
-                align-items: flex-end;
-                justify-content: flex-end;
+        .invoice-header {
+            text-align: center;
+
+            &__heading {
+                text-align: center;
+                margin: 0;
+                font-size: 30px;
+                color: #ff4d4f;
             }
 
             &__title {
-                font-size: 16px;
-                margin-left: 6px;
-                font-weight: 500;
+                font-size: 22px;
+                color: #333;
             }
         }
 
-        .pay-col {
+        .invoice-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-
-            & span {
-                font-size: 16px !important;
-            }
-        }
-
-        .pay-title {
-            margin: 12px 0;
             font-size: 16px;
-        }
 
-        .pay-price {
-            margin: 12px 0;
-            font-size: 17px;
-            font-weight: 500;
-
-            &__input {
-                border: none;
-                outline: none;
-                border-bottom: 2px solid #ff4d4f;
-                text-align: right;
+            &__title {
+                margin: 4px 0;
             }
         }
 
-        .pay-btn {
+        .invoice-btn {
             position: static;
             bottom: 0;
             display: flex;
@@ -420,12 +399,76 @@
             }
         }
 
-        .pay-wrap {
+        .invoice-wrap {
             padding: 14px 0;
 
             Button {
                 width: 80px;
                 border-color: #999;
+            }
+        }
+
+        .invoice-search {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 12px 0;
+
+            &__card {
+                display: flex;
+                align-items: flex-end;
+                justify-content: flex-end;
+            }
+
+            &__title {
+                font-size: 16px;
+                margin-left: 6px;
+                font-weight: 500;
+            }
+        }
+
+        .invoice-col {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            & span {
+                font-size: 16px !important;
+            }
+        }
+
+        .invoice-title {
+            margin: 12px 0;
+            font-size: 16px;
+
+            &__bold {
+                font-weight: 500;
+            }
+
+            &.m4 {
+                margin: 4px 0;
+            }
+        }
+
+        .invoice-price {
+            margin: 12px 0;
+            font-size: 16px;
+
+            &.m4 {
+                margin: 4px 0;
+            }
+
+            &__bold {
+                color: #f82222;
+                font-size: 18px;
+                font-weight: 500;
+            }
+
+            &__input {
+                border: none;
+                outline: none;
+                border-bottom: 2px solid #ff4d4f;
+                text-align: right;
             }
         }
     }
@@ -457,6 +500,18 @@
         }
     }
 
+}
+
+.btn-green {
+    color: #fff;
+    border-color: transparent;
+    background: rgb(0, 180, 0);
+
+    &:hover {
+        color: #fff !important;
+        background: rgb(0, 200, 0) !important;
+        border-color: rgb(0, 200, 0) !important;
+    }
 }
 
 

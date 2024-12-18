@@ -21,6 +21,7 @@ import Loading from './components/share/loading';
 import SaleClient from './components/client/sale.client';
 import OrderPage from './pages/admin/order';
 import './styles/reset.scss';
+import InvoicePage from './pages/admin/invoice';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -105,6 +106,13 @@ export default function App() {
           element:
             <ProtectedRoute>
               <OrderPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "invoice",
+          element:
+            <ProtectedRoute>
+              <InvoicePage />
             </ProtectedRoute>
         },
         {

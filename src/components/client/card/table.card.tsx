@@ -10,12 +10,12 @@ import dayjs from 'dayjs';
 
 interface DiningTableCardProps {
     currentTable: { id?: string | null; name: string };
-    handleTableSelect: (id: string, name: string) => void;
+    handleSelectedTable: (id: string, name: string) => void;
 }
 
 const DiningTableCard: React.FC<DiningTableCardProps> = ({
     currentTable,
-    handleTableSelect
+    handleSelectedTable
 }) => {
     const dispatch = useAppDispatch();
     const diningTables = useSelector((state: RootState) => state.diningTable.result);
@@ -63,7 +63,7 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({
                             <Col span={6} key={table.id}>
                                 <div
                                     className={`table-item ${currentTable.id === table.id ? 'active' : ''}`}
-                                    onClick={() => handleTableSelect(table.id || '', table.name || '')}
+                                    onClick={() => handleSelectedTable(table.id || '', table.name || '')}
                                 >
                                     <div className="item-card">
                                         <p className="item-card__title">{table.name}</p>

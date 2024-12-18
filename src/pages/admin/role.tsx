@@ -16,30 +16,30 @@ import { sfLike } from "spring-filter-query-builder";
 import { groupByPermission } from "@/config/utils";
 
 const RolePage = () => {
+    const dispatch = useAppDispatch();
+    const tableRef = useRef<ActionType>();
     const [openModal, setOpenModal] = useState<boolean>(false);
 
-    const tableRef = useRef<ActionType>();
-
-    const isFetching = useAppSelector(state => state.role.isFetching);
     const meta = useAppSelector(state => state.role.meta);
     const roles = useAppSelector(state => state.role.result);
-    const dispatch = useAppDispatch();
 
-    //all backend permissions
+    const isFetching = useAppSelector(state => state.role.isFetching);
+    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
+
+
+    // all backend permissions
     const [listPermissions, setListPermissions] = useState<{
         module: string;
         permissions: IPermission[]
     }[] | null>(null);
 
-    //current role
+    // current role
     const [singleRole, setSingleRole] = useState<IRole | null>(null);
 
     useEffect(() => {
         const init = async () => {
             const res = await permissionApi.callFetchFilter(`page=1&size=100`);
-            if (res.data?.result) {
-                setListPermissions(groupByPermission(res.data?.result))
-            }
+            if (res.data?.result) setListPermissions(groupByPermission(res.data?.result!));
         }
         init();
     }, [])
@@ -82,6 +82,12 @@ const RolePage = () => {
             title: 'Chức vụ',
             dataIndex: 'name',
             sorter: true,
+            align: "center",
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            hideInSearch: true,
         },
         {
             title: 'Trạng thái',
@@ -114,6 +120,7 @@ const RolePage = () => {
             dataIndex: 'lastModifiedDate',
             width: 200,
             sorter: true,
+            hidden: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
@@ -124,22 +131,16 @@ const RolePage = () => {
         },
         {
 
-            title: 'Actions',
-            width: 50,
+            title: 'Tác vụ',
+            width: 90,
             align: "center",
             hideInSearch: true,
+            hidden: (userRoleId == 1 ? false : true),
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    <Access
-                        permission={ALL_PERMISSIONS.ROLES.UPDATE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.ROLES.UPDATE} hideChildren>
                         <EditOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#ffa500',
-                            }}
-                            type=""
+                            style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
                                 setSingleRole(entity);
                                 setOpenModal(true);
@@ -147,10 +148,7 @@ const RolePage = () => {
                         />
                     </Access>
 
-                    <Access
-                        permission={ALL_PERMISSIONS.ROLES.DELETE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.ROLES.DELETE} hideChildren>
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa chức vụ"}
@@ -159,14 +157,7 @@ const RolePage = () => {
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
+                            <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
                 </Space>
@@ -239,10 +230,7 @@ const RolePage = () => {
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
-                            <Access
-                                permission={ALL_PERMISSIONS.ROLES.CREATE}
-                                hideChildren
-                            >
+                            <Access permission={ALL_PERMISSIONS.ROLES.CREATE} hideChildren>
                                 <Button
                                     icon={<PlusOutlined />}
                                     type="primary"

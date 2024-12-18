@@ -72,7 +72,7 @@ const ProductPage = () => {
         },
         {
             title: 'Tên hàng',
-            width: '190px',
+            width: '250px',
             dataIndex: 'name',
             sorter: true,
         },
@@ -116,12 +116,12 @@ const ProductPage = () => {
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 150,
+            width: 180,
             sorter: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
             },
             hideInSearch: true,
@@ -131,6 +131,7 @@ const ProductPage = () => {
             dataIndex: 'lastModifiedDate',
             width: 150,
             sorter: true,
+            hidden: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
@@ -140,22 +141,15 @@ const ProductPage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Actions',
+            title: 'Tác vụ',
             hideInSearch: true,
-            width: 50,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    < Access
-                        permission={ALL_PERMISSIONS.PRODUCTS.UPDATE}
-                        hideChildren
-                    >
+                    < Access permission={ALL_PERMISSIONS.PRODUCTS.UPDATE} hideChildren>
                         <EditOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#ffa500',
-                            }}
-                            type=""
+                            style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
@@ -163,10 +157,7 @@ const ProductPage = () => {
                         />
                     </Access >
 
-                    <Access
-                        permission={ALL_PERMISSIONS.PRODUCTS.DELETE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.PRODUCTS.DELETE} hideChildren>
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa hàng hóa"}
@@ -175,14 +166,7 @@ const ProductPage = () => {
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
+                            <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
                 </Space >

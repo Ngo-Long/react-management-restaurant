@@ -1,4 +1,4 @@
-import { Col, Form, InputNumber, Modal, Row } from 'antd';
+import { Button, Col, InputNumber, Modal, Row } from 'antd';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@/redux/hooks';
@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         setIsModalOpen(true);
     };
 
-    const handleOk = () => {
+    const handleSelectedProduct = () => {
         if (selectedProduct) {
             handleItemSelect({
                 quantity,
@@ -130,14 +130,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
 
             <Modal
                 className='container-modal'
-                title={`Thêm món: ${selectedProduct?.name}`}
+                title={`${selectedProduct?.name}`}
                 width={400}
                 open={isModalOpen}
-                onOk={handleOk}
                 onCancel={() => setIsModalOpen(false)}
-                cancelText={'Hủy bỏ'}
-                okText={'Thêm món ăn'}
-                confirmLoading={confirmLoading}
+                footer={[
+                    <Button key="cancel" onClick={() => setIsModalOpen(false)}>
+                        Hủy bỏ
+                    </Button>,
+
+                    <Button
+                        className="btn-green"
+                        onClick={handleSelectedProduct}
+                        loading={confirmLoading}
+                    >
+                        Thêm hàng
+                    </Button>,
+                ]}
             >
                 <div className='modal-content'>
                     <div>

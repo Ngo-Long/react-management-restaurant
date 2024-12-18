@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { useState, useRef } from 'react';
 
 import queryString from 'query-string';
-import { IOrder } from "@/types/backend";
+import { IInvoice, IOrder } from "@/types/backend";
 import { sfIn } from "spring-filter-query-builder";
 
 import Access from "@/components/share/access";
@@ -14,34 +14,51 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrder, fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
 
-import { Popconfirm, Space, message, notification } from "antd";
+import { Button, Modal, Popconfirm, Space, message, notification } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import { fetchInvoice } from '@/redux/slice/invoiceSlide';
 
 
-const OrderPage = () => {
+const InvoicePage = () => {
     const tableRef = useRef<ActionType>();
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IOrder | null>(null);
+
+    const [dataInit, setDataInit] = useState<IInvoice | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
-    const orders = useAppSelector(state => state.order.result);
+    const invoices = useAppSelector(state => state.invoice.result);
 
-    const meta = useAppSelector(state => state.order.meta);
-    const isFetching = useAppSelector(state => state.order.isFetching);
+    const meta = useAppSelector(state => state.invoice.meta);
+    const isFetching = useAppSelector(state => state.invoice.isFetching);
 
     const currentUser = useAppSelector(state => state.account.user);
     const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
+
+
+    const showModal = (invoice: IInvoice) => {
+        setDataInit(invoice);
+        setIsModalOpen(true);
+    };
+
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
-    const columns: ProColumns<IOrder>[] = [
+    const columns: ProColumns<IInvoice>[] = [
         {
-            title: 'Đơn hàng',
+            title: 'Mã HD',
             width: 80,
             align: "center",
             dataIndex: 'id',
@@ -58,58 +75,45 @@ const OrderPage = () => {
             hideInSearch: false,
         },
         {
-            title: 'Ghi chú',
-            dataIndex: 'note',
-            sorter: true,
+            title: 'Nguồn',
+            dataIndex: ["order", "tableName"],
+            align: "center",
             hideInSearch: true,
         },
         {
-            title: 'Bàn ăn',
-            dataIndex: ["diningTable", "name"],
+            title: 'Thu ngân',
+            dataIndex: ["user", "name"],
             sorter: true,
             align: "center",
             hideInSearch: false,
         },
         {
             title: 'Tổng tiền',
-            width: 80,
             align: "center",
-            dataIndex: 'totalPrice',
+            dataIndex: 'totalAmount',
             hideInSearch: true,
             render(dom, entity, index, action, schema) {
-                const str = "" + entity.totalPrice;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+                const str = "" + entity.totalAmount;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
             },
-        },
-        {
-            title: 'Nguồn',
-            dataIndex: 'option',
-            align: "center",
-            renderFormItem: (item, props, form) => (
-                <ProFormSelect
-                    showSearch
-                    mode="multiple"
-                    allowClear
-                    valueEnum={{
-                        DINE_IN: 'Tại chỗ',
-                        TAKEAWAY: 'Mang về'
-                    }}
-                    placeholder="Chọn nguồn"
-                />
-            ),
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             align: "center",
+            render: (value) => {
+                return value === 'PAID'
+                    ? 'Đã thanh toán' : value === 'UNPAID'
+                        ? 'Chưa thanh toán' : '';
+            },
             renderFormItem: (item, props, form) => (
                 <ProFormSelect
                     showSearch
                     mode="multiple"
                     allowClear
                     valueEnum={{
-                        COMPLETED: 'Hoàn thành',
-                        PENDING: 'Đang làm'
+                        PAID: 'Đã thanh toán',
+                        UNPAID: 'Chưa thanh toán'
                     }}
                     placeholder="Chọn trạng thái"
                 />
@@ -118,12 +122,12 @@ const OrderPage = () => {
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 150,
+            width: 180,
             sorter: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD/MM/YYYY') : ""}</>
                 )
             },
             hideInSearch: true,
@@ -136,47 +140,29 @@ const OrderPage = () => {
             hidden: true,
             render: (text, record, index, action) => {
                 return (
-                    <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD/MM/YYYY HH:mm:ss') : ""}</>
                 )
             },
             hideInSearch: true,
         },
         {
-            title: 'Chi tiết',
+            title: 'Tác vụ',
             hideInSearch: true,
-            width: 75,
+            width: 120,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    <Access
-                        permission={ALL_PERMISSIONS.ORDERS.DELETE}
-                        hideChildren
-                    >
-                        <Popconfirm
-                            placement="leftTop"
-                            title={"Xác nhận xóa bàn ăn"}
-                            description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
-                            okText="Xác nhận"
-                            cancelText="Hủy"
-                        >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
-                        </Popconfirm>
+                    <Access permission={ALL_PERMISSIONS.INVOICES.GET_PAGINATE} hideChildren >
+                        <Button type="primary" onClick={() => showModal(entity)}>
+                            Chi tiết
+                        </Button>
                     </Access>
                 </Space >
             ),
-
         },
     ];
 
     const buildQuery = (params: any, sort: any, filter: any) => {
-
         const clone = { ...params };
         let parts = [];
         if (clone.name) parts.push(`name ~ '${clone.name}'`);
@@ -220,21 +206,22 @@ const OrderPage = () => {
 
     return (
         <div>
-            <Access permission={ALL_PERMISSIONS.ORDERS.GET_PAGINATE}>
-                <DataTable<IOrder>
+            <Access permission={ALL_PERMISSIONS.INVOICES.GET_PAGINATE}>
+                <DataTable<IInvoice>
                     actionRef={tableRef}
-                    headerTitle="Danh sách đơn hàng"
+                    headerTitle="Danh sách hóa đơn"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
-                    dataSource={orders}
+                    dataSource={invoices}
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            (isRoleOwner
-                                ? dispatch(fetchOrder({ query }))
-                                : dispatch(fetchOrderByRestaurant({ query }))
-                            )
+                            dispatch(fetchInvoice({ query }))
+                            // (isRoleOwner
+                            //     ? dispatch(fetchInvoice({ query }))
+                            //     : dispatch(fetchInvoiceByRestaurant({ query }))
+                            // )
                         }
                     }
                     scroll={{ x: true }}
@@ -251,15 +238,13 @@ const OrderPage = () => {
                 />
             </Access>
 
-            {/* <ModalDiningTable
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                reloadTable={reloadTable}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-            /> */}
+            <Modal title={`Chi tiết hóa đơn [${dataInit?.id}]`} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+            </Modal>
         </div >
     )
 }
 
-export default OrderPage;
+export default InvoicePage;

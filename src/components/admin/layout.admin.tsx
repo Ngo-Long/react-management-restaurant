@@ -115,6 +115,12 @@ const LayoutAdmin: React.FC = () => {
                     icon: <ContainerOutlined />
                 }] : []),
 
+                ...(viewOrder || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/invoice'>Hóa đơn</Link>,
+                    key: '/admin/invoice',
+                    icon: <ContainerOutlined />
+                }] : []),
+
                 ...(viewRole || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/role'>Chức vụ</Link>,
                     key: '/admin/role',

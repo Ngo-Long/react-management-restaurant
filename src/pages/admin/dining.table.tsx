@@ -126,13 +126,12 @@ const DiningTablePage = () => {
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 150,
-            hidden: true,
+            width: 180,
             sorter: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
             },
             hideInSearch: true,
@@ -152,22 +151,15 @@ const DiningTablePage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Actions',
+            title: 'Tác vụ',
             hideInSearch: true,
-            width: 50,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    < Access
-                        permission={ALL_PERMISSIONS.DININGTABLES.UPDATE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.DININGTABLES.UPDATE} hideChildren>
                         <EditOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#ffa500',
-                            }}
-                            type=""
+                            style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
@@ -175,10 +167,7 @@ const DiningTablePage = () => {
                         />
                     </Access >
 
-                    <Access
-                        permission={ALL_PERMISSIONS.DININGTABLES.DELETE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.DININGTABLES.DELETE} hideChildren >
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa bàn ăn"}
@@ -187,14 +176,7 @@ const DiningTablePage = () => {
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
+                            <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
                 </Space >

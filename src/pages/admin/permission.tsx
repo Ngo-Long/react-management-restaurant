@@ -16,17 +16,18 @@ import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 
 const PermissionPage = () => {
+    const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
 
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IPermission | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
-    const dispatch = useAppDispatch();
     const meta = useAppSelector(state => state.permission.meta);
-
     const permissions = useAppSelector(state => state.permission.result);
+
     const isFetching = useAppSelector(state => state.permission.isFetching);
+    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
 
     const handleDeletePermission = async (id: string | undefined) => {
         if (id) {
@@ -66,7 +67,7 @@ const PermissionPage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Tên quyền hạn',
+            title: 'Quyền hạn',
             dataIndex: 'name',
             sorter: true,
         },
@@ -98,6 +99,7 @@ const PermissionPage = () => {
             width: 170,
             sorter: true,
             align: "center",
+            hidden: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -111,6 +113,7 @@ const PermissionPage = () => {
             width: 170,
             sorter: true,
             align: "center",
+            hidden: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
@@ -119,32 +122,24 @@ const PermissionPage = () => {
             hideInSearch: true,
         },
         {
-            title: 'Actions',
+            title: 'Tác vụ',
             hideInSearch: true,
-            width: 50,
+            width: 90,
             align: "center",
+            hidden: (userRoleId == 1 ? false : true),
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    <Access
-                        permission={ALL_PERMISSIONS.PERMISSIONS.UPDATE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.PERMISSIONS.UPDATE} hideChildren>
                         <EditOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#ffa500',
-                            }}
-                            type=""
+                            style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
                             }}
                         />
                     </Access>
-                    <Access
-                        permission={ALL_PERMISSIONS.PERMISSIONS.DELETE}
-                        hideChildren
-                    >
+
+                    <Access permission={ALL_PERMISSIONS.PERMISSIONS.DELETE} hideChildren>
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa quyền hạn"}
@@ -153,14 +148,7 @@ const PermissionPage = () => {
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
+                            <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
                 </Space>

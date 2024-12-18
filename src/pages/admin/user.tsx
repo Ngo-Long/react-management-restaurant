@@ -72,18 +72,24 @@ const UserPage = () => {
             dataIndex: 'email',
             sorter: true,
         },
-
         {
-            title: 'Vị trí',
+            title: 'Giới tính',
+            dataIndex: 'gender',
+            sorter: true,
+            align: "center"
+        },
+        {
+            title: 'Chức vụ',
             dataIndex: ["role", "name"],
             sorter: true,
+            align: "center",
             hideInSearch: true
         },
-
         {
             title: 'Nhà hàng',
             dataIndex: ["restaurant", "name"],
             sorter: true,
+            align: "center",
             hideInSearch: true,
             hidden: (userRoleId == 1 ? false : true)
         },
@@ -93,10 +99,11 @@ const UserPage = () => {
             dataIndex: 'createdDate',
             width: 170,
             sorter: true,
+            // hidden: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
             },
             hideInSearch: true,
@@ -106,6 +113,7 @@ const UserPage = () => {
             dataIndex: 'lastModifiedDate',
             width: 170,
             sorter: true,
+            hidden: true,
             align: "center",
             render: (text, record, index, action) => {
                 return (
@@ -115,20 +123,15 @@ const UserPage = () => {
             hideInSearch: true,
         },
         {
-
-            title: 'Actions',
+            title: 'Tác vụ',
             hideInSearch: true,
-            width: 50,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
                     < Access permission={ALL_PERMISSIONS.USERS.UPDATE} hideChildren>
                         <EditOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#ffa500',
-                            }}
-                            type=""
+                            style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
@@ -145,14 +148,7 @@ const UserPage = () => {
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
+                            <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
                 </Space >
