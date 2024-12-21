@@ -49,19 +49,22 @@ const LoginPage = () => {
                     dispatch(setUserLoginInfo(res.data.user));
 
                     message.success("Đăng nhập tài khoản thành công!");
-                    navigate(callback || "/", { replace: true });
+                    navigate(
+                        callback || `/${res.data.user.restaurant.name}`,
+                        { replace: true }
+                    );
                 } else {
                     notification.error({
-                        message: "Có lỗi xảy ra",
-                        description: res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+                        message: "Đăng nhập thất bại",
+                        description: "Vui lòng kiểm tra lại thông tin đăng nhập",
                         duration: 5,
                     });
                 }
-            } catch (error) {
+            } catch (error: any) {
                 setIsSubmit(false);
                 notification.error({
-                    message: "Đăng nhập thất bại",
-                    description: "Vui lòng kiểm tra lại thông tin đăng nhập của bạn.",
+                    message: "Có lỗi xảy ra",
+                    description: error.message,
                     duration: 5,
                 });
             }

@@ -22,6 +22,7 @@ import SaleClient from './components/client/sale.client';
 import OrderPage from './pages/admin/order';
 import './styles/reset.scss';
 import InvoicePage from './pages/admin/invoice';
+import HomePage from './components/client/home.client';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -48,16 +49,30 @@ export default function App() {
     if (window.location.pathname === '/login' || window.location.pathname === '/register') {
       return;
     }
-    dispatch(fetchAccount())
+
+    dispatch(fetchAccount());
   }, [])
 
   const router = createBrowserRouter([
     {
       path: "/",
-      element: (<LayoutApp><LayoutClient /></LayoutApp>),
+      element:
+        <LayoutApp>
+          <LayoutClient />
+        </LayoutApp>,
       errorElement: <NotFound />,
       children: [
-        { index: true, element: <SaleClient /> }
+        {
+          index: true,
+          element: <HomePage />
+        },
+        {
+          path: "/:name",
+          element:
+            <ProtectedRoute>
+              <SaleClient />
+            </ProtectedRoute>
+        }
       ],
     },
 
@@ -131,12 +146,10 @@ export default function App() {
         }
       ]
     },
-
     {
       path: "/login",
       element: <LoginPage />,
     },
-
     {
       path: "/register",
       element: <RegisterPage />,
