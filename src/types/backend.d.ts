@@ -190,13 +190,38 @@ interface IInvoice {
 export interface IProduct {
     id?: string;
     name: string;
-    sellingPrice?: number;
-    costPrice?: number;
     category?: string;
     unit?: string;
     quantity?: number;
-    sold?: number;
     image: string;
+    shortDesc?: string;
+    detailDesc?: string;
+    active?: boolean;
+    restaurant?: {
+        id: string;
+        name: string;
+    }
+
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+
+export interface IIngredient {
+    id?: string;
+    name?: string;
+    unit?: string;
+    price?: number;
+    category?: string;
+    image: string;
+    initialQuantity?: number;
+    minimumQuantity?: number;
+    description?: string;
+
+    category?: string;
+    quantity?: number;
     shortDesc?: string;
     detailDesc?: string;
     active?: boolean;

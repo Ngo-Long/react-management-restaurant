@@ -1,12 +1,12 @@
+import dayjs from 'dayjs';
 import { Col, Row } from 'antd';
+import { IOrder } from '@/types/backend';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
-import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
-import { IOrder } from '@/types/backend';
 import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
-import dayjs from 'dayjs';
+import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 
 interface DiningTableCardProps {
     currentTable: { id?: string | null; name: string };

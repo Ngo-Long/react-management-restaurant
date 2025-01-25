@@ -58,6 +58,14 @@ const InvoicePage = () => {
 
     const columns: ProColumns<IInvoice>[] = [
         {
+            title: 'Nhà hàng',
+            dataIndex: ["restaurant", "name"],
+            sorter: true,
+            align: "center",
+            hideInSearch: !isRoleOwner,
+            hidden: true
+        },
+        {
             title: 'Mã HD',
             width: 80,
             align: "center",
@@ -98,6 +106,12 @@ const InvoicePage = () => {
             },
         },
         {
+            title: 'Phương thức',
+            dataIndex: 'method',
+            sorter: true,
+            hideInSearch: true,
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'status',
             align: "center",
@@ -125,30 +139,28 @@ const InvoicePage = () => {
             width: 180,
             sorter: true,
             align: "center",
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD/MM/YYYY') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
-            sorter: true,
-            align: "center",
             hidden: true,
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD/MM/YYYY HH:mm:ss') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 120,
+            width: 100,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>

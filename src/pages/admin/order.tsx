@@ -41,7 +41,15 @@ const OrderPage = () => {
 
     const columns: ProColumns<IOrder>[] = [
         {
-            title: 'Đơn hàng',
+            title: 'Nhà hàng',
+            dataIndex: ["restaurant", "name"],
+            sorter: true,
+            align: "center",
+            hideInSearch: !isRoleOwner,
+            hidden: true
+        },
+        {
+            title: 'Mã ĐH',
             width: 80,
             align: "center",
             dataIndex: 'id',
@@ -58,21 +66,19 @@ const OrderPage = () => {
             hideInSearch: false,
         },
         {
+            title: 'Bàn ăn',
+            dataIndex: ["diningTable", "name"],
+            sorter: true,
+            hideInSearch: false,
+        },
+        {
             title: 'Ghi chú',
             dataIndex: 'note',
             sorter: true,
             hideInSearch: true,
         },
         {
-            title: 'Bàn ăn',
-            dataIndex: ["diningTable", "name"],
-            sorter: true,
-            align: "center",
-            hideInSearch: false,
-        },
-        {
             title: 'Tổng tiền',
-            width: 80,
             align: "center",
             dataIndex: 'totalPrice',
             hideInSearch: true,
@@ -118,33 +124,30 @@ const OrderPage = () => {
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 150,
             sorter: true,
             align: "center",
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
-            sorter: true,
-            align: "center",
             hidden: true,
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
-            title: 'Chi tiết',
+            title: 'Tác vụ',
             hideInSearch: true,
-            width: 75,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>

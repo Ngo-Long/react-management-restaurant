@@ -29,17 +29,17 @@ export const ALL_PERMISSIONS = {
         UPDATE: { method: "PUT", apiPath: '/api/v1/dining-tables', module: "DININGTABLES" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/dining-tables/{id}', module: "DININGTABLES" },
     },
+    SUPPLIERS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/ingredients', module: "SUPPLIERS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/ingredients', module: "SUPPLIERS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/ingredients', module: "SUPPLIERS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/ingredients/{id}', module: "SUPPLIERS" },
+    },
     ORDERS: {
         GET_PAGINATE: { method: "GET", apiPath: '/api/v1/orders', module: "ORDERS" },
         CREATE: { method: "POST", apiPath: '/api/v1/orders', module: "ORDERS" },
         UPDATE: { method: "PUT", apiPath: '/api/v1/orders', module: "ORDERS" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/orders/{id}', module: "ORDERS" },
-    },
-    ORDERDETAILS: {
-        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/order-details', module: "ORDERDETAILS" },
-        CREATE: { method: "POST", apiPath: '/api/v1/order-details', module: "ORDERDETAILS" },
-        UPDATE: { method: "PUT", apiPath: '/api/v1/order-details', module: "ORDERDETAILS" },
-        DELETE: { method: "DELETE", apiPath: '/api/v1/order-details/{id}', module: "ORDERDETAILS" },
     },
     PRODUCTS: {
         GET_PAGINATE: { method: "GET", apiPath: '/api/v1/products', module: "PRODUCTS" },
@@ -47,11 +47,23 @@ export const ALL_PERMISSIONS = {
         UPDATE: { method: "PUT", apiPath: '/api/v1/products', module: "PRODUCTS" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/products/{id}', module: "PRODUCTS" },
     },
+    INGREDIENTS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/ingredients', module: "INGREDIENTS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/ingredients', module: "INGREDIENTS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/ingredients', module: "INGREDIENTS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/ingredients/{id}', module: "INGREDIENTS" },
+    },
     INVOICES: {
         GET_PAGINATE: { method: "GET", apiPath: '/api/v1/invoices', module: "INVOICES" },
         CREATE: { method: "POST", apiPath: '/api/v1/invoices', module: "INVOICES" },
         UPDATE: { method: "PUT", apiPath: '/api/v1/invoices', module: "INVOICES" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/invoices/{id}', module: "INVOICES" },
+    },
+    RECEIPTS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/receipts', module: "RECEIPTS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/receipts', module: "RECEIPTS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/receipts', module: "RECEIPTS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/receipts/{id}', module: "RECEIPTS" },
     },
 }
 
@@ -62,8 +74,10 @@ export const ALL_MODULES = {
     ROLES: 'ROLES',
     PERMISSIONS: 'PERMISSIONS',
     DININGTABLES: 'DININGTABLES',
+    SUPPLIERS: 'SUPPLIERS',
     ORDERS: 'ORDERS',
-    ORDERDETAILS: 'ORDERDETAILS',
     PRODUCTS: 'PRODUCTS',
-    INVOICES: 'INVOICES'
+    INGREDIENTS: 'INGREDIENTS',
+    INVOICES: 'INVOICES',
+    RECEIPTS: 'RECEIPTS'
 }

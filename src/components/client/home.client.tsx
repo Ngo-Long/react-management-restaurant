@@ -1,6 +1,6 @@
 import '../../styles/client.home.scss'
-import { Breadcrumb, Button, Flex, Layout, Menu, theme } from "antd";
-import { Content, Footer, Header } from "antd/es/layout/layout";
+import { Button, Flex, Layout } from "antd";
+import { Footer } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {

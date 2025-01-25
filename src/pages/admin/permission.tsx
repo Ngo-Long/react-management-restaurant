@@ -54,6 +54,7 @@ const PermissionPage = () => {
             dataIndex: 'id',
             width: 50,
             align: "center",
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <a href="#" onClick={() => {
@@ -64,7 +65,6 @@ const PermissionPage = () => {
                     </a>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Quyền hạn',
@@ -75,12 +75,14 @@ const PermissionPage = () => {
             title: 'API',
             dataIndex: 'apiPath',
             sorter: true,
+            hideInSearch: true,
         },
         {
             title: 'Phương thức',
             dataIndex: 'method',
             sorter: true,
             align: "center",
+            hideInSearch: true,
             render(dom, entity, index, action, schema) {
                 return (
                     <p style={{ paddingLeft: 10, fontWeight: 'bold', marginBottom: 0, color: colorMethod(entity?.method as string) }}>{entity?.method || ''}</p>
@@ -92,6 +94,7 @@ const PermissionPage = () => {
             dataIndex: 'module',
             sorter: true,
             align: "center",
+            hideInSearch: true,
         },
         {
             title: 'Ngày tạo',
