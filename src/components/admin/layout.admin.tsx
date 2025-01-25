@@ -8,23 +8,18 @@ import {
     DashboardOutlined,
     ExceptionOutlined,
     MenuUnfoldOutlined,
-    AuditOutlined,
-    AppstoreAddOutlined,
     ContainerOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 const { Header, Sider, Content } = Layout;
 import { Button, Dropdown, Layout, Menu, message, Space, theme } from 'antd';
 
-import { isMobile } from 'react-device-detect';
-import React, { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-
 import { authApi } from '@/config/api';
+import React, { useState, useEffect } from 'react';
 import { ALL_PERMISSIONS } from '@/config/permissions';
-
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 const LayoutAdmin: React.FC = () => {
     const location = useLocation();
@@ -36,7 +31,6 @@ const LayoutAdmin: React.FC = () => {
     const [activeMenu, setActiveMenu] = useState('');
 
     const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.account.user);
     const permissions = useAppSelector(state => state.account.user.role.permissions);
 
     useEffect(() => {
@@ -61,6 +55,11 @@ const LayoutAdmin: React.FC = () => {
             const viewProduct = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE.method
+            )
+
+            const viewIngredient = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.INGREDIENTS.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.INGREDIENTS.GET_PAGINATE.method
             )
 
             const viewOrder = permissions?.find(item =>
@@ -106,6 +105,12 @@ const LayoutAdmin: React.FC = () => {
                 ...(viewProduct || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/product'>Thực đơn</Link>,
                     key: '/admin/product',
+                    icon: <ContainerOutlined />
+                }] : []),
+
+                ...(viewIngredient || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/ingredient'>Nguyên liệu</Link>,
+                    key: '/admin/ingredient',
                     icon: <ContainerOutlined />
                 }] : []),
 

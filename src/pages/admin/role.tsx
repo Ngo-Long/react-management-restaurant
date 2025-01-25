@@ -26,6 +26,8 @@ const RolePage = () => {
     const isFetching = useAppSelector(state => state.role.isFetching);
     const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
 
+    const currentUser = useAppSelector(state => state.account.user);
+    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
 
     // all backend permissions
     const [listPermissions, setListPermissions] = useState<{
@@ -79,6 +81,14 @@ const RolePage = () => {
             hideInSearch: true,
         },
         {
+            title: 'Nhà hàng',
+            dataIndex: ["restaurant", "name"],
+            sorter: true,
+            align: "center",
+            hideInSearch: !isRoleOwner,
+            hidden: true
+        },
+        {
             title: 'Chức vụ',
             dataIndex: 'name',
             sorter: true,
@@ -108,26 +118,26 @@ const RolePage = () => {
             width: 200,
             sorter: true,
             align: "center",
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
             width: 200,
             sorter: true,
-            hidden: true,
+            hidden: false,
             align: "center",
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
 

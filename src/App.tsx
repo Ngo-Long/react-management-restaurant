@@ -10,19 +10,19 @@ import DiningTablePage from './pages/admin/dining.table';
 
 import NotFound from "./components/share/not.found";
 import LayoutApp from "./components/share/layout.app";
+import HomePage from './components/client/home.client';
+import SaleClient from './components/client/sale.client';
 import LayoutAdmin from "./components/admin/layout.admin"
 import ProtectedRoute from "./components/share/protected-route.ts";
 
+import './styles/reset.scss';
 import { useEffect, useRef } from 'react';
+import OrderPage from './pages/admin/order';
+import InvoicePage from './pages/admin/invoice';
+import IngredientPage from './pages/admin/ingredient';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
-import Loading from './components/share/loading';
-import SaleClient from './components/client/sale.client';
-import OrderPage from './pages/admin/order';
-import './styles/reset.scss';
-import InvoicePage from './pages/admin/invoice';
-import HomePage from './components/client/home.client';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -114,6 +114,13 @@ export default function App() {
           element:
             <ProtectedRoute>
               <ProductPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "ingredient",
+          element:
+            <ProtectedRoute>
+              <IngredientPage />
             </ProtectedRoute>
         },
         {

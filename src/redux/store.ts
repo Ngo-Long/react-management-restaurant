@@ -12,7 +12,7 @@ import productReducer from './slice/productSlide';
 import restaurantReducer from './slice/restaurantSlide';
 import permissionReducer from './slice/permissionSlide';
 import diningTableReducer from './slice/diningTableSlide';
-import orderDetailReducer from './slice/orderDetailSlide';
+import ingredientReducer from './slice/ingredientSlide';
 
 // Configure the Redux store with various slice reducers
 export const store = configureStore({
@@ -23,8 +23,8 @@ export const store = configureStore({
     diningTable: diningTableReducer,
     order: orderReducer,
     invoice: invoiceReducer,
-    orderDetail: orderDetailReducer,
     product: productReducer,
+    ingredient: ingredientReducer,
     role: roleReducer,
     permission: permissionReducer,
   },
@@ -38,8 +38,8 @@ export type RootState = ReturnType<typeof store.getState>;
 
 // AppThunk type defines the structure for asynchronous actions (thunks)
 export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,       // The return type of the thunk
-  RootState,        // The state type of the store
-  unknown,          // The type for any additional data (if needed)
-  Action<string>    // The type for the action, in this case, a string
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
 >;

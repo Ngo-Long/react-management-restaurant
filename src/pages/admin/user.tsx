@@ -18,16 +18,13 @@ import DataTable from "@/components/client/data-table";
 const UserPage = () => {
     const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
+    const meta = useAppSelector(state => state.user.meta);
+    const isFetching = useAppSelector(state => state.user.isFetching);
 
+    const userList = useAppSelector(state => state.user.result);
     const [dataInit, setDataInit] = useState<IUser | null>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
-
-    const userList = useAppSelector(state => state.user.result);
-    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
-
-    const meta = useAppSelector(state => state.user.meta);
-    const isFetching = useAppSelector(state => state.user.isFetching);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
@@ -73,9 +70,17 @@ const UserPage = () => {
             sorter: true,
         },
         {
+            title: 'Tuổi',
+            dataIndex: 'age',
+            sorter: true,
+            hideInSearch: true,
+            align: "center"
+        },
+        {
             title: 'Giới tính',
             dataIndex: 'gender',
             sorter: true,
+            hideInSearch: true,
             align: "center"
         },
         {
@@ -86,46 +91,31 @@ const UserPage = () => {
             hideInSearch: true
         },
         {
-            title: 'Nhà hàng',
-            dataIndex: ["restaurant", "name"],
-            sorter: true,
-            align: "center",
-            hideInSearch: true,
-            hidden: (userRoleId == 1 ? false : true)
-        },
-
-        {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 170,
-            sorter: true,
-            // hidden: true,
-            align: "center",
+            hidden: true,
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
-            width: 170,
-            sorter: true,
             hidden: true,
-            align: "center",
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 90,
+            width: 100,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
@@ -153,7 +143,6 @@ const UserPage = () => {
                     </Access>
                 </Space >
             ),
-
         },
     ];
 
@@ -164,32 +153,35 @@ const UserPage = () => {
             filter: ""
         }
 
-        const clone = { ...params };
-        if (clone.name) q.filter = `${sfLike("name", clone.name)}`;
-        if (clone.email) {
-            q.filter = clone.name ?
-                q.filter + " and " + `${sfLike("email", clone.email)}`
-                : `${sfLike("email", clone.email)}`;
+        if (params.name) {
+            q.filter = q.filter
+                ? `${q.filter} and ${sfLike("name", params.name)}`
+                : `${sfLike("name", params.name)}`;
+        }
+        if (params.email) {
+            q.filter = q.filter
+                ? `${q.filter} and ${sfLike("email", params.email)}`
+                : `${sfLike("email", params.email)}`;
         }
 
         if (!q.filter) delete q.filter;
-        let temp = queryString.stringify(q);
 
+        let temp = queryString.stringify(q);
         let sortBy = "";
+
         if (sort && sort.name) {
-            sortBy = sort.name === 'ascend' ? "sort=name,asc" : "sort=name,desc";
+            sortBy = sort.name === "ascend" ? "sort=name,asc" : "sort=name,desc";
         }
         if (sort && sort.email) {
-            sortBy = sort.email === 'ascend' ? "sort=email,asc" : "sort=email,desc";
+            sortBy = sort.email === "ascend" ? "sort=email,asc" : "sort=email,desc";
         }
         if (sort && sort.createdDate) {
             sortBy = sort.createdDate === 'ascend' ? "sort=createdDate,asc" : "sort=createdDate,desc";
         }
         if (sort && sort.lastModifiedDate) {
-            sortBy = sort.lastModifiedDate === 'ascend' ? "sort=lastModifiedDate,asc" : "sort=lastModifiedDate,desc";
+            sortBy = sortBy = sort.lastModifiedDate === 'ascend' ? "sort=lastModifiedDate,asc" : "sort=lastModifiedDate,desc";
         }
 
-        //mặc định sort theo lastModifiedDate
         if (Object.keys(sortBy).length === 0) {
             temp = `${temp}&sort=lastModifiedDate,desc`;
         } else {
@@ -212,9 +204,7 @@ const UserPage = () => {
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            userRoleId == 1
-                                ? dispatch(fetchAllUser({ query }))
-                                : dispatch(fetchUserByRestaurant({ query }));
+                            dispatch(fetchUserByRestaurant({ query }))
                         }
                     }
                     scroll={{ x: true }}

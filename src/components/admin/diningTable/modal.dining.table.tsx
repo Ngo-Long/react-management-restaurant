@@ -5,16 +5,12 @@ import {
     ProFormSelect, ProFormSwitch, ProFormText
 } from "@ant-design/pro-components";
 import 'react-quill/dist/quill.snow.css';
-
-import ReactQuill from 'react-quill';
 import { useState, useEffect } from 'react';
-import { isMobile } from 'react-device-detect';
-
-import { DebounceSelect } from "../user/debouce.select";
-
 import { IDiningTable } from "@/types/backend";
-import { diningTableApi, restaurantApi } from "@/config/api";
 import { useAppSelector } from "@/redux/hooks";
+import { isMobile } from 'react-device-detect';
+import { DebounceSelect } from "../user/debouce.select";
+import { diningTableApi, restaurantApi } from "@/config/api";
 
 interface IProps {
     openModal: boolean;

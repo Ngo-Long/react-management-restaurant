@@ -4,8 +4,8 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchRestaurant } from "@/redux/slice/restaurantSlide";
 import { IRestaurant } from "@/types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, message, notification } from "antd";
+import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { useState, useRef } from 'react';
 import dayjs from 'dayjs';
 import { restaurantApi } from "@/config/api";
@@ -27,13 +27,12 @@ const RestaurantPage = () => {
 
     const handleDeleteRestaurant = async (id: string | undefined) => {
         if (!id) {
-            message.warning('ID nhà hàng không hợp lệ!');
+            message.warning('Nhà hàng không hợp lệ!');
             return;
         }
 
         try {
             const res = await restaurantApi.callDelete(id);
-
             if (res && +res.statusCode === 200) {
                 message.success('Xóa nhà hàng thành công');
                 reloadTable();
@@ -41,14 +40,11 @@ const RestaurantPage = () => {
                 notification.error({ message: 'Có lỗi xảy ra!' });
             }
         } catch (error) {
-            console.error('Error while deleting restaurant:', error);
             notification.error({ message: 'Có lỗi xảy ra!' });
         }
     }
 
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
+    const reloadTable = () => tableRef?.current?.reload();
 
     const columns: ProColumns<IRestaurant>[] = [
         {
@@ -56,14 +52,10 @@ const RestaurantPage = () => {
             key: 'index',
             width: 50,
             align: "center",
-            render: (text, record, index) => {
-                return (
-                    <>
-                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>
-                )
-            },
             hideInSearch: true,
+            render: (text, record, index) => {
+                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)} </>)
+            },
         },
         {
             title: 'Tên',
@@ -75,12 +67,19 @@ const RestaurantPage = () => {
             dataIndex: 'address',
             sorter: true,
         },
-
+        {
+            title: 'Hoạt động',
+            align: "center",
+            dataIndex: 'active',
+            hideInSearch: false,
+        },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
             width: 200,
             sorter: true,
+            align: 'center',
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>
@@ -88,13 +87,14 @@ const RestaurantPage = () => {
                     </>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
             width: 200,
             sorter: true,
+            align: 'center',
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>
@@ -102,35 +102,25 @@ const RestaurantPage = () => {
                     </>
                 )
             },
-            hideInSearch: true,
         },
         {
 
             title: 'Tác vụ',
+            width: 100,
+            align: 'center',
             hideInSearch: true,
-            width: 50,
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    < Access
-                        permission={ALL_PERMISSIONS.RESTAURANTS.UPDATE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.RESTAURANTS.UPDATE} hideChildren>
                         <EditOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#ffa500',
-                            }}
-                            type=""
+                            style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
                             }}
                         />
                     </Access >
-                    <Access
-                        permission={ALL_PERMISSIONS.RESTAURANTS.DELETE}
-                        hideChildren
-                    >
+                    <Access permission={ALL_PERMISSIONS.RESTAURANTS.DELETE} hideChildren>
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa nhà hàng"}
@@ -139,14 +129,7 @@ const RestaurantPage = () => {
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
-                            <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteOutlined
-                                    style={{
-                                        fontSize: 20,
-                                        color: '#ff4d4f',
-                                    }}
-                                />
-                            </span>
+                            <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
                 </Space >

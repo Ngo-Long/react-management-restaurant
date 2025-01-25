@@ -1,41 +1,30 @@
 import dayjs from 'dayjs';
 import { useState, useRef } from 'react';
-import { useNavigate } from "react-router-dom";
-
 import queryString from 'query-string';
 import { IProduct } from "@/types/backend";
 import { sfIn } from "spring-filter-query-builder";
-
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
 import ModalProduct from '@/components/admin/product/modal.product';
 
 import { productApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchProduct, fetchProductByRestaurant } from "@/redux/slice/productSlide";
-
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
-
 const ProductPage = () => {
     const tableRef = useRef<ActionType>();
-
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IProduct | null>(null);
-    const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
-
     const dispatch = useAppDispatch();
     const products = useAppSelector(state => state.product.result);
 
+    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [dataInit, setDataInit] = useState<IProduct | null>(null);
+
     const meta = useAppSelector(state => state.product.meta);
     const isFetching = useAppSelector(state => state.product.isFetching);
-
-    const currentUser = useAppSelector(state => state.account.user);
-    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
 
     const reloadTable = () => {
         tableRef?.current?.reload();
@@ -63,68 +52,61 @@ const ProductPage = () => {
             width: 50,
             align: "center",
             render: (text, record, index) => {
-                return (
-                    <>
-                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>)
+                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
             hideInSearch: true,
         },
         {
             title: 'Tên hàng',
-            width: '250px',
             dataIndex: 'name',
             sorter: true,
         },
         {
-            title: 'Nhà hàng',
-            dataIndex: ["restaurant", "name"],
+            title: 'Đơn vị',
+            dataIndex: 'unit',
             sorter: true,
-            hidden: !isRoleOwner,
-            hideInSearch: true,
+            align: "center",
         },
         {
-            title: 'Giá bán',
+            title: 'Phân loại',
+            dataIndex: 'category',
+            sorter: true,
             align: "center",
-            dataIndex: 'sellingPrice',
-            hideInSearch: true,
-            render(dom, entity, index, action, schema) {
-                const str = "" + entity.sellingPrice;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
-            },
         },
         {
-            title: 'Giá vốn',
+            title: 'Hoạt động',
             align: "center",
-            dataIndex: 'costPrice',
-            hideInSearch: true,
+            dataIndex: 'active',
+            hideInSearch: false,
+            renderFormItem: (item, props, form) => (
+                <ProFormSelect
+                    showSearch
+                    allowClear
+                    valueEnum={{
+                        true: 'Hoạt động',
+                        false: 'Ngưng hoạt động'
+                    }}
+                    placeholder="Chọn hoạt động"
+                />
+            ),
             render(dom, entity, index, action, schema) {
-                const str = "" + entity.costPrice;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
-            },
-        },
-        {
-            title: 'Tồn kho',
-            align: "center",
-            dataIndex: 'quantity',
-            hideInSearch: true,
-            render(dom, entity, index, action, schema) {
-                const str = "" + entity.quantity;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+                return <>
+                    <Tag color={entity.active ? "lime" : "red"} >
+                        {entity.active ? "ACTIVE" : "INACTIVE"}
+                    </Tag>
+                </>
             },
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            width: 180,
-            sorter: true,
-            align: "center",
+            hidden: true,
+            hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
             },
-            hideInSearch: true,
         },
         {
             title: 'Ngày sửa',
@@ -171,7 +153,6 @@ const ProductPage = () => {
                     </Access>
                 </Space >
             ),
-
         },
     ];
 
@@ -230,9 +211,7 @@ const ProductPage = () => {
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            (isRoleOwner
-                                ? dispatch(fetchProduct({ query }))
-                                : dispatch(fetchProductByRestaurant({ query })))
+                            dispatch(fetchProductByRestaurant({ query }))
                         }
                     }
                     scroll={{ x: true }}

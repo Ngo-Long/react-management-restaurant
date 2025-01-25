@@ -1,5 +1,5 @@
 import axios from '../config/axios-customize';
-import { IRestaurant } from '../types/backend';
+import { IIngredient, IRestaurant } from '../types/backend';
 import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice, IPermission
@@ -244,6 +244,36 @@ export const productApi = {
 
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IProduct>>>(`/api/v1/products/by-restaurant?${query}`);
+    }
+}
+
+/**
+ *
+Module Ingredient
+ */
+export const ingredientApi = {
+    callCreate(ingredient: IIngredient) {
+        return axios.post<IBackendRes<IIngredient>>('/api/v1/ingredients', { ...ingredient });
+    },
+
+    callUpdate(ingredient: IIngredient) {
+        return axios.put<IBackendRes<IIngredient>>('/api/v1/ingredients', { ...ingredient });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IIngredient>>(`/api/v1/ingredients/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IIngredient>>(`/api/v1/ingredients/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IIngredient>>>(`/api/v1/ingredients?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IIngredient>>>(`/api/v1/ingredients/by-restaurant?${query}`);
     }
 }
 
