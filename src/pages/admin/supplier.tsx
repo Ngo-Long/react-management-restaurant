@@ -1,44 +1,37 @@
 import dayjs from 'dayjs';
-import { useState, useRef } from 'react';
 import queryString from 'query-string';
-import { IDiningTable } from "@/types/backend";
-import { sfIn } from "spring-filter-query-builder";
+import { useState, useRef } from 'react';
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data-table";
-import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
-
-import { diningTableApi } from "@/config/api";
+import { supplierApi } from "@/config/api";
+import { ISupplier } from "@/types/backend";
+import { sfIn } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
+import DataTable from "@/components/client/data-table";
+import ModalSupplier from '@/components/admin/supplier/modal.supplier';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
+import { fetchSupplierByRestaurant } from "@/redux/slice/supplierSlide";
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
-const DiningTablePage = () => {
+const SupplierPage = () => {
     const tableRef = useRef<ActionType>();
-
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
-
+    const [dataInit, setDataInit] = useState<ISupplier | null>(null);
     const dispatch = useAppDispatch();
-    const diningTables = useAppSelector(state => state.diningTable.result);
-
-    const meta = useAppSelector(state => state.diningTable.meta);
-    const isFetching = useAppSelector(state => state.diningTable.isFetching);
-
-    const currentUser = useAppSelector(state => state.account.user);
-    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
+    const suppliers = useAppSelector(state => state.supplier.result);
+    const meta = useAppSelector(state => state.supplier.meta);
+    const isFetching = useAppSelector(state => state.supplier.isFetching);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
-    const handleDeleteDiningTable = async (id: string | undefined) => {
+    const handleDeleteSupplier = async (id: string | undefined) => {
         if (id) {
-            const res = await diningTableApi.callDelete(id);
+            const res = await supplierApi.callDelete(id);
             if (res && +res.statusCode === 200) {
-                message.success('Xóa bàn ăn thành công');
+                message.success('Xóa nhà cung cấp thành công');
                 reloadTable();
             } else {
                 notification.error({
@@ -49,59 +42,59 @@ const DiningTablePage = () => {
         }
     }
 
-    const columns: ProColumns<IDiningTable>[] = [
+    const columns: ProColumns<ISupplier>[] = [
         {
             title: 'STT',
             key: 'index',
             width: 50,
             align: "center",
-            hideInSearch: true,
             render: (text, record, index) => {
-                return (
-                    <>
-                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>)
+                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
+            hideInSearch: true,
         },
         {
-            title: 'Tên bàn ăn',
+            title: 'Tên nhà cung cấp',
             dataIndex: 'name',
             sorter: true,
         },
         {
-            title: 'Số ghế',
+            title: 'SĐT',
+            dataIndex: 'phone',
             sorter: true,
             align: "center",
-            dataIndex: 'seats',
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            sorter: true,
+            align: "center",
+        },
+        {
+            title: 'Địa chỉ',
+            dataIndex: 'address',
+            sorter: true,
+            align: "center",
+        },
+        {
+            title: 'Tiền nợ',
+            align: "center",
+            dataIndex: 'debtAmount',
             hideInSearch: true,
-            render(dom, entity, index, action, schema) {
-                const str = "" + entity.seats;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+            render(_, entity) {
+                const str = "" + entity.debtAmount;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
             },
         },
         {
-            title: 'Vị trí',
-            dataIndex: 'location',
-            sorter: true,
+            title: 'Tổng đã mua',
             align: "center",
-            hideInSearch: false,
-        },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            align: "center",
-            renderFormItem: (item, props, form) => (
-                <ProFormSelect
-                    showSearch
-                    allowClear
-                    valueEnum={{
-                        AVAILABLE: 'Còn trống',
-                        OCCUPIED: 'Đã có khách',
-                        RESERVED: 'Đã đặt trước'
-                    }}
-                    placeholder="Chọn trạng thái"
-                />
-            ),
+            dataIndex: 'totalAmount',
+            hideInSearch: true,
+            render(_, entity) {
+                const str = "" + entity.totalAmount;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
+            },
         },
         {
             title: 'Hoạt động',
@@ -111,6 +104,7 @@ const DiningTablePage = () => {
             renderFormItem: (item, props, form) => (
                 <ProFormSelect
                     showSearch
+                    mode="multiple"
                     allowClear
                     valueEnum={{
                         true: 'Hoạt động',
@@ -119,7 +113,7 @@ const DiningTablePage = () => {
                     placeholder="Chọn hoạt động"
                 />
             ),
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 return <>
                     <Tag color={entity.active ? "lime" : "red"} >
                         {entity.active ? "ACTIVE" : "INACTIVE"}
@@ -136,12 +130,15 @@ const DiningTablePage = () => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
-            }
+            },
         },
         {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
+            width: 150,
+            sorter: true,
             hidden: true,
+            align: "center",
             hideInSearch: true,
             render: (text, record, index, action) => {
                 return (
@@ -152,11 +149,11 @@ const DiningTablePage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    <Access permission={ALL_PERMISSIONS.DININGTABLES.UPDATE} hideChildren>
+                    < Access permission={ALL_PERMISSIONS.SUPPLIERS.UPDATE} hideChildren>
                         <EditOutlined
                             style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
@@ -166,12 +163,12 @@ const DiningTablePage = () => {
                         />
                     </Access >
 
-                    <Access permission={ALL_PERMISSIONS.DININGTABLES.DELETE} hideChildren >
+                    <Access permission={ALL_PERMISSIONS.SUPPLIERS.DELETE} hideChildren>
                         <Popconfirm
                             placement="leftTop"
-                            title={"Xác nhận xóa bàn ăn"}
-                            description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
-                            onConfirm={() => handleDeleteDiningTable(entity.id)}
+                            title={"Xác nhận xóa nhà cung cấp"}
+                            description={"Bạn có chắc chắn muốn xóa nhà cung cấp này ?"}
+                            onConfirm={() => handleDeleteSupplier(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
@@ -210,7 +207,7 @@ const DiningTablePage = () => {
             for (const field of fields) {
                 if (sort[field]) {
                     sortBy = `sort=${field},${sort[field] === 'ascend' ? 'asc' : 'desc'}`;
-                    break;  // Remove this if you want to handle multiple sort parameters
+                    break;
                 }
             }
         }
@@ -227,18 +224,18 @@ const DiningTablePage = () => {
 
     return (
         <div>
-            <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
-                <DataTable<IDiningTable>
+            <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}>
+                <DataTable<ISupplier>
                     actionRef={tableRef}
-                    headerTitle="Danh sách bàn ăn"
+                    headerTitle="Danh sách nhà cung cấp"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
-                    dataSource={diningTables}
+                    dataSource={suppliers}
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            dispatch(fetchDiningTableByRestaurant({ query }))
+                            dispatch(fetchSupplierByRestaurant({ query }))
                         }
                     }
                     scroll={{ x: true }}
@@ -266,7 +263,7 @@ const DiningTablePage = () => {
                 />
             </Access>
 
-            <ModalDiningTable
+            <ModalSupplier
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
@@ -277,4 +274,4 @@ const DiningTablePage = () => {
     )
 }
 
-export default DiningTablePage;
+export default SupplierPage;

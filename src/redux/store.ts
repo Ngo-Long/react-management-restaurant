@@ -9,10 +9,12 @@ import orderReducer from './slice/orderSlide';
 import invoiceReducer from './slice/invoiceSlide';
 import accountReducer from './slice/accountSlide';
 import productReducer from './slice/productSlide';
+import supplierReducer from './slice/supplierSlide';
 import restaurantReducer from './slice/restaurantSlide';
 import permissionReducer from './slice/permissionSlide';
-import diningTableReducer from './slice/diningTableSlide';
 import ingredientReducer from './slice/ingredientSlide';
+import orderDetailReducer from './slice/orderDetailSlide';
+import diningTableReducer from './slice/diningTableSlide';
 
 // Configure the Redux store with various slice reducers
 export const store = configureStore({
@@ -22,11 +24,13 @@ export const store = configureStore({
     user: userReducer,
     diningTable: diningTableReducer,
     order: orderReducer,
+    orderDetail: orderDetailReducer,
     invoice: invoiceReducer,
     product: productReducer,
     ingredient: ingredientReducer,
     role: roleReducer,
     permission: permissionReducer,
+    supplier: supplierReducer
   },
 });
 

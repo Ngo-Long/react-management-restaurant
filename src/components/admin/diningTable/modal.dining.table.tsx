@@ -137,7 +137,6 @@ const ModalDiningTable = (props: IProps) => {
                         ? { label: dataInit?.restaurant?.name, value: dataInit?.restaurant?.id }
                         : { label: currentRestaurant?.name, value: currentRestaurant?.id }
                 } : {}}
-
             >
                 <Row gutter={[20, 20]}>
                     <Col span={24} md={12}>

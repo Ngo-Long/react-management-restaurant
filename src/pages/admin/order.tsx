@@ -32,22 +32,11 @@ const OrderPage = () => {
     const meta = useAppSelector(state => state.order.meta);
     const isFetching = useAppSelector(state => state.order.isFetching);
 
-    const currentUser = useAppSelector(state => state.account.user);
-    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
-
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
     const columns: ProColumns<IOrder>[] = [
-        {
-            title: 'Nhà hàng',
-            dataIndex: ["restaurant", "name"],
-            sorter: true,
-            align: "center",
-            hideInSearch: !isRoleOwner,
-            hidden: true
-        },
         {
             title: 'Mã ĐH',
             width: 80,
@@ -234,10 +223,7 @@ const OrderPage = () => {
                     request={
                         async (params, sort, filter): Promise<any> => {
                             const query = buildQuery(params, sort, filter);
-                            (isRoleOwner
-                                ? dispatch(fetchOrder({ query }))
-                                : dispatch(fetchOrderByRestaurant({ query }))
-                            )
+                            dispatch(fetchOrderByRestaurant({ query }))
                         }
                     }
                     scroll={{ x: true }}

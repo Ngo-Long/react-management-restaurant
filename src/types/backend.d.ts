@@ -189,17 +189,22 @@ interface IInvoice {
 
 export interface IProduct {
     id?: string;
-    name: string;
+    name?: string;
     category?: string;
     unit?: string;
-    quantity?: number;
-    image: string;
+    image: string | null;
     shortDesc?: string;
     detailDesc?: string;
     active?: boolean;
+    categories?: Array<{
+        id?: number;
+        name?: string;
+        price?: number;
+        isDefault?: boolean;
+    }>;
     restaurant?: {
-        id: string;
-        name: string;
+        id?: string;
+        name?: string;
     }
 
     createdBy?: string;
@@ -215,15 +220,75 @@ export interface IIngredient {
     unit?: string;
     price?: number;
     category?: string;
+    status?: string;
     image: string;
     initialQuantity?: number;
     minimumQuantity?: number;
     description?: string;
+    active?: boolean;
+    restaurant?: {
+        id?: string;
+        name?: string;
+    }
 
-    category?: string;
-    quantity?: number;
-    shortDesc?: string;
-    detailDesc?: string;
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+
+export interface ICategory {
+    id?: string | number;
+    name?: string;
+    price?: number;
+    costPrice?: number;
+    default?: boolean;
+    active?: boolean;
+    product?: {
+        id?: string;
+        name?: string;
+    }
+    categoryDetails: Array<{
+        id?: string;
+        quantity?: number;
+        category?: {
+            id?: string;
+        }
+        ingredient?: {
+            id?: string;
+            name?: string;
+        }
+    }>;
+}
+
+export interface ISupplier {
+    id?: string;
+    name?: string;
+    phone?: string;
+    email?: number;
+    address?: string;
+    debtAmount?: number;
+    totalAmount?: number;
+    active?: boolean;
+    restaurant?: {
+        id?: string;
+        name?: string;
+    }
+
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+
+export interface IReceipt {
+    id?: string;
+    type?: string;
+    note?: string;
+    totalAmount?: number;
+    status?: string;
     active?: boolean;
     restaurant?: {
         id: string;

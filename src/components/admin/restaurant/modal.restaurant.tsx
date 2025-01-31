@@ -10,6 +10,7 @@ import { restaurantApi, callUploadSingleFile } from "@/config/api";
 import { IRestaurant } from "@/types/backend";
 import { v4 as uuidv4 } from 'uuid';
 import enUS from 'antd/lib/locale/en_US';
+import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
 
 interface IProps {
     openModal: boolean;
@@ -33,6 +34,8 @@ const ModalRestaurant = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
 
     //modal animation
+    const [form] = Form.useForm();
+    const [value, setValue] = useState<string>("");
     const [animation, setAnimation] = useState<string>('open');
 
     const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
@@ -40,9 +43,6 @@ const ModalRestaurant = (props: IProps) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
-
-    const [value, setValue] = useState<string>("");
-    const [form] = Form.useForm();
 
     useEffect(() => {
         if (dataInit?.id && dataInit?.description) {
@@ -57,7 +57,6 @@ const ModalRestaurant = (props: IProps) => {
                 name: dataInit.logo,
                 uid: uuidv4(),
             }])
-
         }
     }, [dataInit])
 
@@ -120,72 +119,6 @@ const ModalRestaurant = (props: IProps) => {
             }
         }
     }
-
-    const handleRemoveFile = (file: any) => {
-        setDataLogo([])
-    }
-
-    const handlePreview = async (file: any) => {
-        if (!file.originFileObj) {
-            setPreviewImage(file.url);
-            setPreviewOpen(true);
-            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-            return;
-        }
-        getBase64(file.originFileObj, (url: string) => {
-            setPreviewImage(url);
-            setPreviewOpen(true);
-            setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-        });
-    };
-
-    const getBase64 = (img: any, callback: any) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result));
-        reader.readAsDataURL(img);
-    };
-
-    const beforeUpload = (file: any) => {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) {
-            message.error('Chỉ tải ảnh dạng JPG/PNG!');
-        }
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) {
-            message.error('Ảnh không được quá 2MB!');
-        }
-        return isJpgOrPng && isLt2M;
-    };
-
-    const handleChange = (info: any) => {
-        if (info.file.status === 'uploading') {
-            setLoadingUpload(true);
-        }
-        if (info.file.status === 'done') {
-            setLoadingUpload(false);
-        }
-        if (info.file.status === 'error') {
-            setLoadingUpload(false);
-            message.error(info?.file?.error?.event?.message ?? "Đã có lỗi xảy ra khi tải ảnh!")
-        }
-    };
-
-    const handleUploadFileLogo = async ({ file, onSuccess, onError }: any) => {
-        const res = await callUploadSingleFile(file, "restaurant");
-        if (res && res.data) {
-            setDataLogo([{
-                name: res.data.fileName,
-                uid: uuidv4()
-            }])
-            if (onSuccess) onSuccess('ok')
-        } else {
-            if (onError) {
-                setDataLogo([])
-                const error = new Error(res.message);
-                onError({ event: error });
-            }
-        }
-    };
 
     return (
         <>
@@ -251,21 +184,35 @@ const ModalRestaurant = (props: IProps) => {
                                             className="avatar-uploader"
                                             maxCount={1}
                                             multiple={false}
-                                            customRequest={handleUploadFileLogo}
+                                            customRequest={({ file, onSuccess, onError }) => {
+                                                handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
+                                            }}
                                             beforeUpload={beforeUpload}
-                                            onChange={handleChange}
-                                            onRemove={(file) => handleRemoveFile(file)}
-                                            onPreview={handlePreview}
+                                            onChange={(info) => handleChange(info, setLoadingUpload)}
+                                            onRemove={() => handleRemoveFile(setDataLogo)}
+                                            onPreview={(file) => {
+                                                const fileUrl = file.url || '';
+                                                if (!file.originFileObj) {
+                                                    setPreviewImage(fileUrl);
+                                                    setPreviewOpen(true);
+                                                    setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
+                                                    return;
+                                                }
+                                                getBase64(file.originFileObj, (url: string) => {
+                                                    setPreviewImage(url);
+                                                    setPreviewOpen(true);
+                                                    setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
+                                                });
+                                            }}
                                             defaultFileList={
                                                 dataInit?.id ?
-                                                    [
-                                                        {
-                                                            uid: uuidv4(),
-                                                            name: dataInit?.logo ?? "",
-                                                            status: 'done',
-                                                            url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.logo}`,
-                                                        }
-                                                    ] : []
+                                                    [{
+                                                        uid: uuidv4(),
+                                                        name: dataInit?.logo ?? "",
+                                                        status: 'done',
+                                                        url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.logo}`,
+                                                    }]
+                                                    : []
                                             }
 
                                         >

@@ -1,22 +1,24 @@
 import dayjs from 'dayjs';
-import { useState, useRef } from 'react';
 import queryString from 'query-string';
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { IProduct } from "@/types/backend";
 import { sfIn } from "spring-filter-query-builder";
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
-import ModalProduct from '@/components/admin/product/modal.product';
 
 import { productApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchProduct, fetchProductByRestaurant } from "@/redux/slice/productSlide";
+import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
 const ProductPage = () => {
     const tableRef = useRef<ActionType>();
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const products = useAppSelector(state => state.product.result);
 
@@ -60,6 +62,29 @@ const ProductPage = () => {
             title: 'Tên hàng',
             dataIndex: 'name',
             sorter: true,
+        },
+        {
+            title: 'Phân loại',
+            align: "center",
+            dataIndex: 'product.categories',
+            hideInSearch: true,
+            render(dom, entity) {
+                const categories = entity?.categories || [];
+                const defaultCategory = categories.find(c => c.isDefault) || categories[0];
+                return <>{defaultCategory?.name}</>;
+            },
+        },
+        {
+            title: 'Giá bán',
+            align: "center",
+            dataIndex: 'price',
+            hideInSearch: true,
+            render(dom, entity) {
+                const categories = entity?.categories || [];
+                const defaultCategory = categories.find(c => c.isDefault) || categories[0];
+                const price = defaultCategory?.price || 0;
+                return <>{price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>;
+            },
         },
         {
             title: 'Đơn vị',
@@ -133,8 +158,7 @@ const ProductPage = () => {
                         <EditOutlined
                             style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
-                                setOpenModal(true);
-                                setDataInit(entity);
+                                navigate(`/admin/product/upsert?id=${entity.id}`)
                             }}
                         />
                     </Access >
@@ -203,34 +227,30 @@ const ProductPage = () => {
             <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
                 <DataTable<IProduct>
                     actionRef={tableRef}
-                    headerTitle="Danh sách hàng hóa"
+                    headerTitle="Danh sách món ăn"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
                     dataSource={products}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchProductByRestaurant({ query }))
-                        }
-                    }
+                    request={async (params, sort, filter): Promise<any> => {
+                        const query = buildQuery(params, sort, filter);
+                        dispatch(fetchProductByRestaurant({ query }))
+                    }}
                     scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
+                    pagination={{
+                        current: meta.page,
+                        pageSize: meta.pageSize,
+                        showSizeChanger: true,
+                        total: meta.total,
+                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
+                    }}
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
                             <Button
                                 icon={<PlusOutlined />}
                                 type="primary"
-                                onClick={() => setOpenModal(true)}
+                                onClick={() => navigate('upsert')}
                             >
                                 Thêm mới
                             </Button>
@@ -238,14 +258,6 @@ const ProductPage = () => {
                     }}
                 />
             </Access>
-
-            <ModalProduct
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                reloadTable={reloadTable}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-            />
         </div >
     )
 }

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import OrderCard from './card/order.card';
-import ProductCard from './card/product.card';
+import OrderCard from '../../components/client/card/order.card';
+import ProductCard from '../../components/client/card/product.card';
 import { Row, Col, Card, Checkbox, message, notification } from 'antd';
-import DiningTableCard from './card/table.card';
+import DiningTableCard from '../../components/client/card/table.card';
 import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
 import { IOrder } from '@/types/backend';
 import { useAppDispatch } from '@/redux/hooks';

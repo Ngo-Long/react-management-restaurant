@@ -36,12 +36,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         ? products.filter(product => product.category === selectedCategory)
         : products;
 
+    const getDefaultCategoryPrice = (product: IProduct) => {
+        const defaultCategory = product.categories?.find(category => category.isDefault);
+        return defaultCategory ? defaultCategory.price : 0;
+    };
+
     const showModal = (product: IProduct) => {
         // reset product
         setSelectedProduct(product);
         setQuantity(1);
-        setTotalPrice(product.sellingPrice!);
-
+        setTotalPrice(getDefaultCategoryPrice(product) ?? 0);
         setIsModalOpen(true);
     };
 
@@ -49,7 +53,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         if (selectedProduct) {
             handleItemSelect({
                 quantity,
-                price: selectedProduct.sellingPrice,
                 status: 'CONFIRMED',
                 product: {
                     id: selectedProduct.id,
@@ -70,7 +73,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         setQuantity(num);
 
         if (selectedProduct) {
-            setTotalPrice(selectedProduct.sellingPrice! * num);
+            const defaultPrice = getDefaultCategoryPrice(selectedProduct) ?? 0;
+            setTotalPrice(defaultPrice * num);
         }
     };
 
@@ -97,7 +101,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                                 <div className="item-card">
                                     <p className="item-card__title">{product.name}</p>
                                     <p className="item-card__price">
-                                        {(product.sellingPrice + "")?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+
+                                        {/* {new Intl.NumberFormat().format(getDefaultCategoryPrice(product) ?? 0)} ₫ */}
                                     </p>
                                 </div>
                             </div>
@@ -161,7 +166,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                             onChange={handleQuantityChange}
                         />
                         &nbsp; x &nbsp;
-                        {new Intl.NumberFormat().format(selectedProduct?.sellingPrice!)} ₫
+                        {/* {getDefaultCategoryPrice(selectedProduct!) ?? 0} */}
+                        {/* {new Intl.NumberFormat().format(getDefaultCategoryPrice(selectedProduct!) ?? 0)} ₫ */}
                     </div>
 
                     <div className='modal-card'>
