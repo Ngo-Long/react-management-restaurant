@@ -128,16 +128,16 @@ export interface IOrder {
     id?: string;
     note?: string;
     totalPrice?: number;
-    optional?: string;
+    option?: string;
     status?: string;
     user?: {
         id?: string;
         name?: string;
     };
-    diningTable?: {
+    diningTables?: {
         id?: string | null;
         name?: string | null;
-    };
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -147,17 +147,22 @@ export interface IOrder {
 
 export interface IOrderDetail {
     id?: string;
+    price?: string;
     quantity?: number;
-    price?: number;
     status?: string;
-    product?: {
-        id?: string | null;
-        name?: string;
-    };
     order?: {
         id?: string | null;
-        tableName?: string;
     };
+    unit?: {
+        id?: string;
+        name?: string;
+        price?: number;
+        productName?: string;
+    }
+    diningTables?: {
+        id?: string | null;
+        name?: string | null;
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -189,17 +194,22 @@ interface IInvoice {
 
 export interface IProduct {
     id?: string;
-    name: string;
-    category?: string;
-    unit?: string;
-    quantity?: number;
-    image: string;
+    name?: string;
+    type: string;
+    image: string | null;
+    category: string;
     shortDesc?: string;
     detailDesc?: string;
     active?: boolean;
+    units?: Array<{
+        id?: number;
+        name?: string;
+        price?: number;
+        isDefault?: boolean;
+    }>;
     restaurant?: {
-        id: string;
-        name: string;
+        id?: string;
+        name?: string;
     }
 
     createdBy?: string;
@@ -212,18 +222,77 @@ export interface IProduct {
 export interface IIngredient {
     id?: string;
     name?: string;
-    unit?: string;
+    type?: string;
     price?: number;
-    category?: string;
+    status?: string;
     image: string;
+    category?: string;
     initialQuantity?: number;
     minimumQuantity?: number;
     description?: string;
+    active?: boolean;
+    restaurant?: {
+        id?: string;
+        name?: string;
+    }
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
 
-    category?: string;
-    quantity?: number;
-    shortDesc?: string;
-    detailDesc?: string;
+export interface IUnit {
+    id?: string | number;
+    name?: string;
+    price?: number;
+    costPrice?: number;
+    default?: boolean;
+    active?: boolean;
+    product?: {
+        id?: string;
+        name?: string;
+    }
+    unitDetails: Array<{
+        id?: string;
+        quantity?: number;
+        unit?: {
+            id?: string;
+        }
+        ingredient?: {
+            id?: string;
+            name?: string;
+        }
+    }>;
+}
+
+export interface ISupplier {
+    id?: string;
+    name?: string;
+    phone?: string;
+    email?: number;
+    address?: string;
+    debtAmount?: number;
+    totalAmount?: number;
+    active?: boolean;
+    restaurant?: {
+        id?: string;
+        name?: string;
+    }
+
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+
+export interface IReceipt {
+    id?: string;
+    type?: string;
+    note?: string;
+    totalAmount?: number;
+    status?: string;
     active?: boolean;
     restaurant?: {
         id: string;

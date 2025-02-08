@@ -15,7 +15,7 @@ const HomePage = () => {
                             <div
                                 style={{ color: '#ff403d', fontSize: '16px', fontWeight: 600 }}
                             >
-                                .LOGO
+                                .Rservice
                             </div>
                             {/* <img src=".." alt="LOGO" className="logo-img" /> */}
                         </a>
@@ -121,7 +121,7 @@ const HomePage = () => {
                 </section>
 
                 <Footer style={{ textAlign: 'center' }}>
-                    Management restaurant ©{new Date().getFullYear()} Created by NKL
+                    Rservice ©{new Date().getFullYear()} Created by NKL
                 </Footer>
             </Layout>
         </>

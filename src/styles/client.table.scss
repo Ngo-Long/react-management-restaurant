@@ -332,18 +332,25 @@
     &-modal {
         .modal-content {
             margin: 20px 0;
-            font-size: 15px;
         }
 
         .modal-card {
-            margin-top: 16px;
+            margin-top: 20px;
+
+            &__title {
+                font-size: 16px;
+            }
         }
     }
 
     &-invoice {
 
         .invoice-container {
-            padding: 0 20px;
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 500px;
+            padding: 40px 30px;
         }
 
         .invoice-header {
@@ -421,9 +428,8 @@
             }
 
             &__title {
-                font-size: 16px;
+                font-size: 15px;
                 margin-left: 6px;
-                font-weight: 500;
             }
         }
 

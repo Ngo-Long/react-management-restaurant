@@ -1,17 +1,12 @@
-import {
-    Button, Divider, Form,
-    Input, message, notification
-} from 'antd';
-import styles from 'styles/auth.module.scss';
-
 import { authApi } from '@/config/api';
-import { useAppSelector } from '@/redux/hooks';
-import { setUserLoginInfo } from '@/redux/slice/accountSlide';
-
 import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import styles from 'styles/auth.module.scss';
+import { useAppSelector } from '@/redux/hooks';
 import Loading from '@/components/share/loading';
+import { setUserLoginInfo } from '@/redux/slice/accountSlide';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Button, Divider, Form, Input, message, notification } from 'antd';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -25,13 +20,19 @@ const LoginPage = () => {
     let params = new URLSearchParams(location.search);
     const callback = params?.get("callback");
 
-    useEffect(() => {
-        //đã login => redirect to '/'
-        if (isAuthenticated) {
-            // navigate('/');
-            window.location.href = '/';
-        }
-    }, [])
+    // useEffect(() => {
+    //     //đã login => redirect to '/'
+    //     if (!isAuthenticated) {
+    //         // navigate('/');
+    //         window.location.href = '/';
+    //     }
+    // }, [])
+
+    // useEffect(() => {
+    //     if (isAuthenticated && !callback) {
+    //         window.location.href = '/';
+    //     }
+    // }, [isAuthenticated, callback]);
 
     const onFinish = async (values: any) => {
         const { username, password } = values;

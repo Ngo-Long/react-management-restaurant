@@ -1,28 +1,25 @@
+import '@/styles/client.table.scss';
 import React, { useState } from 'react';
-import OrderCard from './card/order.card';
-import ProductCard from './card/product.card';
-import { Row, Col, Card, Checkbox, message, notification } from 'antd';
-import DiningTableCard from './card/table.card';
-import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
 import { IOrder } from '@/types/backend';
 import { useAppDispatch } from '@/redux/hooks';
-import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
-import { orderApi, orderDetailApi } from "@/config/api";
 import { IOrderDetail } from '../../types/backend';
+import { orderApi, orderDetailApi } from "@/config/api";
+import OrderCard from '../../components/client/card/order.card';
+import ProductCard from '../../components/client/card/product.card';
+import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
+import DiningTableCard from '../../components/client/card/table.card';
+import { Row, Col, Card, Checkbox, message, notification } from 'antd';
+import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
-import '@/styles/client.table.scss';
 
 const SaleClient: React.FC = () => {
     const dispatch = useAppDispatch();
-
     const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
     const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(true);
-
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
     const [currentTable, setCurrentTable] = useState({ id: '', name: 'Mang về' });
 
     const handleSelectedTable = (id: string, name: string) => {
-        // reset
         setCurrentTable({ id, name });
 
         // move tab and fetch order
@@ -47,10 +44,9 @@ const SaleClient: React.FC = () => {
     const createPendingOrder = async () => {
         const order = {
             status: "PENDING",
-            diningTable: {
-                id: currentTable.id,
-                name: currentTable.name || 'Mang về'
-            }
+            diningTables: [{
+                id: currentTable.id
+            }]
         };
 
         const res = await orderApi.callCreate(order);
@@ -65,7 +61,7 @@ const SaleClient: React.FC = () => {
 
     const addProductToOrder = async (item: IOrderDetail, order: IOrder) => {
         if (!order?.id) {
-            notification.error({ message: 'Không thể thêm món ăn', description: 'Đơn hàng không hợp lệ.' });
+            notification.error({ message: 'Có lỗi xảy ra', description: 'Đơn hàng không hợp lệ.' });
             return;
         }
 
@@ -91,9 +87,7 @@ const SaleClient: React.FC = () => {
             currentTable={currentTable}
             handleSelectedTable={(id, name) => handleSelectedTable(id, name)}
         />,
-        tab2: <ProductCard
-            handleItemSelect={handleItemSelect}
-        />
+        tab2: <ProductCard handleItemSelect={handleItemSelect} />
     };
 
     return (
@@ -110,10 +104,9 @@ const SaleClient: React.FC = () => {
                     onTabChange={(key) => setActiveTabKey(key)}
                     tabBarExtraContent={
                         <Checkbox
+                            style={{ fontWeight: 500 }}
                             checked={isCheckboxChecked}
                             onChange={(e) => setIsCheckboxChecked(e.target.checked)}
-                            style={{ fontWeight: 500 }}
-
                         >
                             Mở thực đơn khi chọn bàn
                         </Checkbox>

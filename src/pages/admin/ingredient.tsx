@@ -7,10 +7,10 @@ import { IIngredient } from "@/types/backend";
 import { sfIn } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import DataTable from "@/components/client/data-table";
-import ModalIngredient from '@/components/admin/ingredient/modal.ingredient';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
+import ModalIngredient from '@/components/admin/ingredient/modal.ingredient';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
@@ -109,10 +109,9 @@ const IngredientPage = () => {
             align: "center",
             dataIndex: 'active',
             hideInSearch: false,
-            renderFormItem: (item, props, form) => (
+            renderFormItem: () => (
                 <ProFormSelect
                     showSearch
-                    mode="multiple"
                     allowClear
                     valueEnum={{
                         true: 'Hoạt động',
@@ -121,7 +120,7 @@ const IngredientPage = () => {
                     placeholder="Chọn hoạt động"
                 />
             ),
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 return <>
                     <Tag color={entity.active ? "lime" : "red"} >
                         {entity.active ? "ACTIVE" : "INACTIVE"}

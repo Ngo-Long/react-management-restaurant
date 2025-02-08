@@ -1,31 +1,25 @@
 
-import { Col, ConfigProvider, Form, Input, Row, Upload, message, notification } from "antd";
 import {
     ProFormSelect, ProFormSwitch, ProFormText,
-    FooterToolbar, ModalForm, ProForm, ProFormDigit,
-    ProFormTextArea
+    FooterToolbar, ModalForm, ProForm, ProFormDigit, ProFormTextArea
 } from "@ant-design/pro-components";
-import 'react-quill/dist/quill.snow.css';
-
+import { Col, ConfigProvider, Form, Input, Row, Upload, message, notification } from "antd";
 import ReactQuill from 'react-quill';
-import { useState, useEffect, useCallback } from 'react';
+import 'react-quill/dist/quill.snow.css';
 import { isMobile } from 'react-device-detect';
-
+import { useState, useEffect, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { IIngredient } from "@/types/backend";
+import enUS from 'antd/lib/locale/en_US';
 import { DebounceSelect } from "../user/debouce.select";
-
-import { IProduct } from "@/types/backend";
-import { productApi, restaurantApi, callUploadSingleFile } from "@/config/api";
+import { ingredientApi, restaurantApi, callUploadSingleFile } from "@/config/api";
 import { useAppSelector } from "@/redux/hooks";
 import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-
-import { v4 as uuidv4 } from 'uuid';
-import enUS from 'antd/lib/locale/en_US';
-
 
 interface IProps {
     openModal: boolean;
     setOpenModal: (v: boolean) => void;
-    dataInit?: IProduct | null;
+    dataInit?: IIngredient | null;
     setDataInit: (v: any) => void;
     reloadTable: () => void;
 }
@@ -36,12 +30,12 @@ interface IRestaurantSelect {
     key?: string;
 }
 
-interface IProductLogo {
+interface IIngredientLogo {
     name: string;
     uid: string;
 }
 
-const ModalProduct = (props: IProps) => {
+const ModalIngredient = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
 
     const [form] = Form.useForm();
@@ -49,7 +43,7 @@ const ModalProduct = (props: IProps) => {
     //modal animation
     const [animation, setAnimation] = useState<string>('open');
     const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
-    const [dataLogo, setDataLogo] = useState<IProductLogo[]>([]);
+    const [dataLogo, setDataLogo] = useState<IIngredientLogo[]>([]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
@@ -62,14 +56,6 @@ const ModalProduct = (props: IProps) => {
 
     useEffect(() => {
         if (dataInit?.id) {
-            if (dataInit.restaurant) {
-                setRestaurants([{
-                    label: dataInit.restaurant.name,
-                    value: dataInit.restaurant.id,
-                    key: dataInit.restaurant.id,
-                }])
-            }
-
             form.setFieldsValue({
                 ...dataInit,
                 restaurant: { label: dataInit.restaurant?.name, value: dataInit.restaurant?.id },
@@ -153,7 +139,7 @@ const ModalProduct = (props: IProps) => {
     };
 
     const handleUploadFileLogo = async ({ file, onSuccess, onError }: any) => {
-        const res = await callUploadSingleFile(file, "product");
+        const res = await callUploadSingleFile(file, "ingredient");
         if (res && res.data) {
             setDataLogo([{
                 name: res.data.fileName,
@@ -169,7 +155,7 @@ const ModalProduct = (props: IProps) => {
         }
     };
 
-    const submitProduct = async (valuesForm: any) => {
+    const submitIngredient = async (valuesForm: any) => {
         const {
             name, sellingPrice, costPrice, category, unit, quantity,
             sold, shortDesc, detailDesc, active, restaurant
@@ -185,7 +171,7 @@ const ModalProduct = (props: IProps) => {
             label: currentRestaurant?.name
         };
 
-        const product = {
+        const ingredient = {
             id: dataInit?.id,
             name,
             sellingPrice,
@@ -205,8 +191,8 @@ const ModalProduct = (props: IProps) => {
         };
 
         const res = dataInit?.id
-            ? await productApi.callUpdate(product)
-            : await productApi.callCreate(product);
+            ? await ingredientApi.callUpdate(ingredient)
+            : await ingredientApi.callCreate(ingredient);
 
         if (res.data) {
             message.success(`${dataInit?.id ? 'Cập nhật' : 'Tạo mới'} hàng hóa thành công`);
@@ -247,13 +233,13 @@ const ModalProduct = (props: IProps) => {
                     width: isMobile ? "100%" : 900,
                     keyboard: false,
                     maskClosable: false,
-                    className: `modal-product ${animation}`,
-                    rootClassName: `modal-product-root ${animation}`
+                    className: `modal-ingredient ${animation}`,
+                    rootClassName: `modal-ingredient-root ${animation}`
                 }}
                 scrollToFirstError={true}
                 preserve={false}
                 form={form}
-                onFinish={submitProduct}
+                onFinish={submitIngredient}
                 initialValues={dataInit?.id ? {
                     ...dataInit,
                     restaurant: isRoleOwner
@@ -382,7 +368,7 @@ const ModalProduct = (props: IProps) => {
                                                 uid: uuidv4(),
                                                 name: dataInit?.image ?? "",
                                                 status: 'done',
-                                                url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataInit?.image}`,
+                                                url: `${import.meta.env.VITE_BACKEND_URL}/storage/ingredient/${dataInit?.image}`,
                                             }]
                                             : []
                                     }
@@ -461,4 +447,4 @@ const ModalProduct = (props: IProps) => {
     )
 }
 
-export default ModalProduct;
+export default ModalIngredient;

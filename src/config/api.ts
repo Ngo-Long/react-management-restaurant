@@ -1,8 +1,8 @@
 import axios from '../config/axios-customize';
-import { IIngredient, IRestaurant } from '../types/backend';
 import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
-    IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice, IPermission
+    IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
+    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit
 } from '../types/backend';
 
 /**
@@ -249,6 +249,32 @@ export const productApi = {
 
 /**
  *
+Module Unit
+ */
+export const unitApi = {
+    callCreate(unit: IUnit) {
+        return axios.post<IBackendRes<IUnit>>('/api/v1/units', { ...unit });
+    },
+
+    callUpdate(unit: IUnit) {
+        return axios.put<IBackendRes<IUnit>>('/api/v1/units', { ...unit });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IUnit>>(`/api/v1/units/${id}`);
+    },
+
+    callFetchById(id: any) {
+        return axios.get<IBackendRes<IUnit>>(`/api/v1/units/${id}`);
+    },
+
+    callFetchByProduct(id: string) {
+        return axios.get<IBackendRes<IModelPaginate<IUnit>>>(`/api/v1/units/by-product?${id}`);
+    }
+}
+
+/**
+ *
 Module Ingredient
  */
 export const ingredientApi = {
@@ -331,4 +357,64 @@ export const invoiceApi = {
     callFetchById(id: string) {
         return axios.get<IBackendRes<IInvoice>>(`/api/v1/invoices/${id}`);
     },
+}
+
+/**
+ *
+Module Supplier
+ */
+export const supplierApi = {
+    callCreate(supplier: ISupplier) {
+        return axios.post<IBackendRes<ISupplier>>('/api/v1/suppliers', { ...supplier });
+    },
+
+    callUpdate(supplier: ISupplier) {
+        return axios.put<IBackendRes<ISupplier>>('/api/v1/suppliers', { ...supplier });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<ISupplier>>(`/api/v1/suppliers/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<ISupplier>>(`/api/v1/suppliers/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<ISupplier>>>(`/api/v1/suppliers?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<ISupplier>>>(`/api/v1/suppliers/by-restaurant?${query}`);
+    }
+}
+
+/**
+ *
+Module Receipt
+ */
+export const receiptApi = {
+    callCreate(receipt: IReceipt) {
+        return axios.post<IBackendRes<IReceipt>>('/api/v1/receipts', { ...receipt });
+    },
+
+    callUpdate(receipt: IReceipt) {
+        return axios.put<IBackendRes<IReceipt>>('/api/v1/receipts', { ...receipt });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IReceipt>>(`/api/v1/receipts/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IReceipt>>(`/api/v1/receipts/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IReceipt>>>(`/api/v1/receipts?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IReceipt>>>(`/api/v1/receipts/by-restaurant?${query}`);
+    }
 }

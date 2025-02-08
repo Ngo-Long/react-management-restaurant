@@ -1,9 +1,10 @@
-.upsert-job-container {
-    background-color: white;
-    padding: 10px 30px;
-    border-radius: 5px;
-    min-height: 100vh;
+.upsert-container {
     height: auto;
+    min-height: 100vh;
+    border-radius: 5px;
+    margin-bottom: 70px;
+    padding: 10px 30px 30px;
+    background-color: white;
 
     .title {
         padding: 10px 0 20px 0;

@@ -1,29 +1,28 @@
 import dayjs from 'dayjs';
-import { useState, useRef } from 'react';
 import queryString from 'query-string';
+import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { IProduct } from "@/types/backend";
 import { sfIn } from "spring-filter-query-builder";
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
-import ModalProduct from '@/components/admin/product/modal.product';
 
 import { productApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchProduct, fetchProductByRestaurant } from "@/redux/slice/productSlide";
+import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
 const ProductPage = () => {
     const tableRef = useRef<ActionType>();
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const products = useAppSelector(state => state.product.result);
-
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IProduct | null>(null);
 
     const meta = useAppSelector(state => state.product.meta);
+    const products = useAppSelector(state => state.product.result);
     const isFetching = useAppSelector(state => state.product.isFetching);
 
     const reloadTable = () => {
@@ -51,7 +50,7 @@ const ProductPage = () => {
             key: 'index',
             width: 50,
             align: "center",
-            render: (text, record, index) => {
+            render: (_, record, index) => {
                 return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
             hideInSearch: true,
@@ -62,14 +61,43 @@ const ProductPage = () => {
             sorter: true,
         },
         {
-            title: 'Đơn vị',
-            dataIndex: 'unit',
+            title: 'Danh mục',
+            dataIndex: 'category',
             sorter: true,
-            align: "center",
         },
         {
-            title: 'Phân loại',
-            dataIndex: 'category',
+            title: 'Đơn vị tính',
+            dataIndex: 'product.units',
+            hideInSearch: true,
+            width: 200,
+            render(_, record) {
+                const units = record?.units || [];
+                return (
+                    <Space size="small" wrap>
+                        {units.map(unit => (
+                            <Tag key={unit.id} color={unit.isDefault ? 'red' : 'default'} >
+                                {unit.name}
+                            </Tag>
+                        ))}
+                    </Space>
+                );
+            },
+        },
+        {
+            title: 'Giá bán',
+            align: "center",
+            dataIndex: 'price',
+            hideInSearch: true,
+            render(_, record) {
+                const units = record?.units || [];
+                const defaultUnit = units.find(c => c.isDefault) || units[0];
+                const price = defaultUnit?.price || 0;
+                return <>{price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>;
+            },
+        },
+        {
+            title: 'Kiểu loại',
+            dataIndex: 'type',
             sorter: true,
             align: "center",
         },
@@ -89,10 +117,10 @@ const ProductPage = () => {
                     placeholder="Chọn hoạt động"
                 />
             ),
-            render(dom, entity, index, action, schema) {
+            render(_, record) {
                 return <>
-                    <Tag color={entity.active ? "lime" : "red"} >
-                        {entity.active ? "ACTIVE" : "INACTIVE"}
+                    <Tag color={record.active ? "lime" : "red"} >
+                        {record.active ? "ACTIVE" : "INACTIVE"}
                     </Tag>
                 </>
             },
@@ -102,7 +130,7 @@ const ProductPage = () => {
             dataIndex: 'createdDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
@@ -115,7 +143,7 @@ const ProductPage = () => {
             sorter: true,
             hidden: true,
             align: "center",
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
@@ -133,8 +161,7 @@ const ProductPage = () => {
                         <EditOutlined
                             style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
-                                setOpenModal(true);
-                                setDataInit(entity);
+                                navigate(`/admin/product/upsert?id=${entity.id}`)
                             }}
                         />
                     </Access >
@@ -203,34 +230,30 @@ const ProductPage = () => {
             <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
                 <DataTable<IProduct>
                     actionRef={tableRef}
-                    headerTitle="Danh sách hàng hóa"
+                    headerTitle="Danh sách món ăn"
                     rowKey="id"
                     loading={isFetching}
                     columns={columns}
                     dataSource={products}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchProductByRestaurant({ query }))
-                        }
-                    }
+                    request={async (params, sort, filter): Promise<any> => {
+                        const query = buildQuery(params, sort, filter);
+                        dispatch(fetchProductByRestaurant({ query }))
+                    }}
                     scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
+                    pagination={{
+                        current: meta.page,
+                        pageSize: meta.pageSize,
+                        showSizeChanger: true,
+                        total: meta.total,
+                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
+                    }}
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
                             <Button
                                 icon={<PlusOutlined />}
                                 type="primary"
-                                onClick={() => setOpenModal(true)}
+                                onClick={() => navigate('upsert')}
                             >
                                 Thêm mới
                             </Button>
@@ -238,14 +261,6 @@ const ProductPage = () => {
                     }}
                 />
             </Access>
-
-            <ModalProduct
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                reloadTable={reloadTable}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-            />
         </div >
     )
 }

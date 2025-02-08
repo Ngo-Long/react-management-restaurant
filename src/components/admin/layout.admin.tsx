@@ -9,6 +9,11 @@ import {
     ExceptionOutlined,
     MenuUnfoldOutlined,
     ContainerOutlined,
+    LineChartOutlined,
+    BarChartOutlined,
+    DotChartOutlined,
+    PieChartOutlined,
+    RadarChartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 const { Header, Sider, Content } = Layout;
@@ -67,6 +72,16 @@ const LayoutAdmin: React.FC = () => {
                 && item.method === ALL_PERMISSIONS.ORDERS.GET_PAGINATE.method
             )
 
+            const viewReceipt = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.RECEIPTS.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.RECEIPTS.GET_PAGINATE.method
+            )
+
+            const viewSupplier = permissions?.find(item =>
+                item.apiPath === ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE.apiPath
+                && item.method === ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE.method
+            )
+
             const viewRole = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.ROLES.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.ROLES.GET_PAGINATE.method
@@ -105,7 +120,7 @@ const LayoutAdmin: React.FC = () => {
                 ...(viewProduct || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/product'>Thực đơn</Link>,
                     key: '/admin/product',
-                    icon: <ContainerOutlined />
+                    icon: <RadarChartOutlined />
                 }] : []),
 
                 ...(viewIngredient || ACL_ENABLE === 'false' ? [{
@@ -117,13 +132,25 @@ const LayoutAdmin: React.FC = () => {
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/order'>Đơn hàng</Link>,
                     key: '/admin/order',
-                    icon: <ContainerOutlined />
+                    icon: <DotChartOutlined />
                 }] : []),
 
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/invoice'>Hóa đơn</Link>,
                     key: '/admin/invoice',
-                    icon: <ContainerOutlined />
+                    icon: <BarChartOutlined />
+                }] : []),
+
+                ...(viewReceipt || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/receipt'>Biên lai</Link>,
+                    key: '/admin/receipt',
+                    icon: <LineChartOutlined />
+                }] : []),
+
+                ...(viewSupplier || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/supplier'>Nhà cung cấp</Link>,
+                    key: '/admin/supplier',
+                    icon: <PieChartOutlined />
                 }] : []),
 
                 ...(viewRole || ACL_ENABLE === 'false' ? [{
