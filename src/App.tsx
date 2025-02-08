@@ -24,8 +24,8 @@ import SupplierPage from './pages/admin/supplier';
 import IngredientPage from './pages/admin/ingredient';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
 import ViewUpsertProduct from './components/admin/product/upset.product';
+import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
 
 const LayoutClient = () => {
   const location = useLocation();

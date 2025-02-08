@@ -1,27 +1,23 @@
 import dayjs from 'dayjs';
-import { useState, useRef } from 'react';
-
 import queryString from 'query-string';
-import { IInvoice, IOrder } from "@/types/backend";
-import { sfIn } from "spring-filter-query-builder";
-
+import { useState, useRef } from 'react';
+import { IInvoice } from "@/types/backend";
+import { Button, Modal, Space, Tag } from "antd";
 import Access from "@/components/share/access";
+import { sfIn } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
-
-import { orderApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchOrder, fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
-
-import { Button, Modal, Popconfirm, Space, message, notification } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 import { fetchInvoice } from '@/redux/slice/invoiceSlide';
-
-
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import {
+    CheckCircleOutlined,
+    CloseCircleOutlined
+} from '@ant-design/icons';
 const InvoicePage = () => {
     const tableRef = useRef<ActionType>();
+    const meta = useAppSelector(state => state.invoice.meta);
+    const isFetching = useAppSelector(state => state.invoice.isFetching);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -31,13 +27,6 @@ const InvoicePage = () => {
 
     const dispatch = useAppDispatch();
     const invoices = useAppSelector(state => state.invoice.result);
-
-    const meta = useAppSelector(state => state.invoice.meta);
-    const isFetching = useAppSelector(state => state.invoice.isFetching);
-
-    const currentUser = useAppSelector(state => state.account.user);
-    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
-
 
     const showModal = (invoice: IInvoice) => {
         setDataInit(invoice);
@@ -52,21 +41,9 @@ const InvoicePage = () => {
         setIsModalOpen(false);
     };
 
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
-
     const columns: ProColumns<IInvoice>[] = [
         {
-            title: 'Nhà hàng',
-            dataIndex: ["restaurant", "name"],
-            sorter: true,
-            align: "center",
-            hideInSearch: !isRoleOwner,
-            hidden: true
-        },
-        {
-            title: 'Mã HD',
+            title: 'ID',
             width: 80,
             align: "center",
             dataIndex: 'id',
@@ -92,7 +69,6 @@ const InvoicePage = () => {
             title: 'Thu ngân',
             dataIndex: ["user", "name"],
             sorter: true,
-            align: "center",
             hideInSearch: false,
         },
         {
@@ -109,21 +85,23 @@ const InvoicePage = () => {
             title: 'Phương thức',
             dataIndex: 'method',
             sorter: true,
+            align: "center",
             hideInSearch: true,
+            render(_, entity) {
+                return <>
+                    <Tag color={entity.method === "CASH" ? "green" : "red"} >
+                        {entity.method}
+                    </Tag>
+                </>
+            },
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             align: "center",
-            render: (value) => {
-                return value === 'PAID'
-                    ? 'Đã thanh toán' : value === 'UNPAID'
-                        ? 'Chưa thanh toán' : '';
-            },
-            renderFormItem: (item, props, form) => (
+            renderFormItem: () => (
                 <ProFormSelect
                     showSearch
-                    mode="multiple"
                     allowClear
                     valueEnum={{
                         PAID: 'Đã thanh toán',
@@ -132,6 +110,16 @@ const InvoicePage = () => {
                     placeholder="Chọn trạng thái"
                 />
             ),
+            render(_, entity) {
+                return <>
+                    <Tag
+                        color={entity.status === "PAID" ? "#87d068" : "#f50"}
+                        icon={entity.status === "PAID" ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                    >
+                        {entity.status}
+                    </Tag>
+                </>
+            },
         },
         {
             title: 'Ngày tạo',

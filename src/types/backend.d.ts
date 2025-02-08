@@ -128,16 +128,16 @@ export interface IOrder {
     id?: string;
     note?: string;
     totalPrice?: number;
-    optional?: string;
+    option?: string;
     status?: string;
     user?: {
         id?: string;
         name?: string;
     };
-    diningTable?: {
+    diningTables?: {
         id?: string | null;
         name?: string | null;
-    };
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -147,17 +147,22 @@ export interface IOrder {
 
 export interface IOrderDetail {
     id?: string;
+    price?: string;
     quantity?: number;
-    price?: number;
     status?: string;
-    product?: {
-        id?: string | null;
-        name?: string;
-    };
     order?: {
         id?: string | null;
-        tableName?: string;
     };
+    unit?: {
+        id?: string;
+        name?: string;
+        price?: number;
+        productName?: string;
+    }
+    diningTables?: {
+        id?: string | null;
+        name?: string | null;
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -190,13 +195,13 @@ interface IInvoice {
 export interface IProduct {
     id?: string;
     name?: string;
-    category?: string;
-    unit?: string;
+    type: string;
     image: string | null;
+    category: string;
     shortDesc?: string;
     detailDesc?: string;
     active?: boolean;
-    categories?: Array<{
+    units?: Array<{
         id?: number;
         name?: string;
         price?: number;
@@ -217,11 +222,11 @@ export interface IProduct {
 export interface IIngredient {
     id?: string;
     name?: string;
-    unit?: string;
+    type?: string;
     price?: number;
-    category?: string;
     status?: string;
     image: string;
+    category?: string;
     initialQuantity?: number;
     minimumQuantity?: number;
     description?: string;
@@ -230,7 +235,6 @@ export interface IIngredient {
         id?: string;
         name?: string;
     }
-
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -238,7 +242,7 @@ export interface IIngredient {
     lastModifiedDate?: string;
 }
 
-export interface ICategory {
+export interface IUnit {
     id?: string | number;
     name?: string;
     price?: number;
@@ -249,10 +253,10 @@ export interface ICategory {
         id?: string;
         name?: string;
     }
-    categoryDetails: Array<{
+    unitDetails: Array<{
         id?: string;
         quantity?: number;
-        category?: {
+        unit?: {
             id?: string;
         }
         ingredient?: {

@@ -3,21 +3,20 @@ import {
     Flex, message, notification, Radio, Row, Space, Table, TimePicker
 } from "antd";
 import dayjs from 'dayjs';
+import jsPDF from 'jspdf';
+import '@/styles/client.table.scss';
+import html2canvas from 'html2canvas';
 import { useRef, useState } from "react";
 import Search from "antd/es/input/Search";
-import { IOrder, IOrderDetail } from "@/types/backend";
-import { UserOutlined } from '@ant-design/icons';
-import { ColumnType } from "antd/es/table";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { invoiceApi } from "@/config/api";
+import { ColumnType } from "antd/es/table";
+import { UserOutlined } from '@ant-design/icons';
+import { IOrder, IOrderDetail } from "@/types/backend";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
 import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import '@/styles/client.table.scss';
-
 interface InvoiceCardProps {
     open: boolean;
     setOpen: (is: boolean) => void;
@@ -79,6 +78,8 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             message.success(`Thanh toán hóa đơn [ ${res.data.id} ] thành công `);
 
             // reset data
+            setReturnAmount(0);
+            setCustomerPaid(0);
             setCurrentOrder(null);
             dispatch(fetchOrderDetailsByOrderId(''));
             dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100' }));
@@ -93,15 +94,15 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             key: 'index',
             width: 30,
             align: "center",
-            render: (text, record, index) => (index + 1) + (meta.page - 1) * meta.pageSize
+            render: (_, record, index) => (index + 1) + (meta.page - 1) * meta.pageSize
         },
         {
             title: 'Tên món ăn',
             key: 'name',
-            dataIndex: 'product.name',
-            render: (text, record) => (
+            dataIndex: 'product',
+            render: (_, record) => (
                 <div className='btn-name'>
-                    {record.product?.name}
+                    {`${record.unit?.productName} (${record.unit?.name})`}
                 </div>
             )
         },
@@ -118,7 +119,10 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             key: 'price',
             width: 90,
             align: "center" as const,
-            render: (value: any) => (value.toLocaleString())
+            render: (_, record) => {
+                const price = record.unit?.price;
+                return (price ? price.toLocaleString() : '0')
+            }
         },
         {
             title: 'Thành Tiền',
@@ -126,11 +130,15 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             key: 'price',
             width: 90,
             align: "center" as const,
-            render: (value: any, entity) => (
-                <Space>
-                    {(entity.quantity && value) ? (entity.quantity * value).toLocaleString() : '0'}
-                </Space>
-            ),
+            render: (_, record) => {
+                const price = record.unit?.price;
+                const total = price ? record.quantity! * Number(price) : 0;
+                return (
+                    <Space>
+                        {total ? total.toLocaleString() : '0'}
+                    </Space>
+                );
+            }
         }
     ];
 
@@ -167,32 +175,32 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             <Row gutter={40}>
                 <Col span={14}>
                     <div>
-                        {/* <div className='invoice-search'>
-                        <div className='invoice-search__card' >
-                            <UserOutlined style={{ fontSize: '20px' }} />
-                            <div className='invoice-search__title'>Khách hàng</div>
+                        <div className='invoice-search'>
+                            <div className='invoice-search__card' >
+                                <UserOutlined style={{ fontSize: '20px' }} />
+                                <div className='invoice-search__title'>Khách hàng</div>
+                            </div>
+
+                            <Space direction="vertical">
+                                <Search
+                                    placeholder="Tìm tên hoặc điện thoại khách hàng"
+                                    allowClear
+                                    style={{ width: 350 }}
+                                />
+                            </Space>
                         </div>
 
-                        <Space direction="vertical">
-                            <Search
-                                placeholder="Tìm tên hoặc điện thoại khách hàng"
-                                allowClear
-                                style={{ width: 350 }}
-                            />
-                        </Space>
-                    </div>
-
-                    <Table<IOrderDetail>
-                        columns={columns}
-                        dataSource={orderDetails}
-                        pagination={false}
-                        size='middle'
-                        bordered
-                        scroll={orderDetails.length > 10 ? { y: 48 * 10 } : undefined}
-                        rowKey={(record) => record.id || ''}
-                        rowClassName="order-table-row"
-                        className="order-table"
-                    /> */}
+                        <Table<IOrderDetail>
+                            columns={columns}
+                            dataSource={orderDetails}
+                            pagination={false}
+                            size='middle'
+                            bordered
+                            scroll={orderDetails.length > 10 ? { y: 48 * 10 } : undefined}
+                            rowKey={(record) => record.id || ''}
+                            rowClassName="order-table-row"
+                            className="order-table"
+                        />
                     </div>
 
                     <div ref={invoiceRef} className="invoice-container">
@@ -268,8 +276,8 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                     <div className='invoice-col' >
                         <p></p>
                         <Space wrap>
-                            <DatePicker value={dayjs()} format="DD/MM/YYYY" style={{ width: '120px' }} disabled />
-                            <TimePicker value={dayjs()} format="HH:mm" size="middle" style={{ width: '80px' }} disabled />
+                            <DatePicker value={dayjs()} format="DD/MM/YYYY" style={{ width: '120px' }} />
+                            <TimePicker value={dayjs()} format="HH:mm" size="middle" style={{ width: '80px' }} />
                         </Space>
                     </div>
 

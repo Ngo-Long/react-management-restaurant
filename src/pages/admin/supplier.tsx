@@ -224,44 +224,43 @@ const SupplierPage = () => {
 
     return (
         <div>
-            <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}>
-                <DataTable<ISupplier>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách nhà cung cấp"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={suppliers}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchSupplierByRestaurant({ query }))
-                        }
+            {/* <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}> */}
+            <DataTable<ISupplier>
+                actionRef={tableRef}
+                headerTitle="Danh sách nhà cung cấp"
+                rowKey="id"
+                loading={isFetching}
+                columns={columns}
+                dataSource={suppliers}
+                request={
+                    async (params, sort, filter): Promise<any> => {
+                        const query = buildQuery(params, sort, filter);
+                        dispatch(fetchSupplierByRestaurant({ query }))
                     }
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
+                }
+                scroll={{ x: true }}
+                pagination={
+                    {
+                        current: meta.page,
+                        pageSize: meta.pageSize,
+                        showSizeChanger: true,
+                        total: meta.total,
+                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
                     }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
-                            >
-                                Thêm mới
-                            </Button>
-                        );
-                    }}
-                />
-            </Access>
+                }
+                rowSelection={false}
+                toolBarRender={(_action, _rows): any => {
+                    return (
+                        <Button
+                            type="primary" icon={<PlusOutlined />}
+                            onClick={() => setOpenModal(true)}
+                        >
+                            Thêm mới
+                        </Button>
+                    );
+                }}
+            />
+            {/* </Access> */}
 
             <ModalSupplier
                 openModal={openModal}

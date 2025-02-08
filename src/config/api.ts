@@ -2,8 +2,7 @@ import axios from '../config/axios-customize';
 import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
-    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission,
-    ICategory
+    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit
 } from '../types/backend';
 
 /**
@@ -250,27 +249,27 @@ export const productApi = {
 
 /**
  *
-Module Category
+Module Unit
  */
-export const categoryApi = {
-    callCreate(category: ICategory) {
-        return axios.post<IBackendRes<ICategory>>('/api/v1/categories', { ...category });
+export const unitApi = {
+    callCreate(unit: IUnit) {
+        return axios.post<IBackendRes<IUnit>>('/api/v1/units', { ...unit });
     },
 
-    callUpdate(category: ICategory) {
-        return axios.put<IBackendRes<ICategory>>('/api/v1/categories', { ...category });
+    callUpdate(unit: IUnit) {
+        return axios.put<IBackendRes<IUnit>>('/api/v1/units', { ...unit });
     },
 
     callDelete(id: string) {
-        return axios.delete<IBackendRes<ICategory>>(`/api/v1/categories/${id}`);
+        return axios.delete<IBackendRes<IUnit>>(`/api/v1/units/${id}`);
     },
 
     callFetchById(id: any) {
-        return axios.get<IBackendRes<ICategory>>(`/api/v1/categories/${id}`);
+        return axios.get<IBackendRes<IUnit>>(`/api/v1/units/${id}`);
     },
 
     callFetchByProduct(id: string) {
-        return axios.get<IBackendRes<IModelPaginate<ICategory>>>(`/api/v1/categories/by-product?${id}`);
+        return axios.get<IBackendRes<IModelPaginate<IUnit>>>(`/api/v1/units/by-product?${id}`);
     }
 }
 

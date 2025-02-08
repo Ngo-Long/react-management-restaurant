@@ -1,10 +1,10 @@
 import {
-    AlertOutlined, MenuOutlined,
-    DollarOutlined, ShoppingCartOutlined, EditOutlined,
+    AlertOutlined, MenuOutlined, DollarOutlined,
+    ShoppingCartOutlined, EditOutlined, MinusOutlined, PlusOutlined,
 } from '@ant-design/icons';
 import {
     Card, Table, Dropdown, Space, Button, message,
-    notification, Modal, InputNumber, Flex
+    notification, Modal, InputNumber, Flex, Row, Col
 } from 'antd';
 import { ColumnType } from 'antd/es/table';
 import TextArea from 'antd/es/input/TextArea';
@@ -13,15 +13,15 @@ import { useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import InvoiceCard from './invoice.card';
 import { IOrder, IOrderDetail } from '@/types/backend';
-import { authApi, invoiceApi, orderApi, orderDetailApi } from '@/config/api';
+import { authApi, orderApi, orderDetailApi } from '@/config/api';
 
 import { RootState } from '@/redux/store';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { fetchOrderDetailsByOrderId, resetOrderDetails } from '@/redux/slice/orderDetailSlide';
-import InvoiceCard from './invoice.card';
 
 interface OrderCardProps {
     currentOrder: IOrder | null;
@@ -33,13 +33,11 @@ interface OrderCardProps {
 const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, currentTable, setActiveTabKey }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
     const [open, setOpen] = useState(false);
     const [note, setNote] = useState<string>('');
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
-
     const [quantityItem, setQuantityItem] = useState<number>(1);
     const [totalPriceItem, setTotalPriceItem] = useState<number>(0);
 
@@ -60,7 +58,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     useEffect(() => {
         if (orderDetail) {
             setQuantityItem(orderDetail.quantity || 1);
-            setTotalPriceItem((orderDetail?.price || 0) * (orderDetail?.quantity || 1));
+            setTotalPriceItem((orderDetail?.unit?.price || 0) * (orderDetail?.quantity || 1));
         }
     }, [orderDetail]);
 
@@ -147,33 +145,6 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
         }
     }
 
-    const footerModal = () => {
-        return (
-            <Flex gap="small" wrap justify="space-between">
-                <Button style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>
-                    Hủy bỏ
-                </Button>
-
-                <Button
-                    style={{ flex: 1 }}
-                    danger type="primary"
-                    onClick={() => handleRemoveItem(orderDetail?.id!)}
-                >
-                    Xóa hết
-                </Button>
-
-                <Button
-                    style={{ flex: 1 }}
-                    className="btn-green"
-                    onClick={handleUpdateItem}
-                    disabled={confirmLoading}
-                >
-                    Cập nhật
-                </Button>
-            </Flex>
-        )
-    }
-
     const itemsDropdown = [
         {
             label: <Link to={'/admin'}>Trang quản trị</Link>,
@@ -193,12 +164,12 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
         {
             title: 'Tên món ăn',
             key: 'name',
-            dataIndex: 'product.name',
-            render: (text, record) => (
+            dataIndex: 'unit',
+            render: (_, record) => (
                 <Space>
                     <EditOutlined className='btn-icon' />
                     <div className='btn-name'>
-                        {record.product?.name}
+                        {`${record.unit?.productName} (${record.unit?.name})`}
                     </div>
                 </Space >
             )
@@ -216,9 +187,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             key: 'price',
             width: 90,
             align: "center" as const,
-            render: (value: any, entity) => (
+            render: (_, record) => (
                 <Space>
-                    {(entity.quantity && value) ? (entity.quantity * value).toLocaleString() : '0'}
+                    {(record.quantity! * record.unit?.price!).toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 </Space>
             ),
         }
@@ -241,7 +212,10 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 <div style={{ display: "flex", fontSize: '15px' }}>
                     <ShoppingCartOutlined style={{ fontSize: '20px', marginRight: '6px' }} />
                     {currentOrder
-                        ? `Đơn hàng ${currentOrder.id} / ${currentTable?.name}`
+                        ? `Đơn hàng ${currentOrder.id} /
+                            ${currentOrder?.diningTables!
+                            .map(table => table.name)
+                            .join(' - ')}`
                         : `Đơn hàng 0 / ${currentTable?.name}`
                     }
                 </div>
@@ -292,7 +266,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                     <div className='order-total'>
                         <div className='order-total__desc'>
                             Tổng tiền
-                            <span>&nbsp;(0 món)</span>
+                            <span>&nbsp;({currentOrder ? meta.total : 0} món)</span>
                         </div>
 
                         <div className='order-total__price'>
@@ -326,52 +300,108 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             <Modal
                 className='container-modal'
                 title={`
-                    ${orderDetail?.product?.name} [ ${orderDetail?.id} ] -
+                    ${orderDetail?.unit?.productName} (${orderDetail?.unit?.name}) -
                     ${new Date(orderDetail?.createdDate!).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                 `}
                 width={400}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
-                footer={[footerModal()]}
+                footer={[
+                    <Flex gap="small" wrap justify="space-between">
+                        <Button style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>
+                            Hủy
+                        </Button>
+
+                        <Button
+                            danger type="primary" style={{ flex: 1 }}
+                            onClick={() => handleRemoveItem(orderDetail?.id!)}
+                        >
+                            Xóa
+                        </Button>
+
+                        <Button
+                            className="btn-green" style={{ flex: 1 }}
+                            onClick={handleUpdateItem} disabled={confirmLoading}
+                        >
+                            Cập nhật
+                        </Button>
+                    </Flex>
+                ]}
             >
                 <div className='modal-content'>
-                    <div>
-                        Số lượng: &nbsp;
-                        <InputNumber
-                            size="large"
-                            style={{ width: 60 }}
-                            min={1}
-                            max={100}
-                            defaultValue={1}
-                            value={quantityItem}
-                            onChange={(value: number | null) => {
-                                if (value !== null) {
-                                    setQuantityItem(value);
-                                    setTotalPriceItem(value * (orderDetail?.price || 0));
-                                }
-                            }}
-                        />
-                        &nbsp; x &nbsp;
-                        {new Intl.NumberFormat().format(orderDetail?.price!)} ₫
-                    </div>
+                    <Row align="middle" gutter={[6, 6]} className='modal-card'>
+                        <Col span={6}>
+                            <div className='modal-card__title'>Số lượng:</div>
+                        </Col>
+                        <Col span={18}>
+                            <Flex align="center" gap="small">
+                                <Button
+                                    size="small" color="danger" variant="outlined"
+                                    onClick={() => {
+                                        const value = quantityItem - 1;
+                                        setQuantityItem(value);
+                                        setTotalPriceItem(value * (orderDetail?.unit?.price || 0));
+                                    }}
+                                >
+                                    <MinusOutlined />
+                                </Button>
 
-                    <div className='modal-card'>
-                        Thành tiền: &nbsp;
-                        <span style={{ fontSize: '17px' }}>
+                                <InputNumber
+                                    style={{ width: '60px' }}
+                                    min={1} max={99} defaultValue={1}
+                                    size="middle" value={quantityItem}
+                                    onChange={(value: number | null) => {
+                                        if (value !== null) {
+                                            setQuantityItem(value);
+                                            setTotalPriceItem(value * (orderDetail?.unit?.price || 0));
+                                        }
+                                    }}
+                                />
+
+                                <Button
+                                    size="small" color="danger" variant="outlined"
+                                    onClick={() => {
+                                        const value = quantityItem + 1;
+                                        setQuantityItem(value);
+                                        setTotalPriceItem(value * (orderDetail?.unit?.price || 0));
+                                    }}
+                                >
+                                    <PlusOutlined />
+                                </Button>
+                            </Flex>
+                        </Col>
+                    </Row>
+
+                    <Row align="middle" gutter={[6, 6]} className='modal-card'>
+                        <Col span={6}>
+                            <div className='modal-card__title'>Đơn giá:</div>
+                        </Col>
+                        <Col span={18} style={{ fontSize: '16px' }}>
+                            {new Intl.NumberFormat().format(orderDetail?.unit?.price!)} ₫
+                        </Col>
+                    </Row>
+
+                    <Row align="middle" gutter={[6, 6]} className='modal-card'>
+                        <Col span={6}>
+                            <div className='modal-card__title'>Thành tiền:</div>
+                        </Col>
+                        <Col span={18} style={{ fontWeight: 500, fontSize: '16px' }}>
                             {new Intl.NumberFormat().format(totalPriceItem)} ₫
-                        </span>
-                    </div>
+                        </Col>
+                    </Row>
 
-                    <div className='modal-card'>
-                        <div>Ghi chú:</div>
-                        <TextArea
-                            maxLength={100}
-                            style={{ marginTop: '4px' }}
-                            placeholder='Tối đa 100 kí tự'
-                            autoSize={{ minRows: 2, maxRows: 2 }}
-                            onChange={(e) => setNote(e.target.value)}
-                        />
-                    </div>
+                    <Row gutter={[16, 16]}>
+                        <Col span={24} className='modal-card'>
+                            <div className='modal-card__title'>Ghi chú:</div>
+                            <TextArea
+                                maxLength={100}
+                                style={{ marginTop: '4px' }}
+                                placeholder='Tối đa 100 kí tự'
+                                autoSize={{ minRows: 2, maxRows: 2 }}
+                                onChange={(e) => setNote(e.target.value)}
+                            />
+                        </Col>
+                    </Row>
                 </div>
             </Modal>
 

@@ -2,7 +2,12 @@
 import {
     Col, ConfigProvider, Form,
     Row, Upload, message,
-    notification, Breadcrumb
+    notification, Breadcrumb,
+    InputRef,
+    Divider,
+    Space,
+    Input,
+    Button
 } from "antd";
 import {
     ProFormSelect, ProForm,
@@ -15,14 +20,15 @@ import Title from "antd/es/typography/Title";
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { categoryApi, productApi } from "@/config/api";
-import { ICategory, IProduct } from "@/types/backend";
-import CategoryCard from "./product.category";
+import { unitApi, productApi } from "@/config/api";
+import { IUnit, IProduct } from "@/types/backend";
+import CategoryCard from "./product.unit";
 import styles from 'styles/admin.module.scss';
-import { useAppSelector } from "@/redux/hooks";
-import { useState, useEffect, useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
+import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
 
 interface IProductLogo {
     name: string | null;
@@ -32,71 +38,119 @@ interface IProductLogo {
 const ViewUpsertProduct = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
     let location = useLocation();
-    let params = new URLSearchParams(location.search);
     const productId = new URLSearchParams(location.search)?.get("id");
+    const products = useAppSelector(state => state.product.result);
     const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     const [descProduct, setDescProduct] = useState<String>("");
     const [dataProduct, setDataProduct] = useState<IProduct | null>(null);
-    const [categoryList, setCategoryList] = useState<ICategory[]>([]);
+    const [unitList, setUnitList] = useState<IUnit[]>([]);
+
+    // state for slect
+    const inputRef = useRef<InputRef>(null);
+    const [types, setTypes] = useState<string[]>([]);
+    const [newType, setNewType] = useState<string>('');
+    const [categories, setCategories] = useState<string[]>([]);
+    const [newCategory, setNewCategory] = useState<string>('');
 
     //modal animation
+    const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
-    const [dataLogo, setDataLogo] = useState<IProductLogo[]>([]);
-    const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
+    const [dataLogo, setDataLogo] = useState<IProductLogo[]>([
+        { name: "", uid: "" }
+    ]);
+
+    useEffect(() => {
+        if (currentRestaurant?.id) {
+            dispatch(fetchProductByRestaurant({ query: '' }));
+        }
+    }, [currentRestaurant, dispatch]);
+
+    useEffect(() => {
+        // set categories
+        const uniqueCategories = [...new Set(products.map(product => product.category))];
+        setCategories(uniqueCategories);
+
+        // set types
+        const uniqueTypes = [...new Set(products.map(product => product.type))];
+        setTypes(uniqueTypes);
+    }, [products]);
 
     useEffect(() => {
         const init = async () => {
-            if (!productId) return;
-            const res = await productApi.callFetchById(productId);
-            if (!res?.data) return;
+            if (productId) {
+                const res = await productApi.callFetchById(productId);
+                if (!res?.data) return;
 
-            // set product
-            setDataProduct(res.data);
-            setDescProduct(res.data.detailDesc || "");
-            form.setFieldsValue(res.data);
-            setDataLogo([{ name: res.data.image, uid: uuidv4() }])
+                // Set product data
+                setDataProduct(res.data);
+                setDescProduct(res.data.detailDesc || "");
+                form.setFieldsValue(res.data);
+                setDataLogo([{ name: res.data.image, uid: uuidv4() }]);
 
-            // set category
-            const updatedCategories = res.data.categories?.length
-                ? await Promise.all(res.data.categories.map(async (category) => {
-                    const categoryRes = await categoryApi.callFetchById(category.id);
-                    return categoryRes?.data
+                // Set unit data
+                const updatedUnits = await Promise.all((res.data.units || []).map(async (unit) => {
+                    const unitRes = await unitApi.callFetchById(unit.id);
+                    return unitRes?.data
                         ? {
-                            ...categoryRes.data,
-                            isDefault: categoryRes.data.default
+                            ...unitRes.data,
+                            isDefault: unitRes.data.default
                         }
                         : {
-                            id: category.id,
-                            name: category.name,
-                            price: category.price,
+                            id: unit.id,
+                            name: unit.name,
+                            price: unit.price,
                             costPrice: 0,
                             default: false,
-                            categoryDetails: [],
+                            unitDetails: [],
                             product: { id: productId }
                         };
                 }))
-                : [{
+                setUnitList(updatedUnits);
+            } else {
+                const defaultUnit = {
                     id: uuidv4(),
                     name: "Mặc định",
                     price: 0,
                     costPrice: 0,
                     default: true,
-                    categoryDetails: [],
-                    product: { id: res.data.id }
-                }];
+                    unitDetails: []
+                };
+                setUnitList([defaultUnit]);
+            }
+        };
 
-            setCategoryList(updatedCategories);
-        }
         init();
-        return () => form.resetFields()
-    }, [productId])
+        return () => form.resetFields();
+    }, [productId]);
 
-    const hasIngredients = (category: ICategory) => {
-        return category.categoryDetails && category.categoryDetails.length > 0;
+    // add a new category
+    const addCategory = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (newCategory && !categories.includes(newCategory)) {
+            setCategories([...categories, newCategory]);
+            setNewCategory('');
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
+    };
+
+    // add a new type
+    const addType = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (newType && !types.includes(newType)) {
+            setTypes([...types, newType]);
+            setNewCategory('');
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
+    };
+
+    const hasIngredients = (unit: IUnit) => {
+        return unit.unitDetails && unit.unitDetails.length > 0;
     };
 
     const isValidUuidV4 = (id: string): boolean => {
@@ -105,23 +159,20 @@ const ViewUpsertProduct = () => {
     };
 
     const submitProduct = async (valuesForm: any) => {
-        if (dataLogo.length === 0) return message.error('Vui lòng tải ảnh lên');
+        const hasEmptyUnit = unitList.some(unit => !hasIngredients(unit));
+        console.log(unitList);
+        if (hasEmptyUnit) return message.error('Vui lòng chọn nguyên liệu!');
 
-        const hasEmptyCategory = categoryList.some(category => !hasIngredients(category));
-        if (hasEmptyCategory) return message.error('Vui lòng chọn nguyên liệu!');
-
-        const { name, category, unit, sold, shortDesc, detailDesc, active } = valuesForm;
+        const { name, type, category, shortDesc, detailDesc, active } = valuesForm;
         const product = {
             id: dataProduct?.id,
             name,
+            type,
+            image: dataLogo[0].name || null,
             category,
-            unit,
-            sold,
-            image: dataLogo[0].name,
             shortDesc,
             detailDesc,
             active,
-            categories: [],
             restaurant: {
                 id: currentRestaurant?.id,
                 name: currentRestaurant?.name
@@ -132,41 +183,39 @@ const ViewUpsertProduct = () => {
             ? await productApi.callUpdate(product)
             : await productApi.callCreate(product);
 
-        console.log(categoryList);
-
         const results = await Promise.allSettled(
-            categoryList.map(async (category) => {
+            unitList.map(async (unit) => {
                 try {
-                    const newCategory = { ...category, product: { id: resProduct.data?.id } };
-                    if (newCategory?.id && isValidUuidV4(String(newCategory.id))) {
-                        delete newCategory.id;
+                    const newUnit = { ...unit, product: { id: resProduct.data?.id } };
+                    if (newUnit?.id && isValidUuidV4(String(newUnit.id))) {
+                        delete newUnit.id;
                     }
 
-                    const resCategory = newCategory.id
-                        ? await categoryApi.callUpdate(newCategory)
-                        : await categoryApi.callCreate(newCategory);
+                    const resUnit = newUnit.id
+                        ? await unitApi.callUpdate(newUnit)
+                        : await unitApi.callCreate(newUnit);
 
-                    return resCategory.data;
+                    return resUnit.data;
                 } catch (error) {
-                    console.error("Error creating category:", error);
+                    console.error("Error creating unit:", error);
                     return null;
                 }
             })
         );
 
-        const updatedCategories = results
+        const updatedUnits = results
             .filter((result) => result.status === "fulfilled" && result.value !== null)
             .map((result) => (result as PromiseFulfilledResult<any>).value);
 
-        if (resProduct.data && updatedCategories.every(category => category)) {
+        if (resProduct.data && updatedUnits.every(unit => unit)) {
             message.success(`${dataProduct?.id ? 'Cập nhật' : 'Tạo mới'} hàng hóa và danh mục thành công`);
             navigate('/admin/product');
         } else {
             let errorMessage = "Có lỗi xảy ra";
             if (!resProduct.data) errorMessage = `${resProduct.message || 'Lỗi khi tạo/cập nhật sản phẩm'}`;
 
-            const categoryErrorMessages = updatedCategories.filter(category => !category).map(() => 'Lỗi khi tạo/cập nhật danh mục');
-            if (categoryErrorMessages.length > 0) errorMessage += `: ${categoryErrorMessages.join(', ')}`;
+            const unitErrorMessages = updatedUnits.filter(unit => !unit).map(() => 'Lỗi khi tạo/cập nhật danh mục');
+            if (unitErrorMessages.length > 0) errorMessage += `: ${unitErrorMessages.join(', ')}`;
 
             notification.error({ message: 'Có lỗi xảy ra', description: errorMessage, });
         }
@@ -264,33 +313,71 @@ const ViewUpsertProduct = () => {
                                     <ProFormText
                                         label="Tên món ăn"
                                         name="name"
-                                        rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                         placeholder="Nhập món ăn"
+                                        rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                     />
                                 </Col>
+
+                                <Col span={24} md={12}>
+                                    <ProFormSelect
+                                        label="Danh mục"
+                                        name="category"
+                                        placeholder="Chọn danh mục"
+                                        rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                        options={categories.map(category => ({ label: category, value: category }))}
+                                        fieldProps={{
+                                            dropdownRender: (menu) => (
+                                                <>
+                                                    {menu}
+                                                    <Divider style={{ margin: '8px 0' }} />
+                                                    <Space style={{ padding: '0 8px 4px' }}>
+                                                        <Input
+                                                            placeholder="Thêm danh mục mới"
+                                                            value={newCategory}
+                                                            onChange={(e) => setNewCategory(e.target.value)}
+                                                            onKeyDown={(e) => e.stopPropagation()}
+                                                            ref={inputRef}
+                                                        />
+                                                        <Button type="text" icon={<PlusOutlined />} onClick={addCategory}>
+                                                            Thêm
+                                                        </Button>
+                                                    </Space>
+                                                </>
+                                            ),
+                                        }}
+                                    />
+                                </Col>
+
                                 <Col span={24} md={12}>
                                     <ProFormSelect
                                         label="Phân loại"
-                                        name="category"
-                                        valueEnum={{
-                                            FOOD: "Đồ ăn",
-                                            DRINK: "Đồ uống",
-                                            ORTHER: "Khác",
-                                        }}
-                                        placeholder="Vui lòng chọn phân loại"
-                                        rules={[
-                                            { required: true, message: "Vui lòng chọn phân loại!" },
-                                        ]}
-                                    />
-                                </Col>
-                                <Col span={24} md={12}>
-                                    <ProFormText
-                                        label="Đơn vị"
-                                        name="unit"
+                                        name="type"
+                                        placeholder="Chọn phân loại"
                                         rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
-                                        placeholder="Nhập đơn vị"
+                                        options={types.map(type => ({ label: type, value: type }))}
+                                        fieldProps={{
+                                            dropdownRender: (menu) => (
+                                                <>
+                                                    {menu}
+                                                    <Divider style={{ margin: '8px 0' }} />
+                                                    <Space style={{ padding: '0 8px 4px' }}>
+                                                        <Input
+                                                            placeholder="Thêm phân loại mới"
+                                                            value={newType}
+                                                            onChange={(e) => setNewType(e.target.value)}
+                                                            onKeyDown={(e) => e.stopPropagation()}
+                                                            ref={inputRef}
+                                                        />
+                                                        <Button type="text" icon={<PlusOutlined />} onClick={addType}>
+                                                            Thêm
+                                                        </Button>
+                                                    </Space>
+                                                </>
+                                            ),
+                                        }}
                                     />
                                 </Col>
+
                                 <Col span={24} md={12}>
                                     <ProFormText
                                         label="Mô tả"
@@ -298,6 +385,7 @@ const ViewUpsertProduct = () => {
                                         placeholder="Nhập mô tả"
                                     />
                                 </Col>
+
                                 <Col span={24} md={4}>
                                     <ProFormSwitch
                                         label="Hoạt động"
@@ -309,6 +397,7 @@ const ViewUpsertProduct = () => {
                                         fieldProps={{ defaultChecked: true }}
                                     />
                                 </Col>
+
                                 <Col span={24}>
                                     <ProForm.Item
                                         name="detailDesc"
@@ -322,10 +411,10 @@ const ViewUpsertProduct = () => {
                         </Col>
                     </Row>
 
-                    {/* category card */}
+                    {/* unit card */}
                     <CategoryCard
-                        categoryList={categoryList}
-                        setCategoryList={setCategoryList}
+                        unitList={unitList}
+                        setUnitList={setUnitList}
                     />
                 </ProForm>
             </ConfigProvider>

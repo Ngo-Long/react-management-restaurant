@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import queryString from 'query-string';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { IProduct } from "@/types/backend";
@@ -20,12 +20,9 @@ const ProductPage = () => {
     const tableRef = useRef<ActionType>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const products = useAppSelector(state => state.product.result);
-
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IProduct | null>(null);
 
     const meta = useAppSelector(state => state.product.meta);
+    const products = useAppSelector(state => state.product.result);
     const isFetching = useAppSelector(state => state.product.isFetching);
 
     const reloadTable = () => {
@@ -53,7 +50,7 @@ const ProductPage = () => {
             key: 'index',
             width: 50,
             align: "center",
-            render: (text, record, index) => {
+            render: (_, record, index) => {
                 return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
             hideInSearch: true,
@@ -64,14 +61,26 @@ const ProductPage = () => {
             sorter: true,
         },
         {
-            title: 'Phân loại',
-            align: "center",
-            dataIndex: 'product.categories',
+            title: 'Danh mục',
+            dataIndex: 'category',
+            sorter: true,
+        },
+        {
+            title: 'Đơn vị tính',
+            dataIndex: 'product.units',
             hideInSearch: true,
-            render(dom, entity) {
-                const categories = entity?.categories || [];
-                const defaultCategory = categories.find(c => c.isDefault) || categories[0];
-                return <>{defaultCategory?.name}</>;
+            width: 200,
+            render(_, record) {
+                const units = record?.units || [];
+                return (
+                    <Space size="small" wrap>
+                        {units.map(unit => (
+                            <Tag key={unit.id} color={unit.isDefault ? 'red' : 'default'} >
+                                {unit.name}
+                            </Tag>
+                        ))}
+                    </Space>
+                );
             },
         },
         {
@@ -79,22 +88,16 @@ const ProductPage = () => {
             align: "center",
             dataIndex: 'price',
             hideInSearch: true,
-            render(dom, entity) {
-                const categories = entity?.categories || [];
-                const defaultCategory = categories.find(c => c.isDefault) || categories[0];
-                const price = defaultCategory?.price || 0;
+            render(_, record) {
+                const units = record?.units || [];
+                const defaultUnit = units.find(c => c.isDefault) || units[0];
+                const price = defaultUnit?.price || 0;
                 return <>{price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>;
             },
         },
         {
-            title: 'Đơn vị',
-            dataIndex: 'unit',
-            sorter: true,
-            align: "center",
-        },
-        {
-            title: 'Phân loại',
-            dataIndex: 'category',
+            title: 'Kiểu loại',
+            dataIndex: 'type',
             sorter: true,
             align: "center",
         },
@@ -114,10 +117,10 @@ const ProductPage = () => {
                     placeholder="Chọn hoạt động"
                 />
             ),
-            render(dom, entity, index, action, schema) {
+            render(_, record) {
                 return <>
-                    <Tag color={entity.active ? "lime" : "red"} >
-                        {entity.active ? "ACTIVE" : "INACTIVE"}
+                    <Tag color={record.active ? "lime" : "red"} >
+                        {record.active ? "ACTIVE" : "INACTIVE"}
                     </Tag>
                 </>
             },
@@ -127,7 +130,7 @@ const ProductPage = () => {
             dataIndex: 'createdDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
@@ -140,7 +143,7 @@ const ProductPage = () => {
             sorter: true,
             hidden: true,
             align: "center",
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
