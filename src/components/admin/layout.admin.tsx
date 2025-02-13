@@ -4,22 +4,23 @@ import {
     ShopOutlined,
     UserOutlined,
     GatewayOutlined,
-    MenuFoldOutlined,
-    DashboardOutlined,
-    ExceptionOutlined,
-    MenuUnfoldOutlined,
-    ContainerOutlined,
-    LineChartOutlined,
     BarChartOutlined,
     DotChartOutlined,
     PieChartOutlined,
+    MenuFoldOutlined,
+    ContainerOutlined,
+    DashboardOutlined,
+    ExceptionOutlined,
+    LineChartOutlined,
+    MenuUnfoldOutlined,
     RadarChartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 const { Header, Sider, Content } = Layout;
-import { Button, Dropdown, Layout, Menu, message, Space, theme } from 'antd';
+import { Button, Layout, Menu, message, Space, theme } from 'antd';
 
 import { authApi } from '@/config/api';
+import DropdownMenu from '../share/dropdown.menu';
 import React, { useState, useEffect } from 'react';
 import { ALL_PERMISSIONS } from '@/config/permissions';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
@@ -240,11 +241,9 @@ const LayoutAdmin: React.FC = () => {
 
                 <Layout>
                     <Header style={{ padding: 0, background: colorBgContainer, position: "relative", boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.08)" }}>
-                        <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
-                            <Space style={{ cursor: "pointer", position: "absolute", right: "18px" }}>
-                                Welcome Admin
-                            </Space>
-                        </Dropdown>
+                        <Space style={{ cursor: "pointer", position: "absolute", right: "18px" }}>
+                            <DropdownMenu />
+                        </Space>
                     </Header>
 
                     <Content style={{ margin: '16px 16px', height: "calc(100vh - 10%)" }}>

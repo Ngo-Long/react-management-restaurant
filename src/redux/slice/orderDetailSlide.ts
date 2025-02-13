@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { orderDetailApi } from '@/config/api';
 import { IOrderDetail } from '@/types/backend';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 interface IState {
     isFetching: boolean;
@@ -30,6 +30,14 @@ export const fetchOrderDetailsByOrderId = createAsyncThunk(
     }
 )
 
+export const fetchOrderDetailsByRestaurant = createAsyncThunk(
+    'orderDetail/fetchOrderDetailsByRestaurant',
+    async ({ query }: { query: string }) => {
+        const response = await orderDetailApi.callFetchByRestaurant(query);
+        return response;
+    }
+)
+
 const initialState: IState = {
     isFetching: true,
     meta: {
@@ -54,11 +62,9 @@ export const orderDetailSlide = createSlice({
         builder.addCase(fetchOrderDetail.pending, (state, action) => {
             state.isFetching = true;
         })
-
         builder.addCase(fetchOrderDetail.rejected, (state, action) => {
             state.isFetching = false;
         })
-
         builder.addCase(fetchOrderDetail.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
@@ -71,12 +77,25 @@ export const orderDetailSlide = createSlice({
         builder.addCase(fetchOrderDetailsByOrderId.pending, (state) => {
             state.isFetching = true;
         });
-
         builder.addCase(fetchOrderDetailsByOrderId.rejected, (state) => {
             state.isFetching = false;
         });
-
         builder.addCase(fetchOrderDetailsByOrderId.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+                state.meta = action.payload.data.meta;
+                state.result = action.payload.data.result;
+            }
+        });
+
+        // Handle fetchOrderDetailsByRestaurant actions
+        builder.addCase(fetchOrderDetailsByRestaurant.pending, (state) => {
+            state.isFetching = true;
+        })
+        builder.addCase(fetchOrderDetailsByRestaurant.rejected, (state) => {
+            state.isFetching = false;
+        })
+        builder.addCase(fetchOrderDetailsByRestaurant.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;

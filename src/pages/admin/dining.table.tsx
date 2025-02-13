@@ -17,18 +17,13 @@ import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-component
 
 const DiningTablePage = () => {
     const tableRef = useRef<ActionType>();
-
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
 
     const dispatch = useAppDispatch();
     const diningTables = useAppSelector(state => state.diningTable.result);
-
     const meta = useAppSelector(state => state.diningTable.meta);
     const isFetching = useAppSelector(state => state.diningTable.isFetching);
-
-    const currentUser = useAppSelector(state => state.account.user);
-    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
 
     const reloadTable = () => {
         tableRef?.current?.reload();
@@ -74,7 +69,7 @@ const DiningTablePage = () => {
             align: "center",
             dataIndex: 'seats',
             hideInSearch: true,
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 const str = "" + entity.seats;
                 return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
             },
@@ -90,7 +85,7 @@ const DiningTablePage = () => {
             title: 'Trạng thái',
             dataIndex: 'status',
             align: "center",
-            renderFormItem: (item, props, form) => (
+            renderFormItem: () => (
                 <ProFormSelect
                     showSearch
                     allowClear
@@ -108,7 +103,7 @@ const DiningTablePage = () => {
             align: "center",
             dataIndex: 'active',
             hideInSearch: false,
-            renderFormItem: (item, props, form) => (
+            renderFormItem: () => (
                 <ProFormSelect
                     showSearch
                     allowClear
@@ -119,7 +114,7 @@ const DiningTablePage = () => {
                     placeholder="Chọn hoạt động"
                 />
             ),
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 return <>
                     <Tag color={entity.active ? "lime" : "red"} >
                         {entity.active ? "ACTIVE" : "INACTIVE"}
@@ -132,7 +127,7 @@ const DiningTablePage = () => {
             dataIndex: 'createdDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
@@ -143,7 +138,7 @@ const DiningTablePage = () => {
             dataIndex: 'lastModifiedDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
@@ -154,7 +149,7 @@ const DiningTablePage = () => {
             hideInSearch: true,
             width: 100,
             align: "center",
-            render: (_value, entity, _index, _action) => (
+            render: (_, entity) => (
                 <Space>
                     <Access permission={ALL_PERMISSIONS.DININGTABLES.UPDATE} hideChildren>
                         <EditOutlined
