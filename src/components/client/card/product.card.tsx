@@ -4,10 +4,9 @@ import TextArea from 'antd/es/input/TextArea';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
 import { IOrderDetail, IProduct } from '@/types/backend';
-import { Button, Col, Flex, InputNumber, Modal, Radio, Row } from 'antd';
-import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
-import { CheckboxGroupProps } from 'antd/es/checkbox';
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
+import { Button, Col, Flex, InputNumber, Modal, Radio, Row } from 'antd';
 
 interface ProductCardProps {
     handleItemSelect: (item: IOrderDetail) => void;
@@ -68,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
 
         const item = {
             quantity,
-            status: 'CONFIRMED',
+            status: 'AWAITING',
             unit: {
                 id: selectedUnitDetailId,
             }

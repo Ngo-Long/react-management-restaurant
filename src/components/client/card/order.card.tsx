@@ -1,24 +1,21 @@
 import {
-    AlertOutlined, MenuOutlined, DollarOutlined,
-    ShoppingCartOutlined, EditOutlined, MinusOutlined, PlusOutlined,
+    EditOutlined, MinusOutlined, PlusOutlined,
+    AlertOutlined, DollarOutlined, ShoppingCartOutlined
 } from '@ant-design/icons';
 import {
-    Card, Table, Dropdown, Space, Button, message,
-    notification, Modal, InputNumber, Flex, Row, Col
+    Card, Table, Space, Button, message,
+    notification, Modal, InputNumber, Flex, Row, Col,
 } from 'antd';
 import { ColumnType } from 'antd/es/table';
 import TextArea from 'antd/es/input/TextArea';
-
 import { useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 import InvoiceCard from './invoice.card';
 import { IOrder, IOrderDetail } from '@/types/backend';
-import { authApi, orderApi, orderDetailApi } from '@/config/api';
-
+import { orderApi, orderDetailApi } from '@/config/api';
 import { RootState } from '@/redux/store';
-import { setLogoutAction } from '@/redux/slice/accountSlide';
+import DropdownMenu from '@/components/share/dropdown.menu';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { fetchOrderDetailsByOrderId, resetOrderDetails } from '@/redux/slice/orderDetailSlide';
@@ -36,6 +33,10 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     const [open, setOpen] = useState(false);
     const [note, setNote] = useState<string>('');
 
+    const [customerPaid, setCustomerPaid] = useState(0);
+    const [returnAmount, setReturnAmount] = useState(0);
+    const [methodPaid, setMethodPaid] = useState<string>('CASH');
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [quantityItem, setQuantityItem] = useState<number>(1);
@@ -43,11 +44,8 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
 
     const meta = useAppSelector(state => state.orderDetail.meta);
     const [orderDetail, setOrderDetail] = useState<IOrderDetail | null>(null);
+    const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
     const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
-
-    const [customerPaid, setCustomerPaid] = useState(0);
-    const [returnAmount, setReturnAmount] = useState(0);
-    const [methodPaid, setMethodPaid] = useState<string>('CASH');
 
     useEffect(() => {
         currentOrder?.id
@@ -75,19 +73,18 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
         }
     }, [currentOrder]);
 
-    const handleLogout = async () => {
-        const res = await authApi.callLogout();
-        if (res && +res.statusCode === 200) {
-            dispatch(setLogoutAction({}));
-            message.success('Đăng xuất thành công');
-            navigate('/login')
+    useEffect(() => {
+        if (orderDetail) {
+            setQuantityItem(orderDetail.quantity || 1);
+            setSelectedUnitId(orderDetail.unit?.id || null);
+            setTotalPriceItem((orderDetail?.unit?.price || 0) * (orderDetail?.quantity || 1));
         }
-    }
+    }, [orderDetail]);
 
     const handleUpdateItem = async () => {
         const res = await orderDetailApi.callUpdate({
             ...orderDetail,
-            quantity: quantityItem
+            quantity: quantityItem,
         });
 
         if (res.data) {
@@ -129,36 +126,29 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     };
 
     const handleUpdateCompletedOrder = async (currentOrder: IOrder) => {
-        // update order
-        const res = await orderApi.callUpdate({
-            ...currentOrder,
-            note,
-            status: 'COMPLETED'
-        });
+        try {
+            // update order
+            const resOrder = await orderApi.callUpdate({ ...currentOrder, note, status: "COMPLETED" });
+            if (!resOrder.data) {
+                notification.error({ message: "Có lỗi đơn hàng xảy ra", description: resOrder.message });
+                return;
+            }
 
-        if (res.data) {
-            setCurrentOrder(res.data);
-            dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100' }));
-            message.success('Bếp đã được nhận thông báo');
-        } else {
-            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
+            // update order details
+            const awaitingDetails = orderDetails.filter(item => item.status === "AWAITING");
+            await Promise.all(
+                awaitingDetails.map(async (item) => {
+                    await orderDetailApi.callUpdate({ ...item, status: "PENDING" });
+                })
+            );
+
+            setCurrentOrder(resOrder.data);
+            dispatch(fetchDiningTableByRestaurant({ query: "?page=1&size=100" }));
+            message.success("Bếp đã được nhận thông báo");
+        } catch (error: any) {
+            notification.error({ message: "Lỗi hệ thống", description: error.message });
         }
     }
-
-    const itemsDropdown = [
-        {
-            label: <Link to={'/admin'}>Trang quản trị</Link>,
-            key: 'home',
-        },
-        {
-            label: (
-                <span style={{ cursor: 'pointer' }} onClick={handleLogout}>
-                    Đăng xuất
-                </span>
-            ),
-            key: 'logout',
-        },
-    ];
 
     const columns: ColumnType<IOrderDetail>[] = [
         {
@@ -201,13 +191,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             bordered={true}
             className="custom-card"
             style={{ height: '100vh' }}
-            extra={
-                <Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
-                    <Space style={{ cursor: "pointer" }}>
-                        Bán hàng <MenuOutlined />
-                    </Space>
-                </Dropdown>
-            }
+            extra={<DropdownMenu />}
             title={
                 <div style={{ display: "flex", fontSize: '15px' }}>
                     <ShoppingCartOutlined style={{ fontSize: '20px', marginRight: '6px' }} />

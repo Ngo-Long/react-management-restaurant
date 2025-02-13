@@ -30,7 +30,7 @@ export const store = configureStore({
     ingredient: ingredientReducer,
     role: roleReducer,
     permission: permissionReducer,
-    supplier: supplierReducer
+    supplier: supplierReducer,
   },
 });
 

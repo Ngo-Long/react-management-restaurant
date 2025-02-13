@@ -7,6 +7,7 @@ import DashboardPage from './pages/admin/dashboard';
 import RestaurantPage from './pages/admin/restaurant';
 import PermissionPage from './pages/admin/permission';
 import DiningTablePage from './pages/admin/dining.table';
+import KitchenClient from './pages/client/kitchen.client';
 
 import NotFound from './components/share/not.found';
 import LayoutApp from './components/share/layout.app';
@@ -74,6 +75,13 @@ export default function App() {
           element:
             <ProtectedRoute>
               <SaleClient />
+            </ProtectedRoute>
+        },
+        {
+          path: "/:name/kitchen",
+          element:
+            <ProtectedRoute>
+              <KitchenClient />
             </ProtectedRoute>
         }
       ],

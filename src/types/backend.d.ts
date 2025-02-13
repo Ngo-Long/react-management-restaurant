@@ -243,7 +243,7 @@ export interface IIngredient {
 }
 
 export interface IUnit {
-    id?: string | number;
+    id?: string;
     name?: string;
     price?: number;
     costPrice?: number;

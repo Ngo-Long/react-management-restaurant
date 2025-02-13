@@ -331,6 +331,10 @@ export const orderDetailApi = {
     callFetchByOrderId(id: string) {
         return axios.get<IBackendRes<IModelPaginate<IOrderDetail>>>(`/api/v1/order-details/by-order/${id}`);
     },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IOrderDetail>>>(`/api/v1/order-details/by-restaurant?${query}`);
+    },
 }
 
 /**

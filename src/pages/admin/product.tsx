@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import queryString from 'query-string';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { IProduct } from "@/types/backend";
@@ -24,10 +24,20 @@ const ProductPage = () => {
     const meta = useAppSelector(state => state.product.meta);
     const products = useAppSelector(state => state.product.result);
     const isFetching = useAppSelector(state => state.product.isFetching);
+    const [selectedUnits, setSelectedUnits] = useState<{ [key: number]: number }>({});
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
+
+    const handleUnitClick = (productId: number | undefined, unitId: number | undefined) => {
+        if (!productId || !unitId) return;
+
+        setSelectedUnits(prev => ({
+            ...prev,
+            [productId]: unitId
+        }));
+    };
 
     const handleDeleteProduct = async (id: string | undefined) => {
         if (id) {
@@ -75,7 +85,12 @@ const ProductPage = () => {
                 return (
                     <Space size="small" wrap>
                         {units.map(unit => (
-                            <Tag key={unit.id} color={unit.isDefault ? 'red' : 'default'} >
+                            <Tag
+                                key={unit.id}
+                                color={selectedUnits[Number(record.id)] === unit.id ? 'blue' : (unit.isDefault ? 'red' : 'default')}
+                                onClick={() => handleUnitClick(Number(record.id), unit.id)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 {unit.name}
                             </Tag>
                         ))}
@@ -90,13 +105,13 @@ const ProductPage = () => {
             hideInSearch: true,
             render(_, record) {
                 const units = record?.units || [];
-                const defaultUnit = units.find(c => c.isDefault) || units[0];
-                const price = defaultUnit?.price || 0;
-                return <>{price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>;
+                const selectedUnit = units.find(c => c.id === selectedUnits[Number(record.id)]) || units.find(c => c.isDefault) || units[0];
+                const price = selectedUnit?.price || 0;
+                return <>{price.toLocaleString()} ₫</>;
             },
         },
         {
-            title: 'Kiểu loại',
+            title: 'Phân loại',
             dataIndex: 'type',
             sorter: true,
             align: "center",
