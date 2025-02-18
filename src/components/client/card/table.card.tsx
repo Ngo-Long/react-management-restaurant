@@ -13,18 +13,14 @@ interface DiningTableCardProps {
     handleSelectedTable: (id: string, name: string) => void;
 }
 
-const DiningTableCard: React.FC<DiningTableCardProps> = ({
-    currentTable,
-    handleSelectedTable
-}) => {
+const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleSelectedTable }) => {
     const dispatch = useAppDispatch();
     const diningTables = useSelector((state: RootState) => state.diningTable.result);
-
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
     const [currentOrders, setCurrentOrders] = useState<{ [key: string]: IOrder }>({});
 
     useEffect(() => {
-        dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100' }));
+        dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100&sort=sequence,asc&filter=active=true' }));
     }, [dispatch]);
 
     useEffect(() => {

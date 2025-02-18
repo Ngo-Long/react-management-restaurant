@@ -200,7 +200,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                             ${currentOrder?.diningTables!
                             .map(table => table.name)
                             .join(' - ')}`
-                        : `Đơn hàng 0 / ${currentTable?.name}`
+                        : `Đơn hàng / ${currentTable?.name}`
                     }
                 </div>
             }

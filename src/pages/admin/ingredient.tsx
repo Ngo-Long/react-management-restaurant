@@ -16,14 +16,11 @@ import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-component
 
 const IngredientPage = () => {
     const tableRef = useRef<ActionType>();
-
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IIngredient | null>(null);
-    const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
     const ingredients = useAppSelector(state => state.ingredient.result);
-
     const meta = useAppSelector(state => state.ingredient.meta);
     const isFetching = useAppSelector(state => state.ingredient.isFetching);
 
@@ -63,23 +60,23 @@ const IngredientPage = () => {
             sorter: true,
         },
         {
-            title: 'Đơn vị',
-            dataIndex: 'unit',
-            sorter: true,
+            title: 'Phân loại',
+            dataIndex: 'type',
             align: "center",
+            hideInSearch: true,
         },
         {
-            title: 'Phân loại',
+            title: 'Danh mục',
             dataIndex: 'category',
-            sorter: true,
             align: "center",
+            hideInSearch: true,
         },
         {
             title: 'Giá vốn',
             align: "center",
             dataIndex: 'price',
             hideInSearch: true,
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 const str = "" + entity.price;
                 return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
             },
@@ -89,7 +86,7 @@ const IngredientPage = () => {
             align: "center",
             dataIndex: 'initialQuantity',
             hideInSearch: true,
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 const str = "" + entity.initialQuantity;
                 return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
             },
@@ -99,7 +96,7 @@ const IngredientPage = () => {
             align: "center",
             dataIndex: 'minimumQuantity',
             hideInSearch: true,
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 const str = "" + entity.minimumQuantity;
                 return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
             },
@@ -133,7 +130,7 @@ const IngredientPage = () => {
             dataIndex: 'createdDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
@@ -146,7 +143,7 @@ const IngredientPage = () => {
             sorter: true,
             hidden: true,
             align: "center",
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
@@ -191,8 +188,8 @@ const IngredientPage = () => {
         const clone = { ...params };
         let parts = [];
         if (clone.name) parts.push(`name ~ '${clone.name}'`);
-        if (clone?.status?.length) {
-            parts.push(`${sfIn("status", clone.status).toString()}`);
+        if (clone.active !== undefined) {
+            parts.push(`active = ${clone.active}`);
         }
 
         clone.filter = parts.join(' and ');
@@ -204,12 +201,12 @@ const IngredientPage = () => {
         delete clone.current;
         delete clone.pageSize;
         delete clone.name;
-        delete clone.status;
+        delete clone.active;
 
         let temp = queryString.stringify(clone);
 
         let sortBy = "";
-        const fields = ["name", "createdDate", "lastModifiedDate"];
+        const fields = ["name", "active", "createdDate", "lastModifiedDate"];
         if (sort) {
             for (const field of fields) {
                 if (sort[field]) {
@@ -219,11 +216,11 @@ const IngredientPage = () => {
             }
         }
 
-        //mặc định sort theo lastModifiedDate
+        // Thêm sắp xếp mặc định: active giảm dần (true đứng trước false) và createdDate tăng dần
         if (Object.keys(sortBy).length === 0) {
-            temp = `${temp}&sort=lastModifiedDate,desc`;
+            temp = `${temp}&sort=active,desc&sort=createdDate,asc`;
         } else {
-            temp = `${temp}&${sortBy}`;
+            temp = `${temp}&sort=active,desc&${sortBy}`;
         }
 
         return temp;

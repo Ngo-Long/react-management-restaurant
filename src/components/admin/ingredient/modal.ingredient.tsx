@@ -1,18 +1,19 @@
 
 import {
     ProFormSelect, ProFormSwitch, ProFormText,
-    FooterToolbar, ModalForm, ProForm, ProFormDigit, ProFormTextArea
+    FooterToolbar, ModalForm, ProForm, ProFormDigit
 } from "@ant-design/pro-components";
-import { Col, ConfigProvider, Form, Input, Row, Upload, message, notification } from "antd";
+import { Button, Col, ConfigProvider, Divider, Form, Input, InputRef, Row, Space, Upload, message, notification } from "antd";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { isMobile } from 'react-device-detect';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { IIngredient } from "@/types/backend";
 import enUS from 'antd/lib/locale/en_US';
-import { ingredientApi, restaurantApi, callUploadSingleFile } from "@/config/api";
-import { useAppSelector } from "@/redux/hooks";
+import { ingredientApi } from "@/config/api";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
 import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
 
@@ -30,16 +31,51 @@ interface IIngredientLogo {
 }
 
 const ModalIngredient = (props: IProps) => {
-    const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
     const [form] = Form.useForm();
-    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
+    const dispatch = useAppDispatch();
+    const inputRef = useRef<InputRef>(null);
+    const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
+
     const [desc, setDesc] = useState<string>("");
-    const [animation, setAnimation] = useState<string>('open');
-    const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
-    const [dataLogo, setDataLogo] = useState<IIngredientLogo[]>([]);
+    const [types, setTypes] = useState<string[]>([]);
+    const [newType, setNewType] = useState<string>('');
+    const [categories, setCategories] = useState<string[]>([]);
+    const [newCategory, setNewCategory] = useState<string>('');
+    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
+    const [animation, setAnimation] = useState<string>('open');
+    const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
+    const [dataLogo, setDataLogo] = useState<IIngredientLogo[]>([
+        { name: "", uid: "" }
+    ]);
+
+    useEffect(() => {
+        if (currentRestaurant?.id) {
+            dispatch(fetchIngredientByRestaurant({ query: '' }));
+        }
+    }, [currentRestaurant, dispatch]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const ingredients = await ingredientApi.callFetchByRestaurant('');
+
+                // set categories
+                const uniqueCategories = [...new Set(ingredients.data?.result.map((ingredient: IIngredient) => ingredient.category))];
+                setCategories(uniqueCategories);
+
+                // set types
+                const uniqueTypes = [...new Set(ingredients.data?.result.map((ingredient: IIngredient) => ingredient.type))];
+                setTypes(uniqueTypes);
+            } catch (error) {
+                console.error("Lỗi khi fetch dữ liệu bàn ăn:", error);
+            }
+        };
+        fetchData();
+    }, []);
 
     useEffect(() => {
         if (dataInit?.id) {
@@ -51,6 +87,27 @@ const ModalIngredient = (props: IProps) => {
         }
     }, [dataInit])
 
+
+    // add a new category
+    const addCategory = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (newCategory && !categories.includes(newCategory)) {
+            setCategories([...categories, newCategory]);
+            setNewCategory('');
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
+    };
+
+    // add a new type
+    const addType = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (newType && !types.includes(newType)) {
+            setTypes([...types, newType]);
+            setNewCategory('');
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
+    };
+
     const resetModal = useCallback(() => {
         form.resetFields();
         setDataInit(null);
@@ -60,7 +117,7 @@ const ModalIngredient = (props: IProps) => {
 
     const submitIngredient = async (valuesForm: any) => {
         const {
-            name, unit, price, category, status,
+            name, type, price, category, status,
             initialQuantity, minimumQuantity, active
         } = valuesForm;
 
@@ -72,7 +129,7 @@ const ModalIngredient = (props: IProps) => {
         const ingredient = {
             id: dataInit?.id,
             name,
-            unit,
+            type,
             price,
             category,
             status,
@@ -224,19 +281,11 @@ const ModalIngredient = (props: IProps) => {
                             </Col>
 
                             <Col span={24} md={12}>
-                                <ProFormText
-                                    label="Đơn vị"
-                                    name="unit"
-                                    rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                                    placeholder="Nhập đơn vị"
-                                />
-                            </Col>
-
-                            <Col span={24} md={12}>
                                 <ProFormDigit
                                     label="Giá nhập"
                                     name="price"
                                     placeholder="Nhập giá nhập"
+                                    rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                                     fieldProps={{
                                         addonAfter: " ₫",
                                         formatter: (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
@@ -247,16 +296,61 @@ const ModalIngredient = (props: IProps) => {
 
                             <Col span={24} md={12}>
                                 <ProFormSelect
-                                    label="Loại hàng"
-                                    name="category"
-                                    valueEnum={{
-                                        FOOD: 'Đồ ăn',
-                                        DRINK: 'Đồ uống',
-                                        UTENSIL: 'Vật dụng',
-                                        OTHER: 'Khác',
+                                    label="Phân loại"
+                                    name="type"
+                                    placeholder="Chọn phân loại"
+                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                    options={types.map(type => ({ label: type, value: type }))}
+                                    fieldProps={{
+                                        dropdownRender: (menu) => (
+                                            <>
+                                                {menu}
+                                                <Divider style={{ margin: '8px 0' }} />
+                                                <Space style={{ padding: '0 8px 4px' }}>
+                                                    <Input
+                                                        placeholder="Thêm phân loại mới"
+                                                        value={newType}
+                                                        onChange={(e) => setNewType(e.target.value)}
+                                                        onKeyDown={(e) => e.stopPropagation()}
+                                                        ref={inputRef}
+                                                    />
+                                                    <Button type="default" icon={<PlusOutlined />} onClick={addType}>
+                                                        Thêm
+                                                    </Button>
+                                                </Space>
+                                            </>
+                                        ),
                                     }}
-                                    placeholder="Vui lòng chọn loại hàng"
-                                    rules={[{ required: true, message: 'Vui lòng chọn loại hàng!' }]}
+                                />
+                            </Col>
+
+                            <Col span={24} md={12}>
+                                <ProFormSelect
+                                    label="Danh mục"
+                                    name="category"
+                                    placeholder="Chọn danh mục"
+                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                    options={categories.map(category => ({ label: category, value: category }))}
+                                    fieldProps={{
+                                        dropdownRender: (menu) => (
+                                            <>
+                                                {menu}
+                                                <Divider style={{ margin: '8px 0' }} />
+                                                <Space style={{ padding: '0 8px 4px' }}>
+                                                    <Input
+                                                        placeholder="Thêm danh mục mới"
+                                                        value={newCategory}
+                                                        onChange={(e) => setNewCategory(e.target.value)}
+                                                        onKeyDown={(e) => e.stopPropagation()}
+                                                        ref={inputRef}
+                                                    />
+                                                    <Button type="default" icon={<PlusOutlined />} onClick={addCategory}>
+                                                        Thêm
+                                                    </Button>
+                                                </Space>
+                                            </>
+                                        ),
+                                    }}
                                 />
                             </Col>
 

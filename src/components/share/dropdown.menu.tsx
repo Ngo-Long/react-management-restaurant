@@ -24,11 +24,11 @@ const DropdownMenu = () => {
             key: "home",
         },
         {
-            label: <Link to={"/restaurant"}>Bán hàng</Link>,
+            label: <Link to={"/sales"}>Bán hàng</Link>,
             key: "sales",
         },
         {
-            label: <Link to={"/restaurant/kitchen"}>Bếp ăn</Link>,
+            label: <Link to={"/sales/kitchen"}>Bếp ăn</Link>,
             key: "kitchen",
         },
         {

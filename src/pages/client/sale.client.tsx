@@ -17,7 +17,7 @@ const SaleClient: React.FC = () => {
     const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
     const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(true);
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
-    const [currentTable, setCurrentTable] = useState({ id: '', name: 'Mang về' });
+    const [currentTable, setCurrentTable] = useState({ id: '', name: 'Chọn bàn' });
 
     const handleSelectedTable = (id: string, name: string) => {
         setCurrentTable({ id, name });
@@ -54,7 +54,7 @@ const SaleClient: React.FC = () => {
             setCurrentOrder(res.data);
             return res.data;
         } else {
-            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
+            notification.warning({ message: 'Vui lòng chọn bàn trước.', description: "" });
             return null;
         }
     }

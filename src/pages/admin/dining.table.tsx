@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
-import { useState, useRef } from 'react';
 import queryString from 'query-string';
+import { useState, useRef } from 'react';
 import { IDiningTable } from "@/types/backend";
-import { sfIn } from "spring-filter-query-builder";
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
 import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
@@ -10,8 +9,8 @@ import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table'
 import { diningTableApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
 import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
+import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
@@ -21,8 +20,8 @@ const DiningTablePage = () => {
     const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
 
     const dispatch = useAppDispatch();
-    const diningTables = useAppSelector(state => state.diningTable.result);
     const meta = useAppSelector(state => state.diningTable.meta);
+    const diningTables = useAppSelector(state => state.diningTable.result);
     const isFetching = useAppSelector(state => state.diningTable.isFetching);
 
     const reloadTable = () => {
@@ -38,7 +37,7 @@ const DiningTablePage = () => {
             } else {
                 notification.error({
                     message: 'Có lỗi xảy ra!',
-                    description: res.message
+                    description: 'Bàn đã được sử dụng không thể xóa được!'
                 });
             }
         }
@@ -47,15 +46,14 @@ const DiningTablePage = () => {
     const columns: ProColumns<IDiningTable>[] = [
         {
             title: 'STT',
-            key: 'index',
-            width: 50,
             align: "center",
+            dataIndex: 'sequence',
+            width: 70,
+            sorter: true,
             hideInSearch: true,
-            render: (text, record, index) => {
-                return (
-                    <>
-                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>)
+            render(_, entity) {
+                const str = "" + entity.sequence;
+                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
             },
         },
         {
@@ -65,7 +63,6 @@ const DiningTablePage = () => {
         },
         {
             title: 'Số ghế',
-            sorter: true,
             align: "center",
             dataIndex: 'seats',
             hideInSearch: true,
@@ -77,32 +74,31 @@ const DiningTablePage = () => {
         {
             title: 'Vị trí',
             dataIndex: 'location',
-            sorter: true,
             align: "center",
-            hideInSearch: false,
+            hideInSearch: true,
         },
-        {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            align: "center",
-            renderFormItem: () => (
-                <ProFormSelect
-                    showSearch
-                    allowClear
-                    valueEnum={{
-                        AVAILABLE: 'Còn trống',
-                        OCCUPIED: 'Đã có khách',
-                        RESERVED: 'Đã đặt trước'
-                    }}
-                    placeholder="Chọn trạng thái"
-                />
-            ),
-        },
+        // {
+        //     title: 'Trạng thái',
+        //     dataIndex: 'status',
+        //     align: "center",
+        //     renderFormItem: () => (
+        //         <ProFormSelect
+        //             showSearch
+        //             allowClear
+        //             valueEnum={{
+        //                 AVAILABLE: 'Còn trống',
+        //                 OCCUPIED: 'Đã có khách',
+        //                 RESERVED: 'Đã đặt trước'
+        //             }}
+        //             placeholder="Chọn trạng thái"
+        //         />
+        //     ),
+        // },
         {
             title: 'Hoạt động',
             align: "center",
+            sorter: true,
             dataIndex: 'active',
-            hideInSearch: false,
             renderFormItem: () => (
                 <ProFormSelect
                     showSearch
@@ -182,8 +178,8 @@ const DiningTablePage = () => {
         const clone = { ...params };
         let parts = [];
         if (clone.name) parts.push(`name ~ '${clone.name}'`);
-        if (clone?.status?.length) {
-            parts.push(`${sfIn("status", clone.status).toString()}`);
+        if (clone.active !== undefined) {
+            parts.push(`active = ${clone.active}`);
         }
 
         clone.filter = parts.join(' and ');
@@ -195,28 +191,27 @@ const DiningTablePage = () => {
         delete clone.current;
         delete clone.pageSize;
         delete clone.name;
-        delete clone.status;
+        delete clone.active;
 
         let temp = queryString.stringify(clone);
 
         let sortBy = "";
-        const fields = ["name", "createdDate", "lastModifiedDate"];
+        const fields = ["sequence", "name", "createdDate", "lastModifiedDate"];
         if (sort) {
             for (const field of fields) {
                 if (sort[field]) {
                     sortBy = `sort=${field},${sort[field] === 'ascend' ? 'asc' : 'desc'}`;
-                    break;  // Remove this if you want to handle multiple sort parameters
+                    break;
                 }
             }
         }
 
-        //mặc định sort theo lastModifiedDate
+        // Thêm sắp xếp mặc định: active giảm dần (true đứng trước false)
         if (Object.keys(sortBy).length === 0) {
-            temp = `${temp}&sort=lastModifiedDate,desc`;
+            temp = `${temp}&sort=active,desc&sort=sequence,asc`;
         } else {
-            temp = `${temp}&${sortBy}`;
+            temp = `${temp}&sort=active,desc&${sortBy}`;
         }
-
         return temp;
     }
 

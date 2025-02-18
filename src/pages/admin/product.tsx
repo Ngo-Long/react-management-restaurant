@@ -225,16 +225,15 @@ const ProductPage = () => {
             for (const field of fields) {
                 if (sort[field]) {
                     sortBy = `sort=${field},${sort[field] === 'ascend' ? 'asc' : 'desc'}`;
-                    break;  // Remove this if you want to handle multiple sort parameters
+                    break;
                 }
             }
         }
 
-        //mặc định sort theo lastModifiedDate
         if (Object.keys(sortBy).length === 0) {
-            temp = `${temp}&sort=lastModifiedDate,desc`;
+            temp = `${temp}&sort=active,desc&sort=createdDate,asc`;
         } else {
-            temp = `${temp}&${sortBy}`;
+            temp = `${temp}&sort=active,desc&${sortBy}`;
         }
 
         return temp;

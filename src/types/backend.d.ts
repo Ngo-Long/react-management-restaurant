@@ -108,8 +108,9 @@ export interface IRole {
 export interface IDiningTable {
     id?: string;
     name?: string;
-    location?: string;
+    location: string;
     seats?: number;
+    sequence?: number;
     description?: string;
     status?: string;
     active: boolean;
@@ -222,11 +223,11 @@ export interface IProduct {
 export interface IIngredient {
     id?: string;
     name?: string;
-    type?: string;
+    type: string;
     price?: number;
     status?: string;
     image: string;
-    category?: string;
+    category: string;
     initialQuantity?: number;
     minimumQuantity?: number;
     description?: string;

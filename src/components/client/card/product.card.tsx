@@ -15,19 +15,17 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
     const dispatch = useAppDispatch();
     const products = useSelector((state: RootState) => state.product.result);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
 
     const [quantity, setQuantity] = useState<number>(1);
     const [totalPrice, setTotalPrice] = useState<number>(0);
-
     const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [selectedUnitDetailId, setSelectedCUnitDetailId] = useState<any>(null);
 
     useEffect(() => {
-        dispatch(fetchProductByRestaurant({ query: '?page=1&size=100' }));
+        dispatch(fetchProductByRestaurant({ query: '?page=1&size=100&filter=active=true' }));
     }, [dispatch]);
 
     useEffect(() => {

@@ -17,27 +17,27 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 const { Header, Sider, Content } = Layout;
-import { Button, Layout, Menu, message, Space, theme } from 'antd';
+import { Button, Layout, Menu, Space, theme } from 'antd';
 
-import { authApi } from '@/config/api';
 import DropdownMenu from '../share/dropdown.menu';
 import React, { useState, useEffect } from 'react';
 import { ALL_PERMISSIONS } from '@/config/permissions';
-import { setLogoutAction } from '@/redux/slice/accountSlide';
-import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from '@/redux/hooks';
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const LayoutAdmin: React.FC = () => {
     const location = useLocation();
-    const navigate = useNavigate();
     const { token: { colorBgContainer } } = theme.useToken();
+    const permissions = useAppSelector(state => state.account.user.role.permissions);
 
     const [collapsed, setCollapsed] = useState(false);
     const [menuItems, setMenuItems] = useState<MenuProps['items']>([]);
     const [activeMenu, setActiveMenu] = useState('');
 
-    const dispatch = useAppDispatch();
-    const permissions = useAppSelector(state => state.account.user.role.permissions);
+
+    useEffect(() => {
+        setActiveMenu(location.pathname)
+    }, [location])
 
     useEffect(() => {
         const ACL_ENABLE = import.meta.env.VITE_ACL_ENABLE;
@@ -171,32 +171,7 @@ const LayoutAdmin: React.FC = () => {
         }
     }, [permissions]);
 
-    useEffect(() => {
-        setActiveMenu(location.pathname)
-    }, [location])
 
-    const handleLogout = async () => {
-        const res = await authApi.callLogout();
-        if (res && +res.statusCode === 200) {
-            dispatch(setLogoutAction({}));
-            message.success('Đăng xuất thành công');
-            navigate('/login')
-        }
-    }
-
-    const itemsDropdown = [
-        {
-            label: <Link to={'/restaurant'}>Bán hàng</Link>,
-            key: 'home',
-        },
-        {
-            label: <label
-                style={{ cursor: 'pointer' }}
-                onClick={() => handleLogout()}
-            >Đăng xuất</label>,
-            key: 'logout',
-        },
-    ];
 
     return (
         <>

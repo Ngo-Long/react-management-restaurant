@@ -3,32 +3,25 @@ import {
     Col, ConfigProvider, Form,
     Row, Upload, message,
     notification, Breadcrumb,
-    InputRef,
-    Divider,
-    Space,
-    Input,
-    Button
+    InputRef, Divider, Space, Input, Button
 } from "antd";
-import {
-    ProFormSelect, ProForm,
-    FooterToolbar, ProFormSwitch, ProFormText,
-} from "@ant-design/pro-components";
 import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { ProFormSelect, ProForm, FooterToolbar, ProFormSwitch, ProFormText } from "@ant-design/pro-components";
 import enUS from 'antd/lib/locale/en_US';
 import Title from "antd/es/typography/Title";
 
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { unitApi, productApi } from "@/config/api";
-import { IUnit, IProduct } from "@/types/backend";
 import CategoryCard from "./product.unit";
 import styles from 'styles/admin.module.scss';
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { IUnit, IProduct } from "@/types/backend";
+import { unitApi, productApi } from "@/config/api";
 import { useState, useEffect, useRef } from 'react';
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
 import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
+import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
 
 interface IProductLogo {
     name: string | null;
@@ -160,7 +153,6 @@ const ViewUpsertProduct = () => {
 
     const submitProduct = async (valuesForm: any) => {
         const hasEmptyUnit = unitList.some(unit => !hasIngredients(unit));
-        console.log(unitList);
         if (hasEmptyUnit) return message.error('Vui lòng chọn nguyên liệu!');
 
         const { name, type, category, shortDesc, detailDesc, active } = valuesForm;
@@ -305,6 +297,16 @@ const ViewUpsertProduct = () => {
                                     </Upload>
                                 </ConfigProvider>
                             </Form.Item>
+
+                            <ProFormSwitch
+                                label="Hoạt động"
+                                name="active"
+                                checkedChildren="ACTIVE"
+                                unCheckedChildren="INACTIVE"
+                                initialValue={true}
+                                hidden={!dataProduct?.id}
+                                fieldProps={{ defaultChecked: true }}
+                            />
                         </Col>
 
                         <Col span={24} md={20}>
@@ -338,7 +340,7 @@ const ViewUpsertProduct = () => {
                                                             onKeyDown={(e) => e.stopPropagation()}
                                                             ref={inputRef}
                                                         />
-                                                        <Button type="text" icon={<PlusOutlined />} onClick={addCategory}>
+                                                        <Button type="default" icon={<PlusOutlined />} onClick={addCategory}>
                                                             Thêm
                                                         </Button>
                                                     </Space>
@@ -368,7 +370,7 @@ const ViewUpsertProduct = () => {
                                                             onKeyDown={(e) => e.stopPropagation()}
                                                             ref={inputRef}
                                                         />
-                                                        <Button type="text" icon={<PlusOutlined />} onClick={addType}>
+                                                        <Button type="default" icon={<PlusOutlined />} onClick={addType}>
                                                             Thêm
                                                         </Button>
                                                     </Space>
@@ -383,18 +385,6 @@ const ViewUpsertProduct = () => {
                                         label="Mô tả"
                                         name="shortDesc"
                                         placeholder="Nhập mô tả"
-                                    />
-                                </Col>
-
-                                <Col span={24} md={4}>
-                                    <ProFormSwitch
-                                        label="Hoạt động"
-                                        name="active"
-                                        checkedChildren="ACTIVE"
-                                        unCheckedChildren="INACTIVE"
-                                        initialValue={true}
-                                        hidden={true}
-                                        fieldProps={{ defaultChecked: true }}
                                     />
                                 </Col>
 

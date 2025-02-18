@@ -71,14 +71,14 @@ export default function App() {
           element: <HomePage />
         },
         {
-          path: "/:name",
+          path: "/sales",
           element:
             <ProtectedRoute>
               <SaleClient />
             </ProtectedRoute>
         },
         {
-          path: "/:name/kitchen",
+          path: "/sales/kitchen",
           element:
             <ProtectedRoute>
               <KitchenClient />

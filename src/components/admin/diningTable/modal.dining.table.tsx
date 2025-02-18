@@ -1,16 +1,17 @@
 
-import { Col, Form, Input, Row, message, notification } from "antd";
 import {
-    ModalForm, ProForm, ProFormDigit,
+    ModalForm, ProFormDigit,
     ProFormSelect, ProFormSwitch, ProFormText
 } from "@ant-design/pro-components";
+import { Button, Col, Divider, Form, Input, Row, Space, message, notification, InputRef } from "antd";
+
+import { useEffect, useRef, useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
-import { useState, useEffect } from 'react';
+import { diningTableApi } from "@/config/api";
 import { IDiningTable } from "@/types/backend";
 import { useAppSelector } from "@/redux/hooks";
 import { isMobile } from 'react-device-detect';
-import { DebounceSelect } from "../user/debouce.select";
-import { diningTableApi, restaurantApi } from "@/config/api";
+import { PlusOutlined } from '@ant-design/icons';
 
 interface IProps {
     openModal: boolean;
@@ -20,64 +21,67 @@ interface IProps {
     reloadTable: () => void;
 }
 
-interface IRestaurantSelect {
-    label: string;
-    value: string;
-    key?: string;
-}
-
 const ModalDiningTable = (props: IProps) => {
     const [form] = Form.useForm();
-    const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
+    const inputRef = useRef<InputRef>(null);
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
 
-    const currentUser = useAppSelector(state => state.account.user);
-    const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
+    const [locations, setLocations] = useState<string[]>([]);
+    const [newLocation, setNewLocation] = useState<string>('');
     const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     useEffect(() => {
         if (dataInit?.id) {
-            if (dataInit.restaurant) {
-                setRestaurants([{
-                    label: dataInit.restaurant.name,
-                    value: dataInit.restaurant.id,
-                    key: dataInit.restaurant.id,
-                }])
-            }
-
-            form.setFieldsValue({
-                ...dataInit,
-                restaurant: { label: dataInit.restaurant?.name, value: dataInit.restaurant?.id },
-            })
+            form.setFieldsValue({ dataInit })
         }
     }, [dataInit])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const diningTables = await diningTableApi.callFetchByRestaurant('');
+                const uniqueLocations = [...new Set(diningTables.data?.result.map((table: IDiningTable) => table.location))];
+                setLocations(uniqueLocations);
+            } catch (error) {
+                console.error("Lỗi khi fetch dữ liệu bàn ăn:", error);
+            }
+        };
+        fetchData();
+    }, []);
+
+
 
     const handleReset = async () => {
         form.resetFields();
         setDataInit(null);
-        setRestaurants([]);
         setOpenModal(false);
     }
 
-    const submitDiningTable = async (valuesForm: any) => {
-        const { name, location, seats, status, description, active, restaurant } = valuesForm;
+    // add a new location
+    const addLocation = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (newLocation && !locations.includes(newLocation)) {
+            setLocations([...locations, newLocation]);
+            setNewLocation('');
+            setTimeout(() => inputRef.current?.focus(), 0);
+        }
+    };
 
-        const restaurantValue = isRoleOwner ? restaurant : {
-            value: currentRestaurant?.id,
-            label: currentRestaurant?.name
-        };
+    const submitDiningTable = async (valuesForm: any) => {
+        const { name, location, seats, sequence, status, description, active } = valuesForm;
 
         const diningTable = {
             id: dataInit?.id,
             name,
             location,
             seats,
+            sequence,
             status,
             description,
             active,
             restaurant: {
-                id: restaurantValue?.value,
-                name: restaurantValue?.label
+                id: currentRestaurant.id ?? "",
+                name: currentRestaurant.name ?? ""
             }
         };
 
@@ -95,21 +99,6 @@ const ModalDiningTable = (props: IProps) => {
                 description: res.message,
             });
         }
-    }
-
-    // Usage of DebounceSelect
-    async function fetchRestaurantList(name: string): Promise<IRestaurantSelect[]> {
-        const res = await restaurantApi.callFetchFilter(`page=1&size=100&name ~ '${name}'`);
-        if (res && res.data) {
-            const list = res.data.result;
-            const temp = list.map(item => {
-                return {
-                    label: item.name as string,
-                    value: item.id as string
-                }
-            })
-            return temp;
-        } else return [];
     }
 
     return (
@@ -131,12 +120,10 @@ const ModalDiningTable = (props: IProps) => {
                 preserve={false}
                 form={form}
                 onFinish={submitDiningTable}
-                initialValues={dataInit?.id ? {
+                initialValues={{
                     ...dataInit,
-                    restaurant: isRoleOwner
-                        ? { label: dataInit?.restaurant?.name, value: dataInit?.restaurant?.id }
-                        : { label: currentRestaurant?.name, value: currentRestaurant?.id }
-                } : {}}
+                    status: dataInit?.id ? dataInit.status : "AVAILABLE",
+                }}
             >
                 <Row gutter={[20, 20]}>
                     <Col span={24} md={12}>
@@ -150,6 +137,15 @@ const ModalDiningTable = (props: IProps) => {
 
                     <Col span={24} md={12}>
                         <ProFormDigit
+                            label="Số thứ tự"
+                            name="sequence"
+                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                            placeholder="Nhập số thứ tự"
+                        />
+                    </Col>
+
+                    <Col span={24} md={12}>
+                        <ProFormDigit
                             label="Số ghế"
                             name="seats"
                             rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
@@ -158,64 +154,48 @@ const ModalDiningTable = (props: IProps) => {
                     </Col>
 
                     <Col span={24} md={12}>
-                        <ProFormText
+                        <ProFormSelect
                             label="Vị trí"
                             name="location"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập vị trí"
-                        />
-                    </Col>
-
-                    <Col span={24} md={12}>
-                        <ProFormSelect
-                            name="status"
-                            label="Trạng thái"
-                            valueEnum={{
-                                OCCUPIED: 'Đã có khách',
-                                RESERVED: 'Đã đặt trước',
-                                AVAILABLE: 'Còn trống',
-                            }}
-                            placeholder="Vui lòng chọn trạng thái"
-                            rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
-                        />
-                    </Col>
-
-                    {isRoleOwner && (
-                        <Col span={24} md={12}>
-                            <ProForm.Item
-                                label="Thuộc nhà hàng"
-                                name="restaurant"
-                                rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
-                            >
-                                {isRoleOwner ? (
-                                    <DebounceSelect
-                                        allowClear
-                                        showSearch
-                                        defaultValue={restaurants}
-                                        value={restaurants}
-                                        placeholder="Chọn nhà hàng"
-                                        fetchOptions={fetchRestaurantList}
-                                        onChange={(newValue: any) => {
-                                            if (newValue?.length === 0 || newValue?.length === 1) {
-                                                setRestaurants(newValue as IRestaurantSelect[]);
-                                            }
-                                        }}
-                                        style={{ width: '100%' }}
-                                    />
-                                ) : (
+                            placeholder="Chọn vị trí"
+                            rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                            options={locations.map(location => ({ label: location, value: location }))}
+                            fieldProps={{
+                                dropdownRender: (menu) => (
                                     <>
-                                        <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
-                                        <ProFormText
-                                            hidden
-                                            name="restaurant"
-                                            initialValue={{
-                                                label: currentRestaurant?.name,
-                                                value: currentRestaurant?.id,
-                                            }}
-                                        />
+                                        {menu}
+                                        <Divider style={{ margin: '8px 0' }} />
+                                        <Space style={{ padding: '0 8px 4px' }}>
+                                            <Input
+                                                placeholder="Thêm vị trí mới"
+                                                value={newLocation}
+                                                onChange={(e) => setNewLocation(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                                ref={inputRef}
+                                            />
+                                            <Button type="text" icon={<PlusOutlined />} onClick={addLocation}>
+                                                Thêm
+                                            </Button>
+                                        </Space>
                                     </>
-                                )}
-                            </ProForm.Item>
+                                ),
+                            }}
+                        />
+                    </Col>
+
+                    {false && (
+                        <Col span={24} md={12}>
+                            <ProFormSelect
+                                name="status"
+                                label="Trạng thái"
+                                valueEnum={{
+                                    OCCUPIED: 'Đã có khách',
+                                    RESERVED: 'Đã đặt trước',
+                                    AVAILABLE: 'Còn trống',
+                                }}
+                                placeholder="Vui lòng chọn trạng thái"
+                                rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+                            />
                         </Col>
                     )}
 
@@ -228,19 +208,20 @@ const ModalDiningTable = (props: IProps) => {
                         />
                     </Col>
 
-                    <Col span={24} md={12}>
-                        <ProFormSwitch
-                            label="Hoạt động"
-                            name="active"
-                            checkedChildren="ACTIVE"
-                            unCheckedChildren="INACTIVE"
-                            initialValue={true}
-                            fieldProps={{
-                                defaultChecked: true,
-                            }}
-                        />
-                    </Col>
-
+                    {dataInit?.id && (
+                        <Col span={24} md={12}>
+                            <ProFormSwitch
+                                label="Hoạt động"
+                                name="active"
+                                checkedChildren="ACTIVE"
+                                unCheckedChildren="INACTIVE"
+                                initialValue={true}
+                                fieldProps={{
+                                    defaultChecked: true,
+                                }}
+                            />
+                        </Col>
+                    )}
                 </Row>
             </ModalForm >
         </>

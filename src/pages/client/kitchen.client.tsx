@@ -1,10 +1,7 @@
-dayjs.locale('vi');
-dayjs.extend(relativeTime);
-import 'dayjs/locale/vi';
-import dayjs from 'dayjs';
+
 import { Table } from 'antd/lib';
 import '@/styles/client.table.scss';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { ColumnType } from 'antd/es/table';
@@ -16,19 +13,36 @@ import DropdownMenu from '@/components/share/dropdown.menu';
 import { Card, Button, Flex, message, notification } from 'antd';
 import { fetchOrderDetailsByRestaurant } from '@/redux/slice/orderDetailSlide';
 
+import 'dayjs/locale/vi';
+import dayjs from 'dayjs';
+dayjs.locale('vi');
+dayjs.extend(relativeTime);
+
 const KitchenClient: React.FC = () => {
     const dispatch = useAppDispatch();
+    const [loading, setLoading] = useState(false);
     const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
 
     useEffect(() => {
-        dispatch(fetchOrderDetailsByRestaurant({ query: "filter=status~'PENDING'&sort=createdDate,asc" }));
+        fetchData();
     }, [dispatch]);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            await dispatch(fetchOrderDetailsByRestaurant({ query: "filter=status~'PENDING'&sort=createdDate,asc" }));
+        } catch (error: any) {
+            notification.error({ message: "Lỗi khi tải dữ liệu", description: error.message });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleUpdateStatus = async (orderDetail: IOrderDetail, status: 'CANCELED' | 'CONFIRMED') => {
         try {
             orderDetailApi.callUpdate({ ...orderDetail, status });
             message.success(`Cập nhật trạng thái thành công: ${status}`);
-            dispatch(fetchOrderDetailsByRestaurant({ query: "filter=status~'PENDING'&sort=createdDate,asc" }));
+            fetchData();
         } catch (error: any) {
             notification.error({ message: "Lỗi cập nhật trạng thái", description: error.message });
         }
@@ -47,16 +61,16 @@ const KitchenClient: React.FC = () => {
         },
         {
             title: 'Số lượng',
-            dataIndex: 'quantity',
             key: 'quantity',
+            dataIndex: 'quantity',
             width: 200,
             align: "center" as const,
         },
         {
             title: 'Phòng/bàn',
             width: 200,
-            dataIndex: 'diningTables',
             key: 'diningTables',
+            dataIndex: 'diningTables',
             align: "center" as const,
         },
         {
@@ -100,6 +114,7 @@ const KitchenClient: React.FC = () => {
         >
             <Table<IOrderDetail>
                 key={orderDetails.length}
+                loading={loading}
                 columns={columns}
                 dataSource={orderDetails}
                 pagination={false}

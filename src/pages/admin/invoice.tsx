@@ -43,27 +43,44 @@ const InvoicePage = () => {
 
     const columns: ProColumns<IInvoice>[] = [
         {
-            title: 'ID',
+            title: 'Mã HD',
             width: 80,
             align: "center",
             dataIndex: 'id',
-            render: (text, record, index, action) => {
+            hideInSearch: true,
+            render: (text, record) => {
                 return (
                     <div onClick={() => {
                         setOpenViewDetail(true);
                         setDataInit(record);
                     }}>
-                        {record.id}
+                        HD-{record.id}
                     </div>
                 )
+            }
+        },
+        {
+            title: 'Thời gian',
+            dataIndex: 'createdDate',
+            width: 180,
+            sorter: true,
+            align: "center",
+            hideInSearch: true,
+            render: (text, record) => {
+                return (
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD/MM/YYYY') : ""}</>
+                )
             },
-            hideInSearch: false,
         },
         {
             title: 'Nguồn',
             dataIndex: ["order", "tableName"],
             align: "center",
             hideInSearch: true,
+            render(_, entity) {
+                const str = "" + entity.order?.id;
+                return <>-</>
+            },
         },
         {
             title: 'Thu ngân',
@@ -76,7 +93,7 @@ const InvoicePage = () => {
             align: "center",
             dataIndex: 'totalAmount',
             hideInSearch: true,
-            render(dom, entity, index, action, schema) {
+            render(_, entity) {
                 const str = "" + entity.totalAmount;
                 return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>
             },
@@ -122,24 +139,11 @@ const InvoicePage = () => {
             },
         },
         {
-            title: 'Ngày tạo',
-            dataIndex: 'createdDate',
-            width: 180,
-            sorter: true,
-            align: "center",
-            hideInSearch: true,
-            render: (text, record, index, action) => {
-                return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD/MM/YYYY') : ""}</>
-                )
-            },
-        },
-        {
             title: 'Ngày sửa',
             dataIndex: 'lastModifiedDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD/MM/YYYY HH:mm:ss') : ""}</>
                 )

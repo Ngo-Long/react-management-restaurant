@@ -50,10 +50,7 @@ const LoginPage = () => {
                     dispatch(setUserLoginInfo(res.data.user));
 
                     message.success("Đăng nhập tài khoản thành công!");
-                    navigate(
-                        callback || `/${res.data.user.restaurant.name}`,
-                        { replace: true }
-                    );
+                    navigate(callback || `/sales`, { replace: true });
                 } else {
                     notification.error({
                         message: "Đăng nhập thất bại",
