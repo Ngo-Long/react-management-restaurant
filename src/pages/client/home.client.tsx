@@ -1,10 +1,15 @@
-import '../../styles/client.home.scss'
+import '../../styles/client.home.scss';
+import { useState } from "react";
 import { Button, Flex, Layout } from "antd";
 import { Footer } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
+import LoginModal from "../auth/LoginModal";
+import RegisterModal from "../auth/RegisterModal";
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
     return (
         <>
@@ -12,39 +17,22 @@ const HomePage = () => {
                 <header className="fixed-header">
                     <nav className="nav" style={{ padding: '4px 48px' }}>
                         <a href="#" className="nav__logo">
-                            <div
-                                style={{ color: '#ff403d', fontSize: '16px', fontWeight: 600 }}
-                            >
+                            <div style={{ color: '#ff403d', fontSize: '16px', fontWeight: 600 }}>
                                 .Rservice
                             </div>
-                            {/* <img src=".." alt="LOGO" className="logo-img" /> */}
                         </a>
 
                         <ul className="nav__list" id="pc__nav">
-                            <li className="nav__item">
-                                <a href="#" className="nav__link">Sản phẩm</a>
-                            </li>
-
-                            <li className="nav__item">
-                                <a href="#about" className="nav__link">Giải pháp</a>
-                            </li>
+                            <li className="nav__item"><a href="#" className="nav__link">Sản phẩm</a></li>
+                            <li className="nav__item"><a href="#about" className="nav__link">Giải pháp</a></li>
                         </ul>
 
                         <Flex wrap gap="small">
-                            <Button
-                                type="text" danger
-                                className="nav__btn"
-                                style={{ width: '90px' }}
-                                onClick={() => navigate('/login')}
-                            >
+                            <Button type="text" danger className="nav__btn" style={{ width: '90px' }} onClick={() => setIsLoginOpen(true)}>
                                 Đăng nhập
                             </Button>
 
-                            <Button
-                                type="primary" danger
-                                className="nav__btn"
-                                onClick={() => navigate('/register')}
-                            >
+                            <Button type="primary" danger className="nav__btn" onClick={() => setIsRegisterOpen(true)}>
                                 Đăng ký
                             </Button>
                         </Flex>
@@ -55,16 +43,13 @@ const HomePage = () => {
                     <section className="hero__body">
                         <div className="hero-wrap__img">
                             <figure className="hero__image">
-                                <img src="./assets/icon/meomeo.png" alt=""
-                                    className="hero__img" />
-
+                                <img src="./assets/icon/meomeo.png" alt="" className="hero__img" />
                                 <img src="./assets/icon/icon-right.svg" alt="" className="hero__decor hero__decor--right" />
                                 <img src="./assets/icon/icon-left.svg" alt="" className="hero__decor hero__decor--left" />
                             </figure>
 
                             <figure className="hero__image hero__img--fit">
-                                <img src="./assets/icon/concho.png" alt=""
-                                    className="hero__img" />
+                                <img src="./assets/icon/concho.png" alt="" className="hero__img" />
                             </figure>
 
                             <div className="hero-wrap__text">
@@ -104,17 +89,22 @@ const HomePage = () => {
                                 hỗ trợ tối ưu hóa mọi hoạt động kinh doanh các nhà hàng nhỏ đến lớn.
                             </p>
 
-                            <div className="hero__block__btn">
+                            <div className="hero__block__btn" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                 <Button
                                     type="primary"
                                     danger
                                     className="hero__btn"
-                                    onClick={() => navigate('/register')}
+                                    onClick={() => setIsRegisterOpen(true)}
                                     style={{ color: '#ffffff', fontSize: '16px', fontWeight: 600 }}>
                                     Đăng ký ngay
                                 </Button>
 
-                                <a href="/login" className="hero-btn__link">Đăng nhập</a>
+                                <Button
+                                    type="link"
+                                    className="hero-btn__link"
+                                    onClick={() => setIsLoginOpen(true)}>
+                                    Đăng nhập
+                                </Button>
                             </div>
                         </section>
                     </section>
@@ -123,9 +113,15 @@ const HomePage = () => {
                 <Footer style={{ textAlign: 'center' }}>
                     Rservice ©{new Date().getFullYear()} Created by NKL
                 </Footer>
+
+                {/* Login Modal */}
+                <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+                
+                {/* Register Modal */}
+                <RegisterModal open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
             </Layout>
         </>
-    )
+    );
 }
 
 export default HomePage;
