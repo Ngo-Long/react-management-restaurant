@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ant-design/pro-components": "^2.8.2",
+    "@ant-design/pro-components": "^2.8.6",
     "@fortawesome/fontawesome-svg-core": "^6.7.1",
     "@fortawesome/free-brands-svg-icons": "^6.7.1",
     "@fortawesome/free-regular-svg-icons": "^6.7.1",
@@ -28,6 +28,7 @@
     "jspdf": "^2.5.2",
     "lodash": "^4.17.21",
     "lodash.groupby": "^4.6.0",
+    "moment": "^2.30.1",
     "path": "^0.12.7",
     "query-string": "^9.1.1",
     "react": "^18.3.1",
@@ -41,7 +42,8 @@
     "rollup-plugin-visualizer": "^5.12.0",
     "sass": "^1.81.0",
     "spring-filter-query-builder": "^1.1.1",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

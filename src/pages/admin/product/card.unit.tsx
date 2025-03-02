@@ -10,9 +10,9 @@ import { Table } from 'antd/lib';
 import { v4 as uuidv4 } from 'uuid';
 import { ColumnType } from 'antd/es/table';
 import { ingredientApi } from "@/config/api";
+import { IUnit, IIngredient } from '@/types/backend';
 import React, { useEffect, useRef, useState } from 'react';
 import { ProFormText, ProForm } from '@ant-design/pro-components';
-import { IUnit, IIngredient } from '@/types/backend';
 
 interface UnitCardProps {
     unitList: IUnit[];

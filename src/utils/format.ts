@@ -1,7 +1,7 @@
+import map from 'lodash/map';
+import groupBy from 'lodash/groupBy';
 import { IPermission } from '../types/backend';
 import { grey, green, blue, red, orange } from '@ant-design/colors';
-import groupBy from 'lodash/groupBy';
-import map from 'lodash/map';
 
 export const nonAccentVietnamese = (str: string) => {
     str = str.replace(/A|Á|À|Ã|Ạ|Â|Ấ|Ầ|Ẫ|Ậ|Ă|Ắ|Ằ|Ẵ|Ặ/g, "A");

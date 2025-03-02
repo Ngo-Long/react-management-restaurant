@@ -5,15 +5,21 @@ import {
     notification, Breadcrumb,
     InputRef, Divider, Space, Input, Button
 } from "antd";
-import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { ProFormSelect, ProForm, FooterToolbar, ProFormSwitch, ProFormText } from "@ant-design/pro-components";
+import {
+    CheckSquareOutlined,
+    LoadingOutlined, PlusOutlined
+} from '@ant-design/icons';
+import {
+    ProFormSelect, ProForm,
+    FooterToolbar, ProFormSwitch, ProFormText
+} from "@ant-design/pro-components";
 import enUS from 'antd/lib/locale/en_US';
 import Title from "antd/es/typography/Title";
 
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import CategoryCard from "./product.unit";
+import CategoryCard from "./card.unit";
 import styles from 'styles/admin.module.scss';
 import { IUnit, IProduct } from "@/types/backend";
 import { unitApi, productApi } from "@/config/api";
@@ -21,7 +27,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
-import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
+import {
+    beforeUpload, getBase64, handleChange,
+    handleRemoveFile, handleUploadFileLogo
+} from "@/utils/image";
 
 interface IProductLogo {
     name: string | null;
@@ -104,7 +113,7 @@ const ViewUpsertProduct = () => {
                             product: { id: productId }
                         };
                 }))
-                setUnitList(updatedUnits);
+                // setUnitList(updatedUnits);
             } else {
                 const defaultUnit = {
                     id: uuidv4(),

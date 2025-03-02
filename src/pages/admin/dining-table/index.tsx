@@ -1,32 +1,64 @@
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import { IDiningTable } from "@/types/backend";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+    Button, Popconfirm, Space,
+    Switch, message, notification
+} from "antd";
+import {
+    DeleteOutlined, DownloadOutlined,
+    EditOutlined, PlusOutlined, UploadOutlined
+} from "@ant-design/icons";
+import { ActionType, ProColumns } from '@ant-design/pro-components';
+
+import { diningTableApi } from '@/config/api';
+import { IDiningTable } from '@/types/backend';
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
-import ModalDiningTable from '@/components/admin/diningTable/modal.dining.table';
-
-import { diningTableApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
+import { paginationConfigure } from '@/utils/paginator';
+import { convertCSV, handleExportAsXlsx } from '@/utils/file';
+import { ModalBatchImport, ModalDiningTable } from './container';
 import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
 const DiningTablePage = () => {
     const tableRef = useRef<ActionType>();
+    const [loading, setLoading] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
+    const [openUpload, setOpenUpload] = useState<boolean>(false);
 
     const dispatch = useAppDispatch();
     const meta = useAppSelector(state => state.diningTable.meta);
-    const diningTables = useAppSelector(state => state.diningTable.result);
+    const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
+    const diningTables = useAppSelector(state => state.diningTable.result)
+        .filter(table => table.name!.toLowerCase() !== "mang về");
     const isFetching = useAppSelector(state => state.diningTable.isFetching);
+    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
+
+    const fetch = () => {
+        setLoading(true);
+        dispatch(fetchDiningTableByRestaurant({ query: '' }));
+    };
+
+    const handleToggleActive = async (record: IDiningTable, checked: boolean) => {
+        const updatedRecord = { ...record, active: checked };
+        const res = await diningTableApi.callUpdate(updatedRecord);
+
+        if (res && +res.statusCode === 200) {
+            message.success('Cập nhật trạng thái thành công');
+            reloadTable();
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra!',
+                description: 'Không thể cập nhật trạng thái!'
+            });
+        }
+    };
 
     const handleDeleteDiningTable = async (id: string | undefined) => {
         if (id) {
@@ -40,6 +72,49 @@ const DiningTablePage = () => {
                     description: 'Bàn đã được sử dụng không thể xóa được!'
                 });
             }
+        }
+    }
+
+    const formatCSV = (data: IDiningTable[]) => {
+        const excludeKeys = [
+            'id', 'status', 'active', 'createdBy',
+            'createdDate', 'lastModifiedDate', 'lastModifiedBy', 'restaurant'
+        ];
+        return data.map((row) => {
+            return (Object.keys(row) as Array<keyof IDiningTable>)
+                .filter((key) => !excludeKeys.includes(key as string))
+                .reduce((newRow, key) => {
+                    newRow[key] = convertCSV(row[key]);
+                    return newRow;
+                }, {} as Record<keyof IDiningTable, any>)
+        })
+    }
+
+    const batchImportConfigHandler = async (data: IDiningTable[]) => {
+        if (!data || data?.length <= 0) return;
+        setLoading(true);
+
+        const formattedData = data.map(item => ({
+            ...item,
+            status: 'AVAILABLE',
+            active: true,
+            restaurant: {
+                id: currentRestaurant.id ?? '',
+                name: currentRestaurant.name ?? ''
+            }
+        }));
+        console.log('data: ', formattedData);
+
+        try {
+            await diningTableApi.callBatchImport(formattedData);
+            message.success('Nhập danh sách thành công');
+            setOpenUpload(false);
+            fetch();
+        } catch (error) {
+            console.error('Batch import failed:', error);
+            message.error('Lỗi khi nhập danh sách, vui lòng thử lại!');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -77,46 +152,18 @@ const DiningTablePage = () => {
             align: "center",
             hideInSearch: true,
         },
-        // {
-        //     title: 'Trạng thái',
-        //     dataIndex: 'status',
-        //     align: "center",
-        //     renderFormItem: () => (
-        //         <ProFormSelect
-        //             showSearch
-        //             allowClear
-        //             valueEnum={{
-        //                 AVAILABLE: 'Còn trống',
-        //                 OCCUPIED: 'Đã có khách',
-        //                 RESERVED: 'Đã đặt trước'
-        //             }}
-        //             placeholder="Chọn trạng thái"
-        //         />
-        //     ),
-        // },
         {
             title: 'Hoạt động',
             align: "center",
-            sorter: true,
             dataIndex: 'active',
-            renderFormItem: () => (
-                <ProFormSelect
-                    showSearch
-                    allowClear
-                    valueEnum={{
-                        true: 'Hoạt động',
-                        false: 'Ngưng hoạt động'
-                    }}
-                    placeholder="Chọn hoạt động"
+            hideInSearch: true,
+            render: (_, record, index) => [
+                <Switch
+                    key={`switch-${index + 1}`}
+                    defaultChecked={record?.active}
+                    onChange={(checked: boolean) => handleToggleActive(record, checked)}
                 />
-            ),
-            render(_, entity) {
-                return <>
-                    <Tag color={entity.active ? "lime" : "red"} >
-                        {entity.active ? "ACTIVE" : "INACTIVE"}
-                    </Tag>
-                </>
-            },
+            ]
         },
         {
             title: 'Ngày tạo',
@@ -216,45 +263,36 @@ const DiningTablePage = () => {
     }
 
     return (
-        <div>
-            <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
-                <DataTable<IDiningTable>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách bàn ăn"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={diningTables}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchDiningTableByRestaurant({ query }))
-                        }
+        <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
+            <DataTable<IDiningTable>
+                actionRef={tableRef}
+                headerTitle="Danh sách bàn ăn"
+                rowKey="id"
+                loading={isFetching}
+                columns={columns}
+                dataSource={diningTables}
+                request={
+                    async (params, sort, filter): Promise<any> => {
+                        const query = buildQuery(params, sort, filter);
+                        dispatch(fetchDiningTableByRestaurant({ query }))
                     }
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
-                            >
-                                Thêm mới
-                            </Button>
-                        );
-                    }}
-                />
-            </Access>
+                }
+                pagination={paginationConfigure(meta)}
+                rowSelection={false}
+                toolBarRender={(action, rows): any => [
+                    <Button onClick={() => setOpenUpload(true)}>
+                        <UploadOutlined /> Import
+                    </Button>,
+
+                    <Button onClick={handleExportAsXlsx(diningTables, formatCSV)}>
+                        <DownloadOutlined /> Export
+                    </Button>,
+
+                    <Button type="primary" onClick={() => setOpenModal(true)} >
+                        <PlusOutlined /> Thêm mới
+                    </Button>
+                ]}
+            />
 
             <ModalDiningTable
                 openModal={openModal}
@@ -263,7 +301,18 @@ const DiningTablePage = () => {
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-        </div >
+
+            <ModalBatchImport
+                open={openUpload}
+                onOpen={setOpenUpload}
+                loading={loading}
+                onLoading={setLoading}
+                reloadTable={reloadTable}
+                onSubmit={(values) => {
+                    batchImportConfigHandler(values);
+                }}
+            />
+        </Access>
     )
 }
 

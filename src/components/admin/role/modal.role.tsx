@@ -8,7 +8,7 @@ import ModuleApi from "./module.api";
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { resetSingleRole } from "@/redux/slice/roleSlide";
-import { groupByPermission } from "@/config/utils";
+import { groupByPermission } from "@/utils/format";
 
 interface IProps {
     openModal: boolean;

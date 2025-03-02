@@ -1,32 +1,99 @@
+import {
+    Button, Popconfirm, Space,
+    Switch, message, notification
+} from "antd";
+import {
+    DeleteOutlined, DownloadOutlined,
+    EditOutlined, PlusOutlined, UploadOutlined
+} from "@ant-design/icons";
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import Access from "@/components/share/access";
 import { ingredientApi } from "@/config/api";
 import { IIngredient } from "@/types/backend";
-import { sfIn } from "spring-filter-query-builder";
+import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import DataTable from "@/components/client/data-table";
+import { paginationConfigure } from '@/utils/paginator';
+import { convertCSV, handleExportAsXlsx } from "@/utils/file";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
-import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
-import ModalIngredient from '@/components/admin/ingredient/modal.ingredient';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import { ModalBatchImport, ModalIngredient } from '@/pages/admin/ingredient/container';
 
 const IngredientPage = () => {
     const tableRef = useRef<ActionType>();
+    const [loading, setLoading] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openUpload, setOpenUpload] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IIngredient | null>(null);
 
     const dispatch = useAppDispatch();
     const ingredients = useAppSelector(state => state.ingredient.result);
     const meta = useAppSelector(state => state.ingredient.meta);
     const isFetching = useAppSelector(state => state.ingredient.isFetching);
+    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
+
+    const formatCSV = (data: IIngredient[]) => {
+        const excludeKeys = [
+            'id', 'status', 'active', 'createdBy',
+            'createdDate', 'lastModifiedDate', 'lastModifiedBy', 'restaurant'
+        ];
+        return data.map((row) => {
+            return (Object.keys(row) as Array<keyof IIngredient>)
+                .filter((key) => !excludeKeys.includes(key as string))
+                .reduce((newRow, key) => {
+                    newRow[key] = convertCSV(row[key]);
+                    return newRow;
+                }, {} as Record<keyof IIngredient, any>)
+        })
+    }
+
+    const batchImportConfigHandler = async (data: IIngredient[]) => {
+        if (!data || data?.length <= 0) return;
+        setLoading(true);
+
+        const formattedData = data.map(item => ({
+            ...item,
+            active: true,
+            restaurant: {
+                id: currentRestaurant.id ?? '',
+                name: currentRestaurant.name ?? ''
+            }
+        }));
+        console.log('data: ', formattedData);
+
+        try {
+            await ingredientApi.callBatchImport(formattedData);
+            message.success('Nhập danh sách thành công');
+            setOpenUpload(false);
+            reloadTable();
+        } catch (error) {
+            console.error('Batch import failed:', error);
+            message.error('Lỗi khi nhập danh sách, vui lòng thử lại!');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleToggleActive = async (record: IIngredient, checked: boolean) => {
+        const updatedRecord = { ...record, active: checked };
+        const res = await ingredientApi.callUpdate(updatedRecord);
+
+        if (res && +res.statusCode === 200) {
+            message.success('Cập nhật trạng thái thành công');
+            reloadTable();
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra!',
+                description: 'Không thể cập nhật trạng thái!'
+            });
+        }
+    };
 
     const handleDeleteIngredient = async (id: string | undefined) => {
         if (id) {
@@ -105,25 +172,14 @@ const IngredientPage = () => {
             title: 'Hoạt động',
             align: "center",
             dataIndex: 'active',
-            hideInSearch: false,
-            renderFormItem: () => (
-                <ProFormSelect
-                    showSearch
-                    allowClear
-                    valueEnum={{
-                        true: 'Hoạt động',
-                        false: 'Ngưng hoạt động'
-                    }}
-                    placeholder="Chọn hoạt động"
+            hideInSearch: true,
+            render: (_, record, index) => [
+                <Switch
+                    key={`switch-${index + 1}`}
+                    defaultChecked={record?.active}
+                    onChange={(checked: boolean) => handleToggleActive(record, checked)}
                 />
-            ),
-            render(_, entity) {
-                return <>
-                    <Tag color={entity.active ? "lime" : "red"} >
-                        {entity.active ? "ACTIVE" : "INACTIVE"}
-                    </Tag>
-                </>
-            },
+            ]
         },
         {
             title: 'Ngày tạo',
@@ -227,45 +283,36 @@ const IngredientPage = () => {
     }
 
     return (
-        <div>
-            <Access permission={ALL_PERMISSIONS.INGREDIENTS.GET_PAGINATE}>
-                <DataTable<IIngredient>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách nguyên liệu"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={ingredients}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchIngredientByRestaurant({ query }))
-                        }
+        <Access permission={ALL_PERMISSIONS.INGREDIENTS.GET_PAGINATE}>
+            <DataTable<IIngredient>
+                actionRef={tableRef}
+                headerTitle="Danh sách nguyên liệu"
+                rowKey="id"
+                loading={isFetching}
+                columns={columns}
+                dataSource={ingredients}
+                request={
+                    async (params, sort, filter): Promise<any> => {
+                        const query = buildQuery(params, sort, filter);
+                        dispatch(fetchIngredientByRestaurant({ query }))
                     }
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
-                            >
-                                Thêm mới
-                            </Button>
-                        );
-                    }}
-                />
-            </Access>
+                }
+                pagination={paginationConfigure(meta)}
+                rowSelection={false}
+                toolBarRender={(action, rows): any => [
+                    <Button onClick={() => setOpenUpload(true)}>
+                        <UploadOutlined /> Import
+                    </Button>,
+
+                    <Button onClick={handleExportAsXlsx(ingredients, formatCSV)}>
+                        <DownloadOutlined /> Export
+                    </Button>,
+
+                    <Button type="primary" onClick={() => setOpenModal(true)} >
+                        <PlusOutlined /> Thêm mới
+                    </Button>
+                ]}
+            />
 
             <ModalIngredient
                 openModal={openModal}
@@ -274,7 +321,18 @@ const IngredientPage = () => {
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-        </div >
+
+            <ModalBatchImport
+                open={openUpload}
+                onOpen={setOpenUpload}
+                loading={loading}
+                onLoading={setLoading}
+                reloadTable={reloadTable}
+                onSubmit={(values) => {
+                    batchImportConfigHandler(values);
+                }}
+            />
+        </Access>
     )
 }
 

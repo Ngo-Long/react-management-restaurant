@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Modal, Form, Input, Button, message, notification, Divider } from "antd";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useAppSelector } from "@/redux/hooks";
-import { setUserLoginInfo } from "@/redux/slice/accountSlide";
 import { authApi } from "@/config/api";
-import Loading from "@/components/share/loading";
+import { useDispatch } from "react-redux";
 import ForgotPasswordModal from "./ForgotPasswordModal";
+import { setUserLoginInfo } from "@/redux/slice/accountSlide";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { Modal, Form, Input, Button, message, notification, Divider } from "antd";
 
 interface LoginModalProps {
   open: boolean;
@@ -55,13 +53,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
   return (
     <>
-      <Modal title="Đăng nhập" open={open} onCancel={onClose} footer={null}>
+      <Modal
+        title="Đăng nhập"
+        open={open}
+        onCancel={onClose}
+        footer={null}
+      >
         <Form layout="vertical" onFinish={handleLogin}>
-          <Form.Item label="Email" name="email" rules={[{ required: true, message: "Vui lòng nhập email!" }]}> 
+          <Form.Item label="Email" name="email" rules={[{ required: true, message: "Vui lòng nhập email!" }]}>
             <Input placeholder="Nhập email" />
           </Form.Item>
 
-          <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}> 
+          <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}>
             <Input.Password placeholder="Nhập mật khẩu" />
           </Form.Item>
 
@@ -80,7 +83,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
         </Form>
       </Modal>
 
-      <ForgotPasswordModal open={forgotPasswordOpen} onClose={() => setForgotPasswordOpen(false)} />
+      {/* <ForgotPasswordModal open={forgotPasswordOpen} onClose={() => setForgotPasswordOpen(false)} /> */}
     </>
   );
 };

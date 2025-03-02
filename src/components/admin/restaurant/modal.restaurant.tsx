@@ -10,7 +10,7 @@ import { restaurantApi, callUploadSingleFile } from "@/config/api";
 import { IRestaurant } from "@/types/backend";
 import { v4 as uuidv4 } from 'uuid';
 import enUS from 'antd/lib/locale/en_US';
-import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
+import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/utils/image";
 
 interface IProps {
     openModal: boolean;

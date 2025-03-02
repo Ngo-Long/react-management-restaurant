@@ -9,7 +9,7 @@ interface ForgotPasswordModalProps {
 const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ open, onClose }) => {
   const [step, setStep] = useState(1);
   const [form] = Form.useForm();
-  const correctOTP = "123456"; 
+  const correctOTP = "123456";
 
   const handleNext = () => {
     form.validateFields().then(() => setStep(2));

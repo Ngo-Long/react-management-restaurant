@@ -1,7 +1,7 @@
 import { Card, Col, Collapse, Row, Tooltip } from 'antd';
 import { ProFormSwitch } from '@ant-design/pro-components';
 import { grey } from '@ant-design/colors';
-import { colorMethod, groupByPermission } from '@/config/utils';
+import { colorMethod, groupByPermission } from '@/utils/format';
 import { IPermission, IRole } from '@/types/backend';
 import 'styles/reset.scss';
 import type { ProFormInstance } from '@ant-design/pro-components';

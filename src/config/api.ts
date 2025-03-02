@@ -158,6 +158,10 @@ export const roleApi = {
 Module Dining Table
  */
 export const diningTableApi = {
+    callBatchImport(tables: IDiningTable[]) {
+        return axios.post<IBackendRes<IDiningTable[]>>('/api/v1/dining-tables/batch-import', tables);
+    },
+
     callCreate(table: IDiningTable) {
         return axios.post<IBackendRes<IDiningTable>>('/api/v1/dining-tables', { ...table });
     },
@@ -278,6 +282,10 @@ export const unitApi = {
 Module Ingredient
  */
 export const ingredientApi = {
+    callBatchImport(ingredients: IIngredient[]) {
+        return axios.post<IBackendRes<IIngredient[]>>('/api/v1/ingredients/batch-import', ingredients);
+    },
+
     callCreate(ingredient: IIngredient) {
         return axios.post<IBackendRes<IIngredient>>('/api/v1/ingredients', { ...ingredient });
     },

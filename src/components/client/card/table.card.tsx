@@ -42,7 +42,7 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleS
         fetchOrders();
     }, [dispatch, diningTables]);
 
-    const uniqueLocations = Array.from(new Set(diningTables.map(table => table.location)));
+    const uniqueLocations = Array.from(new Set(diningTables.map(table => table?.location)));
 
     const filteredTables = diningTables
         .filter((table) => !selectedLocation || table.location === selectedLocation)

@@ -13,7 +13,8 @@ import ModalRole from "@/components/admin/role/modal.role";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
-import { groupByPermission } from "@/config/utils";
+import { groupByPermission } from "@/utils/format";
+import { paginationConfigure } from "@/utils/paginator";
 
 const RolePage = () => {
     const dispatch = useAppDispatch();
@@ -212,47 +213,30 @@ const RolePage = () => {
     }
 
     return (
-        <div>
-            <Access
-                permission={ALL_PERMISSIONS.ROLES.GET_PAGINATE}
-            >
-                <DataTable<IRole>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách vai trò"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={roles}
-                    request={async (params, sort, filter): Promise<any> => {
-                        const query = buildQuery(params, sort, filter);
-                        dispatch(fetchRole({ query }))
-                    }}
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Access permission={ALL_PERMISSIONS.ROLES.CREATE} hideChildren>
-                                <Button
-                                    icon={<PlusOutlined />}
-                                    type="primary"
-                                    onClick={() => setOpenModal(true)}
-                                >
-                                    Thêm mới
-                                </Button>
-                            </Access>
-                        );
-                    }}
-                />
-            </Access>
+        <Access permission={ALL_PERMISSIONS.ROLES.GET_PAGINATE}>
+            <DataTable<IRole>
+                actionRef={tableRef}
+                headerTitle="Danh sách vai trò"
+                rowKey="id"
+                loading={isFetching}
+                columns={columns}
+                dataSource={roles}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchRole({ query }))
+                }}
+                pagination={paginationConfigure(meta)}
+                rowSelection={false}
+                toolBarRender={(_action, _rows): any => {
+                    return (
+                        <Access permission={ALL_PERMISSIONS.ROLES.CREATE} hideChildren>
+                            <Button type="primary" onClick={() => setOpenModal(true)} >
+                                <PlusOutlined />  Thêm mới
+                            </Button>
+                        </Access>
+                    );
+                }}
+            />
 
             <ModalRole
                 openModal={openModal}
@@ -262,7 +246,7 @@ const RolePage = () => {
                 singleRole={singleRole}
                 setSingleRole={setSingleRole}
             />
-        </div>
+        </Access>
     )
 }
 

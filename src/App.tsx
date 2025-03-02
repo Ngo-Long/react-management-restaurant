@@ -6,7 +6,7 @@ import RegisterPage from './pages/auth/register';
 import DashboardPage from './pages/admin/dashboard';
 import RestaurantPage from './pages/admin/restaurant';
 import PermissionPage from './pages/admin/permission';
-import DiningTablePage from './pages/admin/dining.table';
+import DiningTablePage from './pages/admin/dining-table';
 import KitchenClient from './pages/client/kitchen.client';
 
 import NotFound from './components/share/not.found';
@@ -25,7 +25,7 @@ import SupplierPage from './pages/admin/supplier';
 import IngredientPage from './pages/admin/ingredient';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import ViewUpsertProduct from './components/admin/product/upset.product';
+import ViewUpsertProduct from './pages/admin/product/container';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
 
 const LayoutClient = () => {

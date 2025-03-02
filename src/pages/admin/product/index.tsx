@@ -2,24 +2,31 @@ import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ActionType, ProColumns } from '@ant-design/pro-components';
+import {
+    EditOutlined, PlusOutlined,
+    DeleteOutlined, DownloadOutlined
+} from "@ant-design/icons";
+import {
+    Button, Popconfirm, Space,
+    Switch, Tag, message, notification
+} from "antd";
 
+import { productApi } from '@/config/api';
 import { IProduct } from "@/types/backend";
-import { sfIn } from "spring-filter-query-builder";
 import Access from "@/components/share/access";
+import { sfIn } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
-
-import { productApi } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permissions";
+import { paginationConfigure } from '@/utils/paginator';
+import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
-import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
 const ProductPage = () => {
-    const tableRef = useRef<ActionType>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const tableRef = useRef<ActionType>();
 
     const meta = useAppSelector(state => state.product.meta);
     const products = useAppSelector(state => state.product.result);
@@ -39,6 +46,21 @@ const ProductPage = () => {
         }));
     };
 
+    const handleToggleActive = async (record: IProduct, checked: boolean) => {
+        const updatedRecord = { ...record, active: checked };
+        const res = await productApi.callUpdate(updatedRecord);
+
+        if (res && +res.statusCode === 200) {
+            message.success('Cập nhật trạng thái thành công');
+            reloadTable();
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra!',
+                description: 'Không thể cập nhật trạng thái!'
+            });
+        }
+    };
+
     const handleDeleteProduct = async (id: string | undefined) => {
         if (id) {
             const res = await productApi.callDelete(id);
@@ -52,6 +74,21 @@ const ProductPage = () => {
                 });
             }
         }
+    }
+
+    const formatCSV = (data: IProduct[]) => {
+        const excludeKeys = [
+            'id', 'active', 'createdBy', 'createdDate',
+            'lastModifiedDate', 'lastModifiedBy', 'restaurant'
+        ];
+        return data.map((row) => {
+            return (Object.keys(row) as Array<keyof IProduct>)
+                .filter((key) => !excludeKeys.includes(key as string))
+                .reduce((newRow, key) => {
+                    newRow[key] = convertCSV(row[key]);
+                    return newRow;
+                }, {} as Record<keyof IProduct, any>)
+        })
     }
 
     const columns: ProColumns<IProduct>[] = [
@@ -120,25 +157,14 @@ const ProductPage = () => {
             title: 'Hoạt động',
             align: "center",
             dataIndex: 'active',
-            hideInSearch: false,
-            renderFormItem: (item, props, form) => (
-                <ProFormSelect
-                    showSearch
-                    allowClear
-                    valueEnum={{
-                        true: 'Hoạt động',
-                        false: 'Ngưng hoạt động'
-                    }}
-                    placeholder="Chọn hoạt động"
+            hideInSearch: true,
+            render: (_, record, index) => [
+                <Switch
+                    key={`switch-${index + 1}`}
+                    defaultChecked={record?.active}
+                    onChange={(checked: boolean) => handleToggleActive(record, checked)}
                 />
-            ),
-            render(_, record) {
-                return <>
-                    <Tag color={record.active ? "lime" : "red"} >
-                        {record.active ? "ACTIVE" : "INACTIVE"}
-                    </Tag>
-                </>
-            },
+            ]
         },
         {
             title: 'Ngày tạo',
@@ -170,7 +196,7 @@ const ProductPage = () => {
             hideInSearch: true,
             width: 90,
             align: "center",
-            render: (_value, entity, _index, _action) => (
+            render: (value, entity, index, action) => (
                 <Space>
                     < Access permission={ALL_PERMISSIONS.PRODUCTS.UPDATE} hideChildren>
                         <EditOutlined
@@ -253,26 +279,17 @@ const ProductPage = () => {
                         const query = buildQuery(params, sort, filter);
                         dispatch(fetchProductByRestaurant({ query }))
                     }}
-                    scroll={{ x: true }}
-                    pagination={{
-                        current: meta.page,
-                        pageSize: meta.pageSize,
-                        showSizeChanger: true,
-                        total: meta.total,
-                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                    }}
+                    pagination={paginationConfigure(meta)}
                     rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => navigate('upsert')}
-                            >
-                                Thêm mới
-                            </Button>
-                        );
-                    }}
+                    toolBarRender={(action, rows): any => [
+                        <Button onClick={handleExportAsXlsx(products, formatCSV)}>
+                            <DownloadOutlined /> Export
+                        </Button>,
+
+                        <Button type="primary" onClick={() => navigate('upsert')}>
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    ]}
                 />
             </Access>
         </div >

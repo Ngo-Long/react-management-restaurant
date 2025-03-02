@@ -1,21 +1,28 @@
 
 import {
-    ProFormSelect, ProFormSwitch, ProFormText,
-    FooterToolbar, ModalForm, ProForm, ProFormDigit
+    ProFormSelect, ProFormSwitch, ProFormText, FooterToolbar,
+    ModalForm, ProForm, ProFormDigit, DrawerForm, ProFormUploadDragger, ProTable
 } from "@ant-design/pro-components";
-import { Button, Col, ConfigProvider, Divider, Form, Input, InputRef, Row, Space, Upload, message, notification } from "antd";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { isMobile } from 'react-device-detect';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+    Button, Col, ConfigProvider, Divider, Form, Input,
+    InputRef, Row, Space, Upload, message, notification
+} from "antd";
+import {
+    beforeUpload, getBase64, handleChange,
+    handleRemoveFile, handleUploadFileLogo
+} from "@/utils/image";
 import { v4 as uuidv4 } from 'uuid';
-import { IIngredient } from "@/types/backend";
+import ReactQuill from 'react-quill';
 import enUS from 'antd/lib/locale/en_US';
+import 'react-quill/dist/quill.snow.css';
 import { ingredientApi } from "@/config/api";
+import { IIngredient } from "@/types/backend";
+import { isMobile } from 'react-device-detect';
+import { handleImportXlsx } from "@/utils/file";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
 import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { beforeUpload, getBase64, handleChange, handleRemoveFile, handleUploadFileLogo } from "@/config/image-upload";
 
 interface IProps {
     openModal: boolean;
@@ -30,7 +37,7 @@ interface IIngredientLogo {
     uid: string;
 }
 
-const ModalIngredient = (props: IProps) => {
+export const ModalIngredient = (props: IProps) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const inputRef = useRef<InputRef>(null);
@@ -86,7 +93,6 @@ const ModalIngredient = (props: IProps) => {
             }])
         }
     }, [dataInit])
-
 
     // add a new category
     const addCategory = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
@@ -162,12 +168,14 @@ const ModalIngredient = (props: IProps) => {
 
     return (
         <>
-            <ModalForm
-                title={<>{dataInit?.id ? "Cập nhật nguyên liệu" : "Tạo mới nguyên liệu"}</>}
+            <DrawerForm
+                title={dataInit?.id ? "Cập nhật nguyên liệu" : "Tạo mới nguyên liệu"}
                 open={openModal}
-                modalProps={{
-                    onCancel: resetModal,
-                    afterClose: resetModal,
+                drawerProps={{
+                    onClose: resetModal,
+                    afterOpenChange: (visible) => {
+                        if (!visible) resetModal();
+                    },
                     destroyOnClose: true,
                     width: isMobile ? "100%" : 900,
                     keyboard: false,
@@ -190,7 +198,6 @@ const ModalIngredient = (props: IProps) => {
                         submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
                     }
                 }}
-
             >
                 <Row gutter={[30, 4]}>
                     <Col span={24} md={4}>
@@ -258,12 +265,14 @@ const ModalIngredient = (props: IProps) => {
 
                             <Col span={24} md={24}>
                                 <ProFormSwitch
-                                    label="Hoạt động"
                                     name="active"
+                                    label="Hoạt động"
                                     checkedChildren="ACTIVE"
                                     unCheckedChildren="INACTIVE"
                                     initialValue={true}
                                     fieldProps={{ defaultChecked: true }}
+                                    hidden
+                                    noStyle
                                 />
                             </Col>
                         </Row>
@@ -273,17 +282,17 @@ const ModalIngredient = (props: IProps) => {
                         <Row gutter={[30, 4]}>
                             <Col span={24} md={12}>
                                 <ProFormText
-                                    label="Tên nguyên liệu"
                                     name="name"
-                                    rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                                    label="Tên nguyên liệu"
                                     placeholder="Nhập nguyên liệu"
+                                    rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                                 />
                             </Col>
 
                             <Col span={24} md={12}>
                                 <ProFormDigit
-                                    label="Giá nhập"
                                     name="price"
+                                    label="Giá nhập"
                                     placeholder="Nhập giá nhập"
                                     rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                                     fieldProps={{
@@ -296,8 +305,8 @@ const ModalIngredient = (props: IProps) => {
 
                             <Col span={24} md={12}>
                                 <ProFormSelect
-                                    label="Phân loại"
                                     name="type"
+                                    label="Phân loại"
                                     placeholder="Chọn phân loại"
                                     rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                     options={types.map(type => ({ label: type, value: type }))}
@@ -319,15 +328,15 @@ const ModalIngredient = (props: IProps) => {
                                                     </Button>
                                                 </Space>
                                             </>
-                                        ),
+                                        )
                                     }}
                                 />
                             </Col>
 
                             <Col span={24} md={12}>
                                 <ProFormSelect
-                                    label="Danh mục"
                                     name="category"
+                                    label="Danh mục"
                                     placeholder="Chọn danh mục"
                                     rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                     options={categories.map(category => ({ label: category, value: category }))}
@@ -356,21 +365,21 @@ const ModalIngredient = (props: IProps) => {
 
                             <Col span={24} md={12}>
                                 <ProFormDigit
-                                    label="Số lượng hiện tại"
                                     name="initialQuantity"
+                                    label="Số lượng hiện tại"
                                     placeholder="Nhập số lượng hiện tại"
                                 />
                             </Col>
 
                             <Col span={24} md={12}>
                                 <ProFormDigit
-                                    label="Số lượng tối thiểu"
                                     name="minimumQuantity"
+                                    label="Số lượng tối thiểu"
                                     placeholder="Nhập số lượng tối thiểu"
                                 />
                             </Col>
 
-                            <Col span={24}>
+                            <Col span={24} style={{ "marginBottom": "30px" }}>
                                 <ProForm.Item
                                     name="description"
                                     label="Mô tả chi tiết"
@@ -382,9 +391,145 @@ const ModalIngredient = (props: IProps) => {
                         </Row>
                     </Col>
                 </Row>
-            </ModalForm >
+            </DrawerForm >
         </>
     )
 }
 
-export default ModalIngredient;
+declare type IBatchImportBatchImport = {
+    open: boolean;
+    onOpen: (open: boolean) => void;
+    loading?: boolean;
+    onLoading?: (loading: boolean) => void;
+    reloadTable: () => void;
+    onSubmit: (values: any) => void;
+}
+
+export const ModalBatchImport = (props: IBatchImportBatchImport) => {
+    const { open, onOpen, loading = false, onLoading, reloadTable, onSubmit } = props;
+    const [dataImported, setDataImported] = useState<IIngredient[]>([]);
+
+    const onFinish = async (values: any) => {
+        if (dataImported.length === 0) {
+            message.error("Vui lòng chọn file");
+            return;
+        }
+
+        onLoading && onLoading(true);
+        onSubmit(dataImported);
+        setDataImported([]);
+    }
+
+    return (
+        <ModalForm<IIngredient>
+            title="Nhập nguyên liệu"
+            open={open}
+            modalProps={{
+                onCancel: () => onOpen(false),
+                afterClose: () => onOpen(false),
+                destroyOnClose: true,
+                width: isMobile ? "100%" : 600,
+                keyboard: false,
+                maskClosable: false,
+                okText: 'Xác nhận',
+                cancelText: "Hủy"
+            }}
+            onFinish={onFinish}
+        >
+            <ProFormUploadDragger
+                max={1}
+                name="Nhập nguyên liệu"
+                title="Kéo & thả"
+                label="Tải file (Nếu trùng tên nguyên liệu thì không nhập)"
+                tooltip={`Nếu trùng tên nguyên liệu thì không nhập`}
+                description="Chỉ hỗ trợ file .xlsx, tải lên tối đa 1 file"
+                fieldProps={{
+                    beforeUpload: async (file) => {
+                        const isExcel =
+                            file.type === 'application/vnd.ms-excel' ||
+                            file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        if (!isExcel) {
+                            message.error("Chỉ hỗ trợ file excel .xlsx");
+                            return;
+                        }
+
+                        try {
+                            const data = await handleImportXlsx(file);
+                            setDataImported(data);
+                        } catch (error) {
+                            message.error("Lỗi file");
+                        }
+                        return false;
+                    },
+                    onRemove: () => {
+                        setDataImported([]);
+                    }
+                }}
+            />
+
+            <ProTable<IIngredient>
+                search={false}
+                options={false}
+                dataSource={dataImported}
+                pagination={{
+                    pageSize: 5,
+                    showTotal: (total, range) => `${range[0]}-${range[1]} trên tổng ${total}`
+                }}
+                locale={{
+                    emptyText: (
+                        <div style={{ textAlign: "center" }}>
+                            <div>Không có dữ liệu</div>
+                        </div>
+                    )
+                }}
+                columns={[
+                    {
+                        key: 'name',
+                        dataIndex: 'name',
+                        title: 'Tên nguyên liệu'
+                    },
+                    {
+                        key: 'type',
+                        dataIndex: 'type',
+                        title: 'Phân loại'
+                    },
+                    {
+                        key: 'category',
+                        dataIndex: 'category',
+                        title: 'Danh mục'
+                    },
+                    {
+                        align: "center",
+                        key: 'price',
+                        dataIndex: 'price',
+                        title: 'Giá vốn',
+                        render(_, entity) {
+                            const str = "" + entity.price;
+                            return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+                        },
+                    },
+                    {
+                        align: "center",
+                        key: 'initialQuantity',
+                        dataIndex: 'initialQuantity',
+                        title: 'SL hiện tại',
+                        render(_, entity) {
+                            const str = "" + entity.initialQuantity;
+                            return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+                        },
+                    },
+                    {
+                        align: "center",
+                        key: 'minimumQuantity',
+                        dataIndex: 'minimumQuantity',
+                        title: 'SL tối thiểu',
+                        render(_, entity) {
+                            const str = "" + entity.minimumQuantity;
+                            return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+                        },
+                    }
+                ]}
+            />
+        </ModalForm>
+    );
+};
