@@ -47,6 +47,7 @@ export interface IRestaurant {
     address?: string;
     description: string;
     logo: string;
+    active?: boolean;
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

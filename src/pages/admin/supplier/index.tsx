@@ -1,31 +1,108 @@
+import {
+    Space,
+    Switch,
+    Button,
+    message,
+    Popconfirm,
+    notification
+} from "antd";
+import {
+    EditOutlined,
+    PlusOutlined,
+    UploadOutlined,
+    DeleteOutlined,
+    DownloadOutlined
+} from "@ant-design/icons";
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import Access from "@/components/share/access";
 import { supplierApi } from "@/config/api";
 import { ISupplier } from "@/types/backend";
+import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import DataTable from "@/components/client/data-table";
-import ModalSupplier from '@/components/admin/supplier/modal.supplier';
+import { paginationConfigure } from '@/utils/paginator';
+import { convertCSV, handleExportAsXlsx } from '@/utils/file';
+import { ModalSupplier, ModalBatchImport } from './container';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { fetchSupplierByRestaurant } from "@/redux/slice/supplierSlide";
-import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 
 const SupplierPage = () => {
-    const tableRef = useRef<ActionType>();
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<ISupplier | null>(null);
     const dispatch = useAppDispatch();
-    const suppliers = useAppSelector(state => state.supplier.result);
+    const tableRef = useRef<ActionType>();
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openUpload, setOpenUpload] = useState<boolean>(false);
+    const [dataInit, setDataInit] = useState<ISupplier | null>(null);
+
     const meta = useAppSelector(state => state.supplier.meta);
+    const suppliers = useAppSelector(state => state.supplier.result);
     const isFetching = useAppSelector(state => state.supplier.isFetching);
+    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
+
+    const formatCSV = (data: ISupplier[]) => {
+        const excludeKeys = [
+            'id', 'status', 'active', 'createdBy',
+            'createdDate', 'lastModifiedDate', 'lastModifiedBy', 'restaurant'
+        ];
+        return data.map((row) => {
+            return (Object.keys(row) as Array<keyof ISupplier>)
+                .filter((key) => !excludeKeys.includes(key as string))
+                .reduce((newRow, key) => {
+                    newRow[key] = convertCSV(row[key]);
+                    return newRow;
+                }, {} as Record<keyof ISupplier, any>)
+        })
+    }
+
+    const batchImportConfigHandler = async (data: ISupplier[]) => {
+        if (!data || data?.length <= 0) return;
+        setLoading(true);
+
+        const formattedData = data.map(item => ({
+            ...item,
+            active: true,
+            restaurant: {
+                id: currentRestaurant.id ?? '',
+                name: currentRestaurant.name ?? ''
+            }
+        }));
+        console.log('data: ', formattedData);
+
+        try {
+            await supplierApi.callBatchImport(formattedData);
+            message.success('Nhập danh sách thành công');
+            setOpenUpload(false);
+            reloadTable();
+        } catch (error) {
+            console.error('Batch import failed:', error);
+            message.error('Lỗi khi nhập danh sách, vui lòng thử lại!');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleToggleActive = async (record: ISupplier, checked: boolean) => {
+        const updatedRecord = { ...record, active: checked };
+        const res = await supplierApi.callUpdate(updatedRecord);
+
+        if (res && +res.statusCode === 200) {
+            message.success('Cập nhật trạng thái thành công');
+            reloadTable();
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra!',
+                description: 'Không thể cập nhật trạng thái!'
+            });
+        }
+    };
 
     const handleDeleteSupplier = async (id: string | undefined) => {
         if (id) {
@@ -100,33 +177,21 @@ const SupplierPage = () => {
             title: 'Hoạt động',
             align: "center",
             dataIndex: 'active',
-            hideInSearch: false,
-            renderFormItem: (item, props, form) => (
-                <ProFormSelect
-                    showSearch
-                    mode="multiple"
-                    allowClear
-                    valueEnum={{
-                        true: 'Hoạt động',
-                        false: 'Ngưng hoạt động'
-                    }}
-                    placeholder="Chọn hoạt động"
+            hideInSearch: true,
+            render: (_, record, index) => [
+                <Switch
+                    key={`switch-${index + 1}`}
+                    defaultChecked={record?.active}
+                    onChange={(checked: boolean) => handleToggleActive(record, checked)}
                 />
-            ),
-            render(_, entity) {
-                return <>
-                    <Tag color={entity.active ? "lime" : "red"} >
-                        {entity.active ? "ACTIVE" : "INACTIVE"}
-                    </Tag>
-                </>
-            },
+            ]
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
@@ -140,7 +205,7 @@ const SupplierPage = () => {
             hidden: true,
             align: "center",
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
@@ -151,9 +216,9 @@ const SupplierPage = () => {
             hideInSearch: true,
             width: 90,
             align: "center",
-            render: (_value, entity, _index, _action) => (
+            render: (_value, entity) => (
                 <Space>
-                    < Access permission={ALL_PERMISSIONS.SUPPLIERS.UPDATE} hideChildren>
+                    <Access permission={ALL_PERMISSIONS.SUPPLIERS.UPDATE} hideChildren>
                         <EditOutlined
                             style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
@@ -175,7 +240,7 @@ const SupplierPage = () => {
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
-                </Space >
+                </Space>
             ),
         },
     ];
@@ -184,8 +249,8 @@ const SupplierPage = () => {
         const clone = { ...params };
         let parts = [];
         if (clone.name) parts.push(`name ~ '${clone.name}'`);
-        if (clone?.status?.length) {
-            parts.push(`${sfIn("status", clone.status).toString()}`);
+        if (clone.active !== undefined) {
+            parts.push(`active = ${clone.active}`);
         }
 
         clone.filter = parts.join(' and ');
@@ -212,64 +277,65 @@ const SupplierPage = () => {
             }
         }
 
-        //mặc định sort theo lastModifiedDate
+        // active giảm dần (true đứng trước false)
         if (Object.keys(sortBy).length === 0) {
-            temp = `${temp}&sort=lastModifiedDate,desc`;
+            temp = `${temp}&sort=active,desc`;
         } else {
-            temp = `${temp}&${sortBy}`;
+            temp = `${temp}&sort=active,desc&${sortBy}`;
         }
-
         return temp;
     }
 
     return (
         <div>
-            {/* <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}> */}
-            <DataTable<ISupplier>
-                actionRef={tableRef}
-                headerTitle="Danh sách nhà cung cấp"
-                rowKey="id"
-                loading={isFetching}
-                columns={columns}
-                dataSource={suppliers}
-                request={
-                    async (params, sort, filter): Promise<any> => {
+            <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}>
+                <DataTable<ISupplier>
+                    rowKey="id"
+                    actionRef={tableRef}
+                    headerTitle="Danh sách nhà cung cấp"
+                    loading={isFetching}
+                    columns={columns}
+                    dataSource={suppliers}
+                    request={async (params, sort, filter): Promise<any> => {
                         const query = buildQuery(params, sort, filter);
                         dispatch(fetchSupplierByRestaurant({ query }))
-                    }
-                }
-                scroll={{ x: true }}
-                pagination={
-                    {
-                        current: meta.page,
-                        pageSize: meta.pageSize,
-                        showSizeChanger: true,
-                        total: meta.total,
-                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                    }
-                }
-                rowSelection={false}
-                toolBarRender={(_action, _rows): any => {
-                    return (
-                        <Button
-                            type="primary" icon={<PlusOutlined />}
-                            onClick={() => setOpenModal(true)}
-                        >
-                            Thêm mới
-                        </Button>
-                    );
-                }}
-            />
-            {/* </Access> */}
+                    }}
+                    pagination={paginationConfigure(meta)}
+                    toolBarRender={(): any => [
+                        <Button onClick={() => setOpenUpload(true)}>
+                            <UploadOutlined /> Import
+                        </Button>,
 
-            <ModalSupplier
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                reloadTable={reloadTable}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-            />
-        </div >
+                        <Button onClick={handleExportAsXlsx(suppliers, formatCSV)}>
+                            <DownloadOutlined /> Export
+                        </Button>,
+
+                        <Button type="primary" onClick={() => setOpenModal(true)}>
+                            <PlusOutlined />  Thêm mới
+                        </Button>
+                    ]}
+                />
+
+                <ModalSupplier
+                    openModal={openModal}
+                    setOpenModal={setOpenModal}
+                    reloadTable={reloadTable}
+                    dataInit={dataInit}
+                    setDataInit={setDataInit}
+                />
+
+                <ModalBatchImport
+                    open={openUpload}
+                    onOpen={setOpenUpload}
+                    loading={loading}
+                    onLoading={setLoading}
+                    reloadTable={reloadTable}
+                    onSubmit={(values) => {
+                        batchImportConfigHandler(values);
+                    }}
+                />
+            </Access>
+        </div>
     )
 }
 

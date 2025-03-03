@@ -1,7 +1,15 @@
 
 import {
-    ProFormSelect, ProFormSwitch, ProFormText, FooterToolbar,
-    ModalForm, ProForm, ProFormDigit, DrawerForm, ProFormUploadDragger, ProTable
+    ProFormSelect,
+    ProFormSwitch,
+    ProFormText,
+    FooterToolbar,
+    ModalForm,
+    ProForm,
+    ProFormDigit,
+    DrawerForm,
+    ProFormUploadDragger,
+    ProTable
 } from "@ant-design/pro-components";
 import {
     Button, Col, ConfigProvider, Divider, Form, Input,
@@ -167,232 +175,228 @@ export const ModalIngredient = (props: IProps) => {
     }
 
     return (
-        <>
-            <DrawerForm
-                title={dataInit?.id ? "Cập nhật nguyên liệu" : "Tạo mới nguyên liệu"}
-                open={openModal}
-                drawerProps={{
-                    onClose: resetModal,
-                    afterOpenChange: (visible) => {
-                        if (!visible) resetModal();
-                    },
-                    destroyOnClose: true,
-                    width: isMobile ? "100%" : 900,
-                    keyboard: false,
-                    maskClosable: false,
-                    className: `modal-ingredient ${animation}`,
-                    rootClassName: `modal-ingredient-root ${animation}`
-                }}
-                scrollToFirstError={true}
-                preserve={false}
-                form={form}
-                onFinish={submitIngredient}
-                initialValues={dataInit?.id ? { ...dataInit } : {}}
-                submitter={{
-                    render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
-                    submitButtonProps: {
-                        icon: <CheckSquareOutlined />
-                    },
-                    searchConfig: {
-                        resetText: "Hủy",
-                        submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    }
-                }}
-            >
-                <Row gutter={[30, 4]}>
-                    <Col span={24} md={4}>
-                        <Row gutter={[30, 4]}>
-                            <Col span={24}>
-                                <Form.Item
-                                    labelCol={{ span: 24 }}
-                                    label="Ảnh hàng hóa"
-                                    name="image"
-                                    rules={[{
-                                        required: true,
-                                        message: 'Vui lòng không bỏ trống',
-                                        validator: () => {
-                                            if (dataLogo.length > 0) return Promise.resolve();
-                                            else return Promise.reject(false);
-                                        }
-                                    }]}
-                                >
-                                    <ConfigProvider locale={enUS}>
-                                        <Upload
-                                            name="image"
-                                            listType="picture-card"
-                                            className="avatar-uploader"
-                                            maxCount={1}
-                                            multiple={false}
-                                            customRequest={({ file, onSuccess, onError }) => {
-                                                handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
-                                            }}
-                                            beforeUpload={beforeUpload}
-                                            onChange={(info) => handleChange(info, setLoadingUpload)}
-                                            onRemove={() => handleRemoveFile(setDataLogo)}
-                                            onPreview={(file) => {
-                                                const fileUrl = file.url || '';
-                                                if (!file.originFileObj) {
-                                                    setPreviewImage(fileUrl);
-                                                    setPreviewOpen(true);
-                                                    setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
-                                                    return;
-                                                }
-                                                getBase64(file.originFileObj, (url: string) => {
-                                                    setPreviewImage(url);
-                                                    setPreviewOpen(true);
-                                                    setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
-                                                });
-                                            }}
-                                            defaultFileList={
-                                                dataInit?.id
-                                                    ? [{
-                                                        uid: uuidv4(),
-                                                        name: dataInit?.image ?? "",
-                                                        status: "done",
-                                                        url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataInit?.image}`,
-                                                    }]
-                                                    : []
+        <DrawerForm
+            form={form}
+            open={openModal}
+            preserve={false}
+            scrollToFirstError={true}
+            onFinish={submitIngredient}
+            initialValues={dataInit?.id ? { ...dataInit } : {}}
+            title={dataInit?.id ? "Cập nhật nguyên liệu" : "Tạo mới nguyên liệu"}
+            drawerProps={{
+                onClose: resetModal,
+                afterOpenChange: (visible) => {
+                    if (!visible) resetModal();
+                },
+                destroyOnClose: true,
+                width: isMobile ? "100%" : 900,
+                keyboard: false,
+                maskClosable: false,
+                className: `modal-ingredient ${animation}`,
+                rootClassName: `modal-ingredient-root ${animation}`
+            }}
+            submitter={{
+                render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
+                submitButtonProps: { icon: <CheckSquareOutlined /> },
+                searchConfig: {
+                    resetText: "Hủy",
+                    submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
+                }
+            }}
+        >
+            <Row gutter={16}>
+                <Col span={24} md={4}>
+                    <Row gutter={[30, 4]}>
+                        <Col span={24}>
+                            <Form.Item
+                                labelCol={{ span: 24 }}
+                                label="Ảnh hàng hóa"
+                                name="image"
+                                rules={[{
+                                    required: true,
+                                    message: 'Vui lòng không bỏ trống',
+                                    validator: () => {
+                                        if (dataLogo.length > 0) return Promise.resolve();
+                                        else return Promise.reject(false);
+                                    }
+                                }]}
+                            >
+                                <ConfigProvider locale={enUS}>
+                                    <Upload
+                                        name="image"
+                                        listType="picture-card"
+                                        className="avatar-uploader"
+                                        maxCount={1}
+                                        multiple={false}
+                                        customRequest={({ file, onSuccess, onError }) => {
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
+                                        }}
+                                        beforeUpload={beforeUpload}
+                                        onChange={(info) => handleChange(info, setLoadingUpload)}
+                                        onRemove={() => handleRemoveFile(setDataLogo)}
+                                        onPreview={(file) => {
+                                            const fileUrl = file.url || '';
+                                            if (!file.originFileObj) {
+                                                setPreviewImage(fileUrl);
+                                                setPreviewOpen(true);
+                                                setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
+                                                return;
                                             }
-                                        >
-                                            <div>
-                                                {loadingUpload ? <LoadingOutlined /> : <PlusOutlined />}
-                                                <div style={{ marginTop: 8 }}>Upload</div>
-                                            </div>
-                                        </Upload>
-                                    </ConfigProvider>
-                                </Form.Item>
-                            </Col>
+                                            getBase64(file.originFileObj, (url: string) => {
+                                                setPreviewImage(url);
+                                                setPreviewOpen(true);
+                                                setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
+                                            });
+                                        }}
+                                        defaultFileList={
+                                            dataInit?.id
+                                                ? [{
+                                                    uid: uuidv4(),
+                                                    name: dataInit?.image ?? "",
+                                                    status: "done",
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataInit?.image}`,
+                                                }]
+                                                : []
+                                        }
+                                    >
+                                        <div>
+                                            {loadingUpload ? <LoadingOutlined /> : <PlusOutlined />}
+                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                        </div>
+                                    </Upload>
+                                </ConfigProvider>
+                            </Form.Item>
+                        </Col>
 
-                            <Col span={24} md={24}>
-                                <ProFormSwitch
-                                    name="active"
-                                    label="Hoạt động"
-                                    checkedChildren="ACTIVE"
-                                    unCheckedChildren="INACTIVE"
-                                    initialValue={true}
-                                    fieldProps={{ defaultChecked: true }}
-                                    hidden
-                                    noStyle
-                                />
-                            </Col>
-                        </Row>
-                    </Col>
+                        <Col span={24} md={24}>
+                            <ProFormSwitch
+                                name="active"
+                                label="Hoạt động"
+                                checkedChildren="ACTIVE"
+                                unCheckedChildren="INACTIVE"
+                                initialValue={true}
+                                fieldProps={{ defaultChecked: true }}
+                                hidden
+                                noStyle
+                            />
+                        </Col>
+                    </Row>
+                </Col>
 
-                    <Col span={24} md={20}>
-                        <Row gutter={[30, 4]}>
-                            <Col span={24} md={12}>
-                                <ProFormText
-                                    name="name"
-                                    label="Tên nguyên liệu"
-                                    placeholder="Nhập nguyên liệu"
-                                    rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                                />
-                            </Col>
+                <Col span={24} md={20}>
+                    <Row gutter={[30, 4]}>
+                        <Col span={24} md={12}>
+                            <ProFormText
+                                name="name"
+                                label="Tên nguyên liệu"
+                                placeholder="Nhập nguyên liệu"
+                                rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                            />
+                        </Col>
 
-                            <Col span={24} md={12}>
-                                <ProFormDigit
-                                    name="price"
-                                    label="Giá nhập"
-                                    placeholder="Nhập giá nhập"
-                                    rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                                    fieldProps={{
-                                        addonAfter: " ₫",
-                                        formatter: (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-                                        parser: (value) => +(value || '').replace(/\$\s?|(,*)/g, '')
-                                    }}
-                                />
-                            </Col>
+                        <Col span={24} md={12}>
+                            <ProFormDigit
+                                name="price"
+                                label="Giá nhập"
+                                placeholder="Nhập giá nhập"
+                                rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                                fieldProps={{
+                                    addonAfter: " ₫",
+                                    formatter: (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+                                    parser: (value) => +(value || '').replace(/\$\s?|(,*)/g, '')
+                                }}
+                            />
+                        </Col>
 
-                            <Col span={24} md={12}>
-                                <ProFormSelect
-                                    name="type"
-                                    label="Phân loại"
-                                    placeholder="Chọn phân loại"
-                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
-                                    options={types.map(type => ({ label: type, value: type }))}
-                                    fieldProps={{
-                                        dropdownRender: (menu) => (
-                                            <>
-                                                {menu}
-                                                <Divider style={{ margin: '8px 0' }} />
-                                                <Space style={{ padding: '0 8px 4px' }}>
-                                                    <Input
-                                                        placeholder="Thêm phân loại mới"
-                                                        value={newType}
-                                                        onChange={(e) => setNewType(e.target.value)}
-                                                        onKeyDown={(e) => e.stopPropagation()}
-                                                        ref={inputRef}
-                                                    />
-                                                    <Button type="default" icon={<PlusOutlined />} onClick={addType}>
-                                                        Thêm
-                                                    </Button>
-                                                </Space>
-                                            </>
-                                        )
-                                    }}
-                                />
-                            </Col>
+                        <Col span={24} md={12}>
+                            <ProFormSelect
+                                name="type"
+                                label="Phân loại"
+                                placeholder="Chọn phân loại"
+                                rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                options={types.map(type => ({ label: type, value: type }))}
+                                fieldProps={{
+                                    dropdownRender: (menu) => (
+                                        <>
+                                            {menu}
+                                            <Divider style={{ margin: '8px 0' }} />
+                                            <Space style={{ padding: '0 8px 4px' }}>
+                                                <Input
+                                                    placeholder="Thêm phân loại mới"
+                                                    value={newType}
+                                                    onChange={(e) => setNewType(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                    ref={inputRef}
+                                                />
+                                                <Button type="default" icon={<PlusOutlined />} onClick={addType}>
+                                                    Thêm
+                                                </Button>
+                                            </Space>
+                                        </>
+                                    )
+                                }}
+                            />
+                        </Col>
 
-                            <Col span={24} md={12}>
-                                <ProFormSelect
-                                    name="category"
-                                    label="Danh mục"
-                                    placeholder="Chọn danh mục"
-                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
-                                    options={categories.map(category => ({ label: category, value: category }))}
-                                    fieldProps={{
-                                        dropdownRender: (menu) => (
-                                            <>
-                                                {menu}
-                                                <Divider style={{ margin: '8px 0' }} />
-                                                <Space style={{ padding: '0 8px 4px' }}>
-                                                    <Input
-                                                        placeholder="Thêm danh mục mới"
-                                                        value={newCategory}
-                                                        onChange={(e) => setNewCategory(e.target.value)}
-                                                        onKeyDown={(e) => e.stopPropagation()}
-                                                        ref={inputRef}
-                                                    />
-                                                    <Button type="default" icon={<PlusOutlined />} onClick={addCategory}>
-                                                        Thêm
-                                                    </Button>
-                                                </Space>
-                                            </>
-                                        ),
-                                    }}
-                                />
-                            </Col>
+                        <Col span={24} md={12}>
+                            <ProFormSelect
+                                name="category"
+                                label="Danh mục"
+                                placeholder="Chọn danh mục"
+                                rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                options={categories.map(category => ({ label: category, value: category }))}
+                                fieldProps={{
+                                    dropdownRender: (menu) => (
+                                        <>
+                                            {menu}
+                                            <Divider style={{ margin: '8px 0' }} />
+                                            <Space style={{ padding: '0 8px 4px' }}>
+                                                <Input
+                                                    placeholder="Thêm danh mục mới"
+                                                    value={newCategory}
+                                                    onChange={(e) => setNewCategory(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                    ref={inputRef}
+                                                />
+                                                <Button type="default" icon={<PlusOutlined />} onClick={addCategory}>
+                                                    Thêm
+                                                </Button>
+                                            </Space>
+                                        </>
+                                    ),
+                                }}
+                            />
+                        </Col>
 
-                            <Col span={24} md={12}>
-                                <ProFormDigit
-                                    name="initialQuantity"
-                                    label="Số lượng hiện tại"
-                                    placeholder="Nhập số lượng hiện tại"
-                                />
-                            </Col>
+                        <Col span={24} md={12}>
+                            <ProFormDigit
+                                name="initialQuantity"
+                                label="Số lượng hiện tại"
+                                placeholder="Nhập số lượng hiện tại"
+                            />
+                        </Col>
 
-                            <Col span={24} md={12}>
-                                <ProFormDigit
-                                    name="minimumQuantity"
-                                    label="Số lượng tối thiểu"
-                                    placeholder="Nhập số lượng tối thiểu"
-                                />
-                            </Col>
+                        <Col span={24} md={12}>
+                            <ProFormDigit
+                                name="minimumQuantity"
+                                label="Số lượng tối thiểu"
+                                placeholder="Nhập số lượng tối thiểu"
+                            />
+                        </Col>
 
-                            <Col span={24} style={{ "marginBottom": "30px" }}>
-                                <ProForm.Item
-                                    name="description"
-                                    label="Mô tả chi tiết"
-                                    rules={[{ required: false, message: '' }]}
-                                >
-                                    <ReactQuill theme="snow" />
-                                </ProForm.Item>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </DrawerForm >
-        </>
+                        <Col span={24} style={{ "marginBottom": "30px" }}>
+                            <ProForm.Item
+                                name="description"
+                                label="Mô tả chi tiết"
+                                rules={[{ required: false, message: '' }]}
+                            >
+                                <ReactQuill theme="snow" />
+                            </ProForm.Item>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+        </DrawerForm >
     )
 }
 
@@ -455,6 +459,10 @@ export const ModalBatchImport = (props: IBatchImportBatchImport) => {
 
                         try {
                             const data = await handleImportXlsx(file);
+                            if (data.length > 100) {
+                                message.error("File không được quá 100 dòng");
+                                return false;
+                            }
                             setDataImported(data);
                         } catch (error) {
                             message.error("Lỗi file");

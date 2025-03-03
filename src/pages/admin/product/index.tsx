@@ -196,7 +196,7 @@ const ProductPage = () => {
             hideInSearch: true,
             width: 90,
             align: "center",
-            render: (value, entity, index, action) => (
+            render: (value, entity) => (
                 <Space>
                     < Access permission={ALL_PERMISSIONS.PRODUCTS.UPDATE} hideChildren>
                         <EditOutlined
@@ -266,33 +266,30 @@ const ProductPage = () => {
     }
 
     return (
-        <div>
-            <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
-                <DataTable<IProduct>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách món ăn"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={products}
-                    request={async (params, sort, filter): Promise<any> => {
-                        const query = buildQuery(params, sort, filter);
-                        dispatch(fetchProductByRestaurant({ query }))
-                    }}
-                    pagination={paginationConfigure(meta)}
-                    rowSelection={false}
-                    toolBarRender={(action, rows): any => [
-                        <Button onClick={handleExportAsXlsx(products, formatCSV)}>
-                            <DownloadOutlined /> Export
-                        </Button>,
+        <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
+            <DataTable<IProduct>
+                rowKey="id"
+                actionRef={tableRef}
+                headerTitle="Danh sách món ăn"
+                loading={isFetching}
+                columns={columns}
+                dataSource={products}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchProductByRestaurant({ query }))
+                }}
+                pagination={paginationConfigure(meta)}
+                toolBarRender={(): any => [
+                    <Button onClick={handleExportAsXlsx(products, formatCSV)}>
+                        <DownloadOutlined /> Export
+                    </Button>,
 
-                        <Button type="primary" onClick={() => navigate('upsert')}>
-                            <PlusOutlined /> Thêm mới
-                        </Button>
-                    ]}
-                />
-            </Access>
-        </div >
+                    <Button type="primary" onClick={() => navigate('upsert')}>
+                        <PlusOutlined /> Thêm mới
+                    </Button>
+                ]}
+            />
+        </Access>
     )
 }
 

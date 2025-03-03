@@ -286,6 +286,11 @@ export const ModalBatchImport = (props: IBatchImportBatchImport) => {
 
                         try {
                             const data = await handleImportXlsx(file);
+                            if (data.length > 100) {
+                                message.error("File không được quá 100 dòng");
+                                return false;
+                            }
+
                             setDataImported(data);
                         } catch (error) {
                             message.error("Lỗi file");

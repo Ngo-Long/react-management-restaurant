@@ -376,6 +376,10 @@ export const invoiceApi = {
 Module Supplier
  */
 export const supplierApi = {
+    callBatchImport(suppliers: ISupplier[]) {
+        return axios.post<IBackendRes<ISupplier[]>>('/api/v1/suppliers/batch-import', suppliers);
+    },
+
     callCreate(supplier: ISupplier) {
         return axios.post<IBackendRes<ISupplier>>('/api/v1/suppliers', { ...supplier });
     },

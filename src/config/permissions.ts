@@ -30,10 +30,10 @@ export const ALL_PERMISSIONS = {
         DELETE: { method: "DELETE", apiPath: '/api/v1/dining-tables/{id}', module: "DININGTABLES" },
     },
     SUPPLIERS: {
-        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/ingredients', module: "SUPPLIERS" },
-        CREATE: { method: "POST", apiPath: '/api/v1/ingredients', module: "SUPPLIERS" },
-        UPDATE: { method: "PUT", apiPath: '/api/v1/ingredients', module: "SUPPLIERS" },
-        DELETE: { method: "DELETE", apiPath: '/api/v1/ingredients/{id}', module: "SUPPLIERS" },
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/suppliers', module: "SUPPLIERS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/suppliers', module: "SUPPLIERS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/suppliers', module: "SUPPLIERS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/suppliers/{id}', module: "SUPPLIERS" },
     },
     ORDERS: {
         GET_PAGINATE: { method: "GET", apiPath: '/api/v1/orders', module: "ORDERS" },

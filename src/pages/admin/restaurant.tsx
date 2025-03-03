@@ -1,18 +1,19 @@
-import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";
+import dayjs from 'dayjs';
+import queryString from 'query-string';
+import { useState, useRef } from 'react';
+import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+
+import { restaurantApi } from "@/config/api";
+import { IRestaurant } from "@/types/backend";
+import Access from "@/components/share/access";
+import { sfLike } from "spring-filter-query-builder";
+import { ALL_PERMISSIONS } from "@/config/permissions";
 import DataTable from "@/components/client/data-table";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchRestaurant } from "@/redux/slice/restaurantSlide";
-import { IRestaurant } from "@/types/backend";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
-import { useState, useRef } from 'react';
-import dayjs from 'dayjs';
-import { restaurantApi } from "@/config/api";
-import queryString from 'query-string';
-import Access from "@/components/share/access";
-import { ALL_PERMISSIONS } from "@/config/permissions";
-import { sfLike } from "spring-filter-query-builder";
+import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";
 
 const RestaurantPage = () => {
     const tableRef = useRef<ActionType>();
@@ -65,13 +66,36 @@ const RestaurantPage = () => {
         {
             title: 'Địa  chỉ',
             dataIndex: 'address',
-            sorter: true,
+            hideInSearch: true,
+        },
+        {
+            title: 'Mô tả',
+            dataIndex: 'description',
+            hideInSearch: true,
         },
         {
             title: 'Hoạt động',
             align: "center",
             dataIndex: 'active',
             hideInSearch: false,
+            renderFormItem: (item, props, form) => (
+                <ProFormSelect
+                    showSearch
+                    allowClear
+                    valueEnum={{
+                        true: 'Hoạt động',
+                        false: 'Ngưng hoạt động'
+                    }}
+                    placeholder="Chọn hoạt động"
+                />
+            ),
+            render(dom, entity) {
+                return <>
+                    <Tag color={entity.active ? "lime" : "red"} >
+                        {entity.active ? "ACTIVE" : "INACTIVE"}
+                    </Tag>
+                </>
+            },
         },
         {
             title: 'Ngày tạo',
@@ -88,21 +112,21 @@ const RestaurantPage = () => {
                 )
             },
         },
-        {
-            title: 'Ngày sửa',
-            dataIndex: 'lastModifiedDate',
-            width: 200,
-            sorter: true,
-            align: 'center',
-            hideInSearch: true,
-            render: (text, record, index, action) => {
-                return (
-                    <>
-                        {record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}
-                    </>
-                )
-            },
-        },
+        // {
+        //     title: 'Ngày sửa',
+        //     dataIndex: 'lastModifiedDate',
+        //     width: 200,
+        //     sorter: true,
+        //     align: 'center',
+        //     hideInSearch: true,
+        //     render: (text, record, index, action) => {
+        //         return (
+        //             <>
+        //                 {record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}
+        //             </>
+        //         )
+        //     },
+        // },
         {
             title: 'Tác vụ',
             width: 100,

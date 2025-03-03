@@ -1,14 +1,25 @@
-import { FooterToolbar, ModalForm, ProCard, ProFormSwitch, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
-import { Col, Form, Row, message, notification } from "antd";
-import { isMobile } from 'react-device-detect';
+import {
+    Col,
+    Row,
+    Form,
+    message,
+    notification
+} from "antd";
+import {
+    ProCard,
+    DrawerForm,
+    ProFormText,
+    FooterToolbar,
+    ProFormSwitch,
+    ProFormTextArea
+} from "@ant-design/pro-components";
+import ModuleApi from "./module.api";
 import { roleApi } from "@/config/api";
+import { isMobile } from 'react-device-detect';
+import { useAppDispatch } from "@/redux/hooks";
 import { IPermission, IRole } from "@/types/backend";
 import { CheckSquareOutlined } from "@ant-design/icons";
-import ModuleApi from "./module.api";
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { resetSingleRole } from "@/redux/slice/roleSlide";
-import { groupByPermission } from "@/utils/format";
+import { useState } from "react";
 
 interface IProps {
     openModal: boolean;
@@ -24,8 +35,9 @@ interface IProps {
 
 const ModalRole = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, listPermissions, singleRole, setSingleRole } = props;
-    const dispatch = useAppDispatch();
     const [form] = Form.useForm();
+    const dispatch = useAppDispatch();
+    const [animation, setAnimation] = useState<string>('open');
 
     const submitRole = async (valuesForm: any) => {
         const { description, active, name, permissions } = valuesForm;
@@ -81,91 +93,93 @@ const ModalRole = (props: IProps) => {
     }
 
     return (
-        <>
-            <ModalForm
-                title={<>{singleRole?.id ? "Cập nhật chức vụ" : "Tạo mới chức vụ"}</>}
-                open={openModal}
-                modalProps={{
-                    onCancel: () => { handleReset() },
-                    afterClose: () => handleReset(),
-                    destroyOnClose: true,
-                    width: isMobile ? "100%" : 900,
-                    keyboard: false,
-                    maskClosable: false,
-                }}
-                scrollToFirstError={true}
-                preserve={false}
-                form={form}
-                onFinish={submitRole}
-                submitter={{
-                    render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
-                    submitButtonProps: {
-                        icon: <CheckSquareOutlined />
-                    },
-                    searchConfig: {
-                        resetText: "Hủy",
-                        submitText: <>{singleRole?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    }
-                }}
-            >
-                <Row gutter={16}>
-                    <Col lg={12} md={12} sm={24} xs={24}>
-                        <ProFormText
-                            label="Tên chức vụ"
-                            name="name"
-                            rules={[
-                                { required: true, message: 'Vui lòng không bỏ trống' },
-                            ]}
-                            placeholder="Nhập tên"
-                        />
-                    </Col>
-                    <Col lg={12} md={12} sm={24} xs={24}>
-                        <ProFormSwitch
-                            label="Trạng thái"
-                            name="active"
-                            checkedChildren="ACTIVE"
-                            unCheckedChildren="INACTIVE"
-                            initialValue={true}
-                            fieldProps={{
-                                defaultChecked: true,
-                            }}
-                        />
-                    </Col>
+        <DrawerForm
+            form={form}
+            open={openModal}
+            preserve={false}
+            onFinish={submitRole}
+            scrollToFirstError={true}
+            title={<>{singleRole?.id ? "Cập nhật chức vụ" : "Tạo mới chức vụ"}</>}
+            drawerProps={{
+                keyboard: false,
+                maskClosable: false,
+                destroyOnClose: true,
+                onClose: handleReset,
+                afterOpenChange: (visible) => {
+                    if (!visible) handleReset();
+                },
+                width: isMobile ? "100%" : 900,
+                className: `modal-ingredient ${animation}`,
+                rootClassName: `modal-ingredient-root ${animation}`
+            }}
+            submitter={{
+                render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
+                submitButtonProps: {
+                    icon: <CheckSquareOutlined />
+                },
+                searchConfig: {
+                    resetText: "Hủy",
+                    submitText: <>{singleRole?.id ? "Cập nhật" : "Tạo mới"}</>,
+                }
+            }}
+        >
+            <Row gutter={16}>
+                <Col lg={12} md={12} sm={24} xs={24}>
+                    <ProFormText
+                        label="Tên chức vụ"
+                        name="name"
+                        rules={[
+                            { required: true, message: 'Vui lòng không bỏ trống' },
+                        ]}
+                        placeholder="Nhập tên"
+                    />
+                </Col>
+                <Col lg={12} md={12} sm={24} xs={24}>
+                    <ProFormSwitch
+                        label="Trạng thái"
+                        name="active"
+                        checkedChildren="ACTIVE"
+                        unCheckedChildren="INACTIVE"
+                        initialValue={true}
+                        fieldProps={{
+                            defaultChecked: true,
+                        }}
+                    />
+                </Col>
 
-                    <Col span={24}>
-                        <ProFormTextArea
-                            label="Miêu tả"
-                            name="description"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập miêu tả role"
-                            fieldProps={{
-                                autoSize: { minRows: 2 }
-                            }}
+                <Col span={24}>
+                    <ProFormTextArea
+                        label="Miêu tả"
+                        name="description"
+                        rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                        placeholder="Nhập miêu tả role"
+                        fieldProps={{
+                            autoSize: { minRows: 2 }
+                        }}
+                    />
+                </Col>
+                <Col span={24}>
+                    <ProCard
+                        title="Quyền hạn"
+                        subTitle="Các quyền hạn được phép cho vai trò này"
+                        headStyle={{ color: '#d81921' }}
+                        style={{ marginBottom: 20 }}
+                        headerBordered
+                        size="small"
+                        bordered
+                    >
+                        <ModuleApi
+                            form={form}
+                            listPermissions={listPermissions}
+                            singleRole={singleRole}
+                            openModal={openModal}
                         />
-                    </Col>
-                    <Col span={24}>
-                        <ProCard
-                            title="Quyền hạn"
-                            subTitle="Các quyền hạn được phép cho vai trò này"
-                            headStyle={{ color: '#d81921' }}
-                            style={{ marginBottom: 20 }}
-                            headerBordered
-                            size="small"
-                            bordered
-                        >
-                            <ModuleApi
-                                form={form}
-                                listPermissions={listPermissions}
-                                singleRole={singleRole}
-                                openModal={openModal}
-                            />
 
-                        </ProCard>
+                    </ProCard>
 
-                    </Col>
-                </Row>
-            </ModalForm>
-        </>
+                </Col>
+            </Row>
+        </DrawerForm>
     )
 }
 

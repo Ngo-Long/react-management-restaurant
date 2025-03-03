@@ -285,9 +285,9 @@ const IngredientPage = () => {
     return (
         <Access permission={ALL_PERMISSIONS.INGREDIENTS.GET_PAGINATE}>
             <DataTable<IIngredient>
+                rowKey="id"
                 actionRef={tableRef}
                 headerTitle="Danh sách nguyên liệu"
-                rowKey="id"
                 loading={isFetching}
                 columns={columns}
                 dataSource={ingredients}
@@ -298,7 +298,6 @@ const IngredientPage = () => {
                     }
                 }
                 pagination={paginationConfigure(meta)}
-                rowSelection={false}
                 toolBarRender={(action, rows): any => [
                     <Button onClick={() => setOpenUpload(true)}>
                         <UploadOutlined /> Import

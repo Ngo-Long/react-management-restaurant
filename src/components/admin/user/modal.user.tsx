@@ -1,11 +1,37 @@
-import { ModalForm, ProForm, ProFormDigit, ProFormSelect, ProFormText } from "@ant-design/pro-components";
-import { Col, Form, Input, Row, message, notification } from "antd";
-import { isMobile } from 'react-device-detect';
-import { useState, useEffect } from "react";
-import { userApi, roleApi, restaurantApi } from "@/config/api";
+import {
+    Row,
+    Col,
+    Form,
+    Input,
+    message,
+    notification,
+    ConfigProvider,
+    Upload
+} from "antd";
+import {
+    ProForm,
+    ProFormText,
+    ProFormDigit,
+    ProFormSelect,
+    ProFormTextArea,
+    DrawerForm,
+    FooterToolbar,
+    ProFormSwitch,
+} from "@ant-design/pro-components";
+import {
+    beforeUpload, getBase64, handleChange,
+    handleRemoveFile, handleUploadFileLogo
+} from "@/utils/image";
+import { v4 as uuidv4 } from 'uuid';
+import ReactQuill from "react-quill";
 import { IUser } from "@/types/backend";
-import { DebounceSelect } from "./debouce.select";
+import enUS from 'antd/lib/locale/en_US';
+import { useState, useEffect } from "react";
+import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
+import { DebounceSelect } from "./debouce.select";
+import { userApi, roleApi, restaurantApi } from "@/config/api";
+import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 interface IProps {
     openModal: boolean;
@@ -21,16 +47,29 @@ export interface IRestaurantSelect {
     key?: string;
 }
 
+interface IUserLogo {
+    name: string;
+    uid: string;
+}
+
 const ModalUser = (props: IProps) => {
     const [form] = Form.useForm();
     const [roles, setRoles] = useState<IRestaurantSelect[]>([]);
-
     const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
 
+    const [animation, setAnimation] = useState<string>('open');
     const currentUser = useAppSelector(state => state.account.user);
     const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
     const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
+
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+    const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
+    const [dataLogo, setDataLogo] = useState<IUserLogo[]>([
+        { name: "", uid: "" }
+    ]);
 
     useEffect(() => {
         if (dataInit?.id) {
@@ -141,159 +180,262 @@ const ModalUser = (props: IProps) => {
     }
 
     return (
-        <>
-            <ModalForm
-                title={<>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>}
-                open={openModal}
-                modalProps={{
-                    onCancel: () => { handleReset() },
-                    afterClose: () => handleReset(),
-                    destroyOnClose: true,
-                    width: isMobile ? "100%" : 900,
-                    keyboard: false,
-                    maskClosable: false,
-                    okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: "Hủy"
-                }}
-                scrollToFirstError={true}
-                preserve={false}
-                form={form}
-                onFinish={submitUser}
-                initialValues={dataInit?.id ? {
-                    ...dataInit,
-                    role: { label: dataInit.role?.name, value: dataInit.role?.id },
-                    restaurant: isRoleOwner
-                        ? { label: dataInit?.restaurant?.name, value: dataInit?.restaurant?.id }
-                        : { label: currentRestaurant?.name, value: currentRestaurant?.id }
-                } : {}}
-
-            >
-                <Row gutter={16}>
-                    <Col lg={12} md={12} sm={24} xs={24}>
-                        <ProFormText
-                            disabled={dataInit?.id ? true : false}
-                            label="Email"
-                            name="email"
-                            rules={[
-                                { required: true, message: 'Vui lòng không bỏ trống' },
-                                { type: 'email', message: 'Vui lòng nhập email hợp lệ' }
-                            ]}
-                            placeholder="Nhập email"
-                        />
-                    </Col>
-                    <Col lg={12} md={12} sm={24} xs={24}>
-                        <ProFormText.Password
-                            disabled={dataInit?.id ? true : false}
-                            label="Mật khẩu"
-                            name="password"
-                            rules={[{ required: dataInit?.id ? false : true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập mật khẩu"
-                        />
-                    </Col>
-                    <Col lg={6} md={6} sm={24} xs={24}>
-                        <ProFormText
-                            label="Tên hiển thị"
-                            name="name"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập tên hiển thị"
-                        />
-                    </Col>
-                    <Col lg={6} md={6} sm={24} xs={24}>
-                        <ProFormDigit
-                            label="Số tuổi"
-                            name="age"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập số tuổi"
-                        />
-                    </Col>
-                    <Col lg={6} md={6} sm={24} xs={24}>
-                        <ProFormSelect
-                            name="gender"
-                            label="Giới Tính"
-                            valueEnum={{
-                                MALE: 'Nam',
-                                FEMALE: 'Nữ',
-                                OTHER: 'Khác',
-                            }}
-                            placeholder="Chọn giới tính"
-                            rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
-                        />
-                    </Col>
-
-                    <Col lg={6} md={6} sm={24} xs={24}>
-                        <ProForm.Item
-                            name="role"
-                            label="Vai trò"
-                            rules={[{ required: true, message: 'Vui lòng chọn vai trò!' }]}
-
-                        >
-                            <DebounceSelect
-                                allowClear
-                                showSearch
-                                defaultValue={roles}
-                                value={roles}
-                                placeholder="Chọn công vai trò"
-                                fetchOptions={fetchRoleList}
-                                onChange={(newValue: any) => {
-                                    if (newValue?.length === 0 || newValue?.length === 1) {
-                                        setRoles(newValue as IRestaurantSelect[]);
+        <DrawerForm
+            form={form}
+            open={openModal}
+            preserve={false}
+            onFinish={submitUser}
+            scrollToFirstError={true}
+            title={<>{dataInit?.id ? "Cập nhật người dùng" : "Tạo mới người dùng"}</>}
+            drawerProps={{
+                keyboard: false,
+                maskClosable: false,
+                destroyOnClose: true,
+                onClose: handleReset,
+                afterOpenChange: (visible) => {
+                    if (!visible) handleReset();
+                },
+                width: isMobile ? "100%" : 900,
+                className: `modal-ingredient ${animation}`,
+                rootClassName: `modal-ingredient-root ${animation}`
+            }}
+            initialValues={dataInit?.id ? {
+                ...dataInit,
+                role: { label: dataInit.role?.name, value: dataInit.role?.id },
+                restaurant: isRoleOwner
+                    ? { label: dataInit?.restaurant?.name, value: dataInit?.restaurant?.id }
+                    : { label: currentRestaurant?.name, value: currentRestaurant?.id }
+            } : {}}
+            submitter={{
+                render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
+                submitButtonProps: { icon: <CheckSquareOutlined /> },
+                searchConfig: {
+                    resetText: "Hủy",
+                    submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
+                }
+            }}
+        >
+            <Row gutter={16}>
+                <Col span={24} md={4}>
+                    <Row gutter={[30, 4]}>
+                        <Col span={24}>
+                            <Form.Item
+                                labelCol={{ span: 24 }}
+                                label="Chọn Ảnh"
+                                // name="image"
+                                rules={[{
+                                    required: true,
+                                    message: 'Vui lòng không bỏ trống',
+                                    validator: () => {
+                                        if (dataLogo.length > 0) return Promise.resolve();
+                                        else return Promise.reject(false);
                                     }
-                                }}
-                                style={{ width: '100%' }}
-                            />
-                        </ProForm.Item>
-                    </Col>
-
-                    {isRoleOwner && (
-                        <Col lg={12} md={12} sm={24} xs={24}>
-                            <ProForm.Item
-                                label="Thuộc nhà hàng"
-                                name="restaurant"
-                                rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
+                                }]}
                             >
-                                {isRoleOwner ? (
-                                    <DebounceSelect
-                                        allowClear
-                                        showSearch
-                                        defaultValue={restaurants}
-                                        value={restaurants}
-                                        placeholder="Chọn nhà hàng"
-                                        fetchOptions={fetchRestaurantList}
-                                        onChange={(newValue: any) => {
-                                            if (newValue?.length === 0 || newValue?.length === 1) {
-                                                setRestaurants(newValue as IRestaurantSelect[]);
-                                            }
+                                <ConfigProvider locale={enUS}>
+                                    <Upload
+                                        name="image"
+                                        listType="picture-card"
+                                        className="avatar-uploader"
+                                        maxCount={1}
+                                        multiple={false}
+                                        customRequest={({ file, onSuccess, onError }) => {
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
                                         }}
-                                        style={{ width: '100%' }}
-                                    />
-                                ) : (
-                                    <>
-                                        <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
-                                        <ProFormText
-                                            hidden
-                                            name="restaurant"
-                                            initialValue={{
-                                                label: currentRestaurant?.name,
-                                                value: currentRestaurant?.id,
-                                            }}
-                                        />
-                                    </>
-                                )}
+                                        beforeUpload={beforeUpload}
+                                        onChange={(info) => handleChange(info, setLoadingUpload)}
+                                        onRemove={() => handleRemoveFile(setDataLogo)}
+                                        onPreview={(file) => {
+                                            const fileUrl = file.url || '';
+                                            if (!file.originFileObj) {
+                                                setPreviewImage(fileUrl);
+                                                setPreviewOpen(true);
+                                                setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
+                                                return;
+                                            }
+                                            getBase64(file.originFileObj, (url: string) => {
+                                                setPreviewImage(url);
+                                                setPreviewOpen(true);
+                                                setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
+                                            });
+                                        }}
+                                        defaultFileList={
+                                            dataInit?.id
+                                                ? [{
+                                                    uid: uuidv4(),
+                                                    // name: dataInit?.image ?? "",
+                                                    name: "",
+                                                    status: "done",
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataInit?.image}`,
+                                                }]
+                                                : []
+                                        }
+                                    >
+                                        <div>
+                                            {loadingUpload ? <LoadingOutlined /> : <PlusOutlined />}
+                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                        </div>
+                                    </Upload>
+                                </ConfigProvider>
+                            </Form.Item>
+                        </Col>
+
+                        <Col span={24} md={24}>
+                            <ProFormSwitch
+                                // name="active"
+                                label="Hoạt động"
+                                checkedChildren="ACTIVE"
+                                unCheckedChildren="INACTIVE"
+                                initialValue={true}
+                                fieldProps={{ defaultChecked: true }}
+                                hidden
+                                noStyle
+                            />
+                        </Col>
+                    </Row>
+                </Col>
+
+                <Col span={24} md={20}>
+                    <Row gutter={[30, 4]}>
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormText
+                                name="email"
+                                label="Email"
+                                placeholder="Nhập email"
+                                disabled={dataInit?.id ? true : false}
+                                rules={[
+                                    { required: true, message: 'Vui lòng không bỏ trống' },
+                                    { type: 'email', message: 'Vui lòng nhập email hợp lệ' }
+                                ]}
+                            />
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormText.Password
+                                name="password"
+                                label="Mật khẩu"
+                                placeholder="Nhập mật khẩu"
+                                disabled={dataInit?.id ? true : false}
+                                rules={[{ required: dataInit?.id ? false : true, message: 'Vui lòng không bỏ trống' }]}
+                            />
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormText
+                                name="name"
+                                label="Tên hiển thị"
+                                rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                                placeholder="Nhập tên hiển thị"
+                            />
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormDigit
+                                name="age"
+                                label="Số tuổi"
+                                rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                                placeholder="Nhập số tuổi"
+                            />
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormSelect
+                                name="gender"
+                                label="Giới Tính"
+                                valueEnum={{
+                                    MALE: 'Nam',
+                                    FEMALE: 'Nữ',
+                                    OTHER: 'Khác',
+                                }}
+                                placeholder="Chọn giới tính"
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                            />
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProForm.Item
+                                name="role"
+                                label="Vai trò"
+                                rules={[{ required: true, message: 'Vui lòng chọn vai trò!' }]}
+                            >
+                                <DebounceSelect
+                                    allowClear
+                                    showSearch
+                                    value={roles}
+                                    defaultValue={roles}
+                                    style={{ width: '100%' }}
+                                    placeholder="Chọn công vai trò"
+                                    fetchOptions={fetchRoleList}
+                                    onChange={(newValue: any) => {
+                                        if (newValue?.length === 0 || newValue?.length === 1) {
+                                            setRoles(newValue as IRestaurantSelect[]);
+                                        }
+                                    }}
+                                />
                             </ProForm.Item>
                         </Col>
-                    )}
 
-                    <Col lg={12} md={12} sm={24} xs={24}>
-                        <ProFormText
-                            label="Địa chỉ"
-                            name="address"
-                            rules={[{ required: false, message: '' }]}
-                            placeholder="Nhập địa chỉ"
-                        />
-                    </Col>
-                </Row>
-            </ModalForm >
-        </>
+                        {isRoleOwner && (
+                            <Col lg={12} md={12} sm={24} xs={24}>
+                                <ProForm.Item
+                                    label="Thuộc nhà hàng"
+                                    name="restaurant"
+                                    rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
+                                >
+                                    {isRoleOwner ? (
+                                        <DebounceSelect
+                                            allowClear
+                                            showSearch
+                                            value={restaurants}
+                                            defaultValue={restaurants}
+                                            style={{ width: '100%' }}
+                                            placeholder="Chọn nhà hàng"
+                                            fetchOptions={fetchRestaurantList}
+                                            onChange={(newValue: any) => {
+                                                if (newValue?.length === 0 || newValue?.length === 1) {
+                                                    setRestaurants(newValue as IRestaurantSelect[]);
+                                                }
+                                            }}
+                                        />
+                                    ) : (
+                                        <>
+                                            <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
+                                            <ProFormText
+                                                hidden
+                                                name="restaurant"
+                                                initialValue={{
+                                                    label: currentRestaurant?.name,
+                                                    value: currentRestaurant?.id,
+                                                }}
+                                            />
+                                        </>
+                                    )}
+                                </ProForm.Item>
+                            </Col>
+                        )}
+
+                        <Col span={24}>
+                            <ProFormTextArea
+                                label="Địa chỉ"
+                                name="address"
+                                rules={[{ required: false, message: '' }]}
+                                placeholder="Nhập địa chỉ"
+                            />
+                        </Col>
+
+                        <Col span={24} style={{ "marginBottom": "30px" }}>
+                            <ProForm.Item
+                                label="Mô tả"
+                                // name="description"
+                                rules={[{ required: false, message: '' }]}
+                            >
+                                <ReactQuill theme="snow" />
+                            </ProForm.Item>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+        </DrawerForm>
     )
 }
 

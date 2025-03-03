@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchAllUser, fetchUserByRestaurant } from "@/redux/slice/userSlide";
+import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
 import { IUser } from "@/types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -14,6 +14,7 @@ import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { sfLike } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
+import { paginationConfigure } from "@/utils/paginator";
 
 const UserPage = () => {
     const dispatch = useAppDispatch();
@@ -51,18 +52,22 @@ const UserPage = () => {
             key: 'index',
             width: 50,
             align: "center",
-            render: (text, record, index) => {
-                return (
-                    <>
-                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>)
-            },
             hideInSearch: true,
+            render: (text, record, index) => {
+                return (<>{(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
+            },
         },
         {
             title: 'Họ tên',
             dataIndex: 'name',
             sorter: true,
+        },
+        {
+            title: 'Chức vụ',
+            dataIndex: ["role", "name"],
+            sorter: true,
+            align: "center",
+            hideInSearch: true
         },
         {
             title: 'Email',
@@ -83,19 +88,13 @@ const UserPage = () => {
             hideInSearch: true,
             align: "center"
         },
-        {
-            title: 'Chức vụ',
-            dataIndex: ["role", "name"],
-            sorter: true,
-            align: "center",
-            hideInSearch: true
-        },
+
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
                     <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
                 )
@@ -106,7 +105,7 @@ const UserPage = () => {
             dataIndex: 'lastModifiedDate',
             hidden: true,
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
                     <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
                 )
@@ -192,45 +191,26 @@ const UserPage = () => {
     }
 
     return (
-        <div>
-            <Access permission={ALL_PERMISSIONS.USERS.GET_PAGINATE}>
-                <DataTable<IUser>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách người dùng"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={userList}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchUserByRestaurant({ query }))
-                        }
-                    }
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Button
-                                icon={<PlusOutlined />}
-                                type="primary"
-                                onClick={() => setOpenModal(true)}
-                            >
-                                Thêm mới
-                            </Button>
-                        );
-                    }}
-                />
-            </Access>
+        <Access permission={ALL_PERMISSIONS.USERS.GET_PAGINATE}>
+            <DataTable<IUser>
+                rowKey="id"
+                actionRef={tableRef}
+                headerTitle="Danh sách người dùng"
+                loading={isFetching}
+                columns={columns}
+                dataSource={userList}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchUserByRestaurant({ query }))
+                }}
+                pagination={paginationConfigure(meta)}
+                rowSelection={false}
+                toolBarRender={(_action, _rows): any => [
+                    <Button type="primary" onClick={() => setOpenModal(true)}>
+                        <PlusOutlined /> Thêm mới
+                    </Button>
+                ]}
+            />
 
             <ModalUser
                 openModal={openModal}
@@ -246,7 +226,7 @@ const UserPage = () => {
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-        </div >
+        </Access>
     )
 }
 

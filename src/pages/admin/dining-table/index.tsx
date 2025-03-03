@@ -253,7 +253,7 @@ const DiningTablePage = () => {
             }
         }
 
-        // Thêm sắp xếp mặc định: active giảm dần (true đứng trước false)
+        // active giảm dần (true đứng trước false)
         if (Object.keys(sortBy).length === 0) {
             temp = `${temp}&sort=active,desc&sort=sequence,asc`;
         } else {
@@ -265,21 +265,18 @@ const DiningTablePage = () => {
     return (
         <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
             <DataTable<IDiningTable>
+                rowKey="id"
                 actionRef={tableRef}
                 headerTitle="Danh sách bàn ăn"
-                rowKey="id"
                 loading={isFetching}
                 columns={columns}
                 dataSource={diningTables}
-                request={
-                    async (params, sort, filter): Promise<any> => {
-                        const query = buildQuery(params, sort, filter);
-                        dispatch(fetchDiningTableByRestaurant({ query }))
-                    }
-                }
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchDiningTableByRestaurant({ query }))
+                }}
                 pagination={paginationConfigure(meta)}
-                rowSelection={false}
-                toolBarRender={(action, rows): any => [
+                toolBarRender={(): any => [
                     <Button onClick={() => setOpenUpload(true)}>
                         <UploadOutlined /> Import
                     </Button>,
