@@ -4,10 +4,10 @@ import { supplierApi } from "@/config/api";
 import { ISupplier } from "@/types/backend";
 import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
+import { handleImportXlsx } from '@/utils/file';
 import { useEffect, useCallback, useState } from 'react';
 import { Col, Form, Row, message, notification } from "antd";
 import { ProFormSwitch, ProFormText, ModalForm, ProFormUploadDragger, ProTable } from "@ant-design/pro-components";
-import { handleImportXlsx } from '@/utils/file';
 
 interface IProps {
     openModal: boolean;
@@ -72,76 +72,76 @@ export const ModalSupplier = (props: IProps) => {
     }
 
     return (
-        <>
-            <ModalForm
-                title={<>{dataInit?.id ? "Cập nhật nhà cung cấp" : "Tạo mới nhà cung cấp"}</>}
-                open={openModal}
-                modalProps={{
-                    onCancel: resetModal,
-                    afterClose: resetModal,
-                    destroyOnClose: true,
-                    width: isMobile ? "100%" : 900,
-                    keyboard: false,
-                    maskClosable: false,
-                    okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: "Hủy"
-                }}
-                scrollToFirstError={true}
-                preserve={false}
-                form={form}
-                onFinish={submitSupplier}
-                initialValues={dataInit?.id ? { ...dataInit } : {}}
-            >
-                <Row gutter={[30, 4]}>
-                    <Col span={24} md={12}>
-                        <ProFormText
-                            label="Tên nhà cung cấp"
-                            name="name"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập nhà cung cấp"
-                        />
-                    </Col>
+        <ModalForm
+            form={form}
+            open={openModal}
+            preserve={false}
+            scrollToFirstError={true}
+            onFinish={submitSupplier}
+            initialValues={dataInit?.id ? { ...dataInit } : {}}
+            title={<>{dataInit?.id ? "Cập nhật nhà cung cấp" : "Tạo mới nhà cung cấp"}</>}
+            modalProps={{
+                onCancel: resetModal,
+                afterClose: resetModal,
+                destroyOnClose: true,
+                width: isMobile ? "100%" : 700,
+                keyboard: false,
+                maskClosable: false,
+                okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
+                cancelText: "Hủy"
+            }}
+        >
+            <Row gutter={[30, 4]}>
+                <Col span={24} md={12}>
+                    <ProFormText
+                        label="Tên nhà cung cấp"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                        placeholder="Nhập nhà cung cấp"
+                    />
+                </Col>
 
-                    <Col span={24} md={12}>
-                        <ProFormText
-                            label="Số điện thoại"
-                            name="phone"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập số điện thoại"
-                        />
-                    </Col>
+                <Col span={24} md={12}>
+                    <ProFormText
+                        label="Số điện thoại"
+                        name="phone"
+                        rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                        placeholder="Nhập số điện thoại"
+                    />
+                </Col>
 
-                    <Col span={24} md={12}>
-                        <ProFormText
-                            label="Số email"
-                            name="email"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập email"
-                        />
-                    </Col>
+                <Col span={24} md={12}>
+                    <ProFormText
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                        placeholder="Nhập email"
+                    />
+                </Col>
 
-                    <Col span={24} md={12}>
-                        <ProFormText
-                            label="Số địa chỉ"
-                            name="address"
-                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                            placeholder="Nhập địa chỉ"
-                        />
-                    </Col>
+                <Col span={24} md={12}>
+                    <ProFormText
+                        label="Địa chỉ"
+                        name="address"
+                        rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                        placeholder="Nhập địa chỉ"
+                    />
+                </Col>
 
-                    <Col span={24} md={24}>
-                        <ProFormSwitch
-                            label="Hoạt động"
-                            name="active"
-                            checkedChildren="ACTIVE"
-                            unCheckedChildren="INACTIVE"
-                            initialValue={true}
-                            fieldProps={{ defaultChecked: true }}
-                        />
-                    </Col>
-                </Row>
-            </ModalForm >
-        </>
+                <Col span={24} md={24}>
+                    <ProFormSwitch
+                        hidden
+                        noStyle
+                        label="Hoạt động"
+                        name="active"
+                        checkedChildren="ACTIVE"
+                        unCheckedChildren="INACTIVE"
+                        initialValue={true}
+                        fieldProps={{ defaultChecked: true }}
+                    />
+                </Col>
+            </Row>
+        </ModalForm >
     )
 }
 

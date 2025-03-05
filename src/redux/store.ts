@@ -1,11 +1,12 @@
 import {
   Action,
-  configureStore,
   ThunkAction,
+  configureStore
 } from '@reduxjs/toolkit';
 import roleReducer from './slice/roleSlide';
 import userReducer from './slice/userSlide';
 import orderReducer from './slice/orderSlide';
+import receiptReducer from './slice/receiptSlide';
 import invoiceReducer from './slice/invoiceSlide';
 import accountReducer from './slice/accountSlide';
 import productReducer from './slice/productSlide';
@@ -19,18 +20,19 @@ import diningTableReducer from './slice/diningTableSlide';
 // Configure the Redux store with various slice reducers
 export const store = configureStore({
   reducer: {
-    account: accountReducer,
-    restaurant: restaurantReducer,
+    role: roleReducer,
     user: userReducer,
-    diningTable: diningTableReducer,
     order: orderReducer,
-    orderDetail: orderDetailReducer,
+    account: accountReducer,
     invoice: invoiceReducer,
     product: productReducer,
-    ingredient: ingredientReducer,
-    role: roleReducer,
-    permission: permissionReducer,
+    receipt: receiptReducer,
     supplier: supplierReducer,
+    ingredient: ingredientReducer,
+    permission: permissionReducer,
+    restaurant: restaurantReducer,
+    diningTable: diningTableReducer,
+    orderDetail: orderDetailReducer,
   },
 });
 

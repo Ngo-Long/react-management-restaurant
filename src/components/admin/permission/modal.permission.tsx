@@ -1,9 +1,19 @@
-import { ModalForm, ProFormSelect, ProFormText } from "@ant-design/pro-components";
-import { Col, Form, Row, message, notification } from "antd";
-import { isMobile } from 'react-device-detect';
+import {
+    Col,
+    Row,
+    Form,
+    message,
+    notification
+} from "antd";
+import {
+    ModalForm,
+    ProFormText,
+    ProFormSelect
+} from "@ant-design/pro-components";
 import { useEffect } from "react";
 import { permissionApi } from '@/config/api';
 import { IPermission } from "@/types/backend";
+import { isMobile } from 'react-device-detect';
 import { ALL_MODULES } from "@/config/permissions";
 
 interface IProps {
@@ -24,16 +34,10 @@ const ModalPermission = (props: IProps) => {
         }
     }, [dataInit])
 
-
     const submitPermission = async (valuesForm: any) => {
         const { name, apiPath, method, module } = valuesForm;
         if (dataInit?.id) {
-            //update
-            const permission = {
-                name,
-                apiPath, method, module
-            }
-
+            const permission = { name, apiPath, method, module }
             const res = await permissionApi.callUpdate(permission, dataInit.id);
             if (res.data) {
                 message.success("Cập nhật quyền hạn thành công");
@@ -46,11 +50,7 @@ const ModalPermission = (props: IProps) => {
                 });
             }
         } else {
-            //create
-            const permission = {
-                name,
-                apiPath, method, module
-            }
+            const permission = { name, apiPath, method, module }
             const res = await permissionApi.callCreate(permission);
             if (res.data) {
                 message.success("Thêm mới quyền hạn thành công");
@@ -74,43 +74,40 @@ const ModalPermission = (props: IProps) => {
     return (
         <>
             <ModalForm
-                title={<>{dataInit?.id ? "Cập nhật quyền hạn" : "Tạo mới quyền hạn"}</>}
+                form={form}
                 open={openModal}
+                preserve={false}
+                scrollToFirstError={true}
+                onFinish={submitPermission}
+                initialValues={dataInit?.id ? dataInit : {}}
+                title={<>{dataInit?.id ? "Cập nhật quyền hạn" : "Tạo mới quyền hạn"}</>}
                 modalProps={{
                     onCancel: () => { handleReset() },
                     afterClose: () => handleReset(),
                     destroyOnClose: true,
-                    width: isMobile ? "100%" : 900,
+                    width: isMobile ? "100%" : 700,
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
                     cancelText: "Hủy"
                 }}
-                scrollToFirstError={true}
-                preserve={false}
-                form={form}
-                onFinish={submitPermission}
-                initialValues={dataInit?.id ? dataInit : {}}
             >
                 <Row gutter={16}>
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormText
-                            label="Tên quyền hạn"
                             name="name"
-                            rules={[
-                                { required: true, message: 'Vui lòng không bỏ trống' },
-                            ]}
+                            label="Tên quyền hạn"
                             placeholder="Nhập tên quyền hạn"
+                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                         />
                     </Col>
+
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormText
-                            label="Đường dẫn API"
                             name="apiPath"
-                            rules={[
-                                { required: true, message: 'Vui lòng không bỏ trống' },
-                            ]}
+                            label="Đường dẫn API"
                             placeholder="Nhập đường dẫn API"
+                            rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                         />
                     </Col>
 
@@ -129,16 +126,16 @@ const ModalPermission = (props: IProps) => {
                             rules={[{ required: true, message: 'Vui lòng chọn phương thức gọi!' }]}
                         />
                     </Col>
+
                     <Col lg={12} md={12} sm={24} xs={24}>
                         <ProFormSelect
-                            label="Thuộc mô hình"
                             name="module"
+                            label="Thuộc mô hình"
                             valueEnum={ALL_MODULES}
                             placeholder="Vui lòng chọn module"
                             rules={[{ required: true, message: 'Vui lòng chọn module!' }]}
                         />
                     </Col>
-
                 </Row>
             </ModalForm>
         </>

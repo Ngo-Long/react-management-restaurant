@@ -130,11 +130,11 @@ const LayoutAdmin: React.FC = () => {
                     icon: <ContainerOutlined />
                 }] : []),
 
-                ...(viewOrder || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/order'>Đơn hàng</Link>,
-                    key: '/admin/order',
-                    icon: <DotChartOutlined />
-                }] : []),
+                // ...(viewOrder || ACL_ENABLE === 'false' ? [{
+                //     label: <Link to='/admin/order'>Đơn hàng</Link>,
+                //     key: '/admin/order',
+                //     icon: <DotChartOutlined />
+                // }] : []),
 
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/invoice'>Hóa đơn</Link>,

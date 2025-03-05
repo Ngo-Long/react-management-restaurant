@@ -1,17 +1,26 @@
+import {
+    Tag,
+    Space,
+    Switch,
+    Button,
+    message,
+    Popconfirm,
+    notification
+} from "antd";
+import {
+    EditOutlined,
+    PlusOutlined,
+    DeleteOutlined,
+    DownloadOutlined
+} from "@ant-design/icons";
+import {
+    ProColumns,
+    ActionType
+} from '@ant-design/pro-components';
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ActionType, ProColumns } from '@ant-design/pro-components';
-import {
-    EditOutlined, PlusOutlined,
-    DeleteOutlined, DownloadOutlined
-} from "@ant-design/icons";
-import {
-    Button, Popconfirm, Space,
-    Switch, Tag, message, notification
-} from "antd";
-
 import { productApi } from '@/config/api';
 import { IProduct } from "@/types/backend";
 import Access from "@/components/share/access";
@@ -152,6 +161,7 @@ const ProductPage = () => {
             dataIndex: 'type',
             sorter: true,
             align: "center",
+            hideInSearch: true,
         },
         {
             title: 'Hoạt động',
@@ -198,7 +208,7 @@ const ProductPage = () => {
             align: "center",
             render: (value, entity) => (
                 <Space>
-                    < Access permission={ALL_PERMISSIONS.PRODUCTS.UPDATE} hideChildren>
+                    <Access permission={ALL_PERMISSIONS.PRODUCTS.UPDATE} hideChildren>
                         <EditOutlined
                             style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
@@ -269,11 +279,11 @@ const ProductPage = () => {
         <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
             <DataTable<IProduct>
                 rowKey="id"
-                actionRef={tableRef}
-                headerTitle="Danh sách món ăn"
-                loading={isFetching}
                 columns={columns}
+                actionRef={tableRef}
+                loading={isFetching}
                 dataSource={products}
+                headerTitle="Danh sách món ăn"
                 request={async (params, sort, filter): Promise<any> => {
                     const query = buildQuery(params, sort, filter);
                     dispatch(fetchProductByRestaurant({ query }))

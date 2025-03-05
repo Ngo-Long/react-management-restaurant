@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import queryString from 'query-string';
-import { useState, useRef } from 'react';
-import { IInvoice } from "@/types/backend";
+import { useState, useRef, useEffect } from 'react';
+import { IInvoice, IOrder } from "@/types/backend";
 import { Button, Modal, Space, Tag } from "antd";
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
@@ -14,19 +14,17 @@ import {
     CheckCircleOutlined,
     CloseCircleOutlined
 } from '@ant-design/icons';
+import { orderApi } from '@/config/api';
 const InvoicePage = () => {
+    const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
     const meta = useAppSelector(state => state.invoice.meta);
+    const invoices = useAppSelector(state => state.invoice.result);
     const isFetching = useAppSelector(state => state.invoice.isFetching);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [openModal, setOpenModal] = useState<boolean>(false);
-
     const [dataInit, setDataInit] = useState<IInvoice | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
-
-    const dispatch = useAppDispatch();
-    const invoices = useAppSelector(state => state.invoice.result);
 
     const showModal = (invoice: IInvoice) => {
         setDataInit(invoice);
@@ -43,23 +41,6 @@ const InvoicePage = () => {
 
     const columns: ProColumns<IInvoice>[] = [
         {
-            title: 'Mã HD',
-            width: 80,
-            align: "center",
-            dataIndex: 'id',
-            hideInSearch: true,
-            render: (text, record) => {
-                return (
-                    <div onClick={() => {
-                        setOpenViewDetail(true);
-                        setDataInit(record);
-                    }}>
-                        HD-{record.id}
-                    </div>
-                )
-            }
-        },
-        {
             title: 'Thời gian',
             dataIndex: 'createdDate',
             width: 180,
@@ -73,13 +54,30 @@ const InvoicePage = () => {
             },
         },
         {
+            title: 'Mã HD',
+            width: 80,
+            align: "center",
+            dataIndex: 'id',
+            hideInSearch: true,
+            render: (text, record) => {
+                return (
+                    <div onClick={() => {
+                        setOpenViewDetail(true);
+                        setDataInit(record);
+                    }}>
+                        HD00{record.id}
+                    </div>
+                )
+            }
+        },
+        {
             title: 'Nguồn',
             dataIndex: ["order", "tableName"],
             align: "center",
             hideInSearch: true,
             render(_, entity) {
-                const str = "" + entity.order?.id;
-                return <>-</>
+                const tableName = entity.order?.tableName || "-";
+                return <>{tableName}</>;
             },
         },
         {

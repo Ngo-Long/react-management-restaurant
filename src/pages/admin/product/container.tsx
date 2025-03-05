@@ -1,21 +1,37 @@
 
 import {
-    Col, ConfigProvider, Form,
-    Row, Upload, message,
-    notification, Breadcrumb,
-    InputRef, Divider, Space, Input, Button
+    Col,
+    Form,
+    Row,
+    Space,
+    Input,
+    Upload,
+    Button,
+    message,
+    Divider,
+    InputRef,
+    Breadcrumb,
+    notification,
+    ConfigProvider,
 } from "antd";
 import {
-    CheckSquareOutlined,
-    LoadingOutlined, PlusOutlined
+    ProForm,
+    ProFormText,
+    ProFormSelect,
+    FooterToolbar,
+    ProFormSwitch,
+} from "@ant-design/pro-components";
+import {
+    PlusOutlined,
+    LoadingOutlined,
+    CheckSquareOutlined
 } from '@ant-design/icons';
 import {
-    ProFormSelect, ProForm,
-    FooterToolbar, ProFormSwitch, ProFormText
-} from "@ant-design/pro-components";
+    beforeUpload, getBase64, handleChange,
+    handleRemoveFile, handleUploadFileLogo
+} from "@/utils/image";
 import enUS from 'antd/lib/locale/en_US';
 import Title from "antd/es/typography/Title";
-
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -27,14 +43,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
-import {
-    beforeUpload, getBase64, handleChange,
-    handleRemoveFile, handleUploadFileLogo
-} from "@/utils/image";
 
 interface IProductLogo {
-    name: string | null;
     uid: string;
+    name: string | null;
 }
 
 const ViewUpsertProduct = () => {
@@ -92,28 +104,35 @@ const ViewUpsertProduct = () => {
                 // Set product data
                 setDataProduct(res.data);
                 setDescProduct(res.data.detailDesc || "");
-                form.setFieldsValue(res.data);
                 setDataLogo([{ name: res.data.image, uid: uuidv4() }]);
+                form.setFieldsValue(res.data);
 
                 // Set unit data
                 const updatedUnits = await Promise.all((res.data.units || []).map(async (unit) => {
                     const unitRes = await unitApi.callFetchById(unit.id);
                     return unitRes?.data
-                        ? {
-                            ...unitRes.data,
-                            isDefault: unitRes.data.default
-                        }
-                        : {
+                        ? ({
+                            id: unitRes.data.id ?? unit.id,
+                            name: unitRes.data.name ?? unit.name,
+                            price: unitRes.data.price ?? unit.price ?? 0,
+                            costPrice: unitRes.data.costPrice ?? 0,
+                            default: unitRes.data.default ?? false,
+                            active: unitRes.data.active ?? true,
+                            unitDetails: unitRes.data.unitDetails ?? [],
+                            product: unitRes.data.product ?? { id: productId },
+                        } as IUnit)
+                        : ({
                             id: unit.id,
                             name: unit.name,
-                            price: unit.price,
+                            price: unit.price ?? 0,
                             costPrice: 0,
                             default: false,
+                            active: true,
                             unitDetails: [],
                             product: { id: productId }
-                        };
+                        } as IUnit);
                 }))
-                // setUnitList(updatedUnits);
+                setUnitList(updatedUnits);
             } else {
                 const defaultUnit = {
                     id: uuidv4(),
@@ -130,6 +149,8 @@ const ViewUpsertProduct = () => {
         init();
         return () => form.resetFields();
     }, [productId]);
+
+    console.log(dataLogo);
 
     // add a new category
     const addCategory = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
@@ -257,9 +278,9 @@ const ViewUpsertProduct = () => {
 
                         <Col span={24} md={4}>
                             <Form.Item
-                                labelCol={{ span: 24 }}
-                                label="Chọn ảnh"
                                 name="image"
+                                label="Chọn ảnh"
+                                labelCol={{ span: 24 }}
                             >
                                 <ConfigProvider locale={enUS}>
                                     <Upload
@@ -288,16 +309,12 @@ const ViewUpsertProduct = () => {
                                                 setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
                                             });
                                         }}
-                                        defaultFileList={
-                                            dataProduct?.id
-                                                ? [{
-                                                    uid: uuidv4(),
-                                                    name: dataProduct?.image ?? "",
-                                                    status: "done",
-                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataProduct?.image}`,
-                                                }]
-                                                : []
-                                        }
+                                        fileList={dataLogo.map(logo => ({
+                                            uid: logo.uid,
+                                            name: logo.name || '',
+                                            status: 'done',
+                                            url: logo.name ? `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${logo.name}` : '',
+                                        }))}
                                     >
                                         <div>
                                             {loadingUpload ? <LoadingOutlined /> : <PlusOutlined />}
@@ -308,12 +325,13 @@ const ViewUpsertProduct = () => {
                             </Form.Item>
 
                             <ProFormSwitch
+                                hidden
+                                noStyle
                                 label="Hoạt động"
                                 name="active"
                                 checkedChildren="ACTIVE"
                                 unCheckedChildren="INACTIVE"
                                 initialValue={true}
-                                hidden={!dataProduct?.id}
                                 fieldProps={{ defaultChecked: true }}
                             />
                         </Col>

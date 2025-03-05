@@ -14,6 +14,7 @@ import ModalPermission from "@/components/admin/permission/modal.permission";
 import { colorMethod } from "@/utils/format";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
+import { paginationConfigure } from "@/utils/paginator";
 
 const PermissionPage = () => {
     const dispatch = useAppDispatch();
@@ -211,43 +212,24 @@ const PermissionPage = () => {
                 permission={ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE}
             >
                 <DataTable<IPermission>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách quyền hạn"
                     rowKey="id"
-                    loading={isFetching}
                     columns={columns}
+                    actionRef={tableRef}
+                    loading={isFetching}
                     dataSource={permissions}
+                    headerTitle="Danh sách quyền hạn"
                     request={async (params, sort, filter): Promise<any> => {
                         const query = buildQuery(params, sort, filter);
                         dispatch(fetchPermission({ query }))
                     }}
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Access
-                                permission={ALL_PERMISSIONS.PERMISSIONS.CREATE}
-                                hideChildren
-                            >
-                                <Button
-                                    icon={<PlusOutlined />}
-                                    type="primary"
-                                    onClick={() => setOpenModal(true)}
-                                >
-                                    Thêm mới
-                                </Button>
-                            </Access>
-                        );
-                    }}
+                    pagination={paginationConfigure(meta)}
+                    toolBarRender={(_action, _rows): any => [
+                        <Access permission={ALL_PERMISSIONS.PERMISSIONS.CREATE} hideChildren>
+                            <Button type="primary" onClick={() => setOpenModal(true)}>
+                                <PlusOutlined /> Thêm mới
+                            </Button>
+                        </Access>
+                    ]}
                 />
             </Access>
 

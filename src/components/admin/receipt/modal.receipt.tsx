@@ -368,7 +368,7 @@ const ModalIngredient = (props: IProps) => {
                                                 uid: uuidv4(),
                                                 name: dataInit?.image ?? "",
                                                 status: 'done',
-                                                url: `${import.meta.env.VITE_BACKEND_URL}/storage/ingredient/${dataInit?.image}`,
+                                                url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.image}`,
                                             }]
                                             : []
                                     }

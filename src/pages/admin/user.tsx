@@ -15,6 +15,7 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import { sfLike } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
 import { paginationConfigure } from "@/utils/paginator";
+import moment from "moment";
 
 const UserPage = () => {
     const dispatch = useAppDispatch();
@@ -75,24 +76,41 @@ const UserPage = () => {
             sorter: true,
         },
         {
-            title: 'Tuổi',
-            dataIndex: 'age',
-            sorter: true,
+            title: 'SĐT',
+            dataIndex: 'phoneNumber',
+        },
+        {
+            title: 'Ngày sinh',
+            dataIndex: 'birthDate',
+            align: "center",
             hideInSearch: true,
-            align: "center"
+            render: (_, record) => {
+                return moment(record.birthDate).format('DD-MM-YYYY');
+            },
         },
         {
             title: 'Giới tính',
             dataIndex: 'gender',
-            sorter: true,
             hideInSearch: true,
-            align: "center"
+            align: "center",
+            render: (_, record) => {
+                switch (record.gender) {
+                    case 'MALE': return 'Nam';
+                    case 'FEMALE': return 'Nữ';
+                    case 'OTHER': return 'Khác';
+                    default: return record.gender;
+                }
+            }
         },
-
         {
-            title: 'Ngày tạo',
+            title: 'Địa chỉ',
+            key: 'address',
+            dataIndex: 'address',
+            hideInSearch: true,
+        },
+        {
+            title: 'Thời gian',
             dataIndex: 'createdDate',
-            hidden: true,
             hideInSearch: true,
             render: (text, record) => {
                 return (

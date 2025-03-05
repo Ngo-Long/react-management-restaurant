@@ -17,6 +17,7 @@ import { IOrder, IOrderDetail } from "@/types/backend";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
 import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
+
 interface InvoiceCardProps {
     open: boolean;
     setOpen: (is: boolean) => void;

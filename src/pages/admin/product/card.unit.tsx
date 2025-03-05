@@ -214,9 +214,10 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             },
         },
         {
-            key: "unit",
+            key: "type",
             title: "Đơn vị",
-            dataIndex: "unit",
+            dataIndex: "type",
+            align: "center",
         },
         {
             key: 'price',

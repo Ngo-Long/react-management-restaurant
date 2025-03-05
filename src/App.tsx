@@ -18,8 +18,6 @@ import ProtectedRoute from './components/share/protected-route.ts';
 
 import './styles/reset.scss';
 import { useEffect, useRef } from 'react';
-import OrderPage from './pages/admin/order';
-import ReceiptPage from './pages/admin/receipt';
 import InvoicePage from './pages/admin/invoice';
 import SupplierPage from './pages/admin/supplier';
 import IngredientPage from './pages/admin/ingredient';
@@ -27,6 +25,8 @@ import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import ViewUpsertProduct from './pages/admin/product/container';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
+import ReceiptPage from './pages/admin/receipt';
+import ViewUpsertReceipt from './pages/admin/receipt/container';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -125,17 +125,26 @@ export default function App() {
           path: "ingredient",
           element: <ProtectedRoute> <IngredientPage /> </ProtectedRoute>
         },
-        {
-          path: "order",
-          element: <ProtectedRoute> <OrderPage /> </ProtectedRoute>
-        },
+        // {
+        //   path: "order",
+        //   element: <ProtectedRoute> <OrderPage /> </ProtectedRoute>
+        // },
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>
         },
         {
           path: "receipt",
-          element: <ProtectedRoute> <ReceiptPage /> </ProtectedRoute>
+          children: [
+            {
+              index: true,
+              element: <ProtectedRoute> <ReceiptPage /> </ProtectedRoute>
+            },
+            {
+              path: "upsert",
+              element: <ProtectedRoute> <ViewUpsertReceipt /></ProtectedRoute>
+            }
+          ]
         },
         {
           path: "supplier",

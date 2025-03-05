@@ -212,14 +212,14 @@ export const ModalDiningTable = (props: IProps) => {
                 </Col>
                 <Col span={24} md={12}>
                     <ProFormSwitch
+                        hidden
+                        noStyle
                         label="Hoạt động"
                         name="active"
                         checkedChildren="ACTIVE"
                         unCheckedChildren="INACTIVE"
                         initialValue={true}
                         fieldProps={{ defaultChecked: true }}
-                        hidden
-                        noStyle
                     />
                 </Col>
             </ModalForm >

@@ -11,17 +11,18 @@ import {
 import {
     ProForm,
     ProFormText,
-    ProFormDigit,
     ProFormSelect,
     ProFormTextArea,
     DrawerForm,
     FooterToolbar,
     ProFormSwitch,
+    ProFormDatePicker,
 } from "@ant-design/pro-components";
 import {
     beforeUpload, getBase64, handleChange,
     handleRemoveFile, handleUploadFileLogo
 } from "@/utils/image";
+import moment from "moment";
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from "react-quill";
 import { IUser } from "@/types/backend";
@@ -30,6 +31,7 @@ import { useState, useEffect } from "react";
 import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
 import { DebounceSelect } from "./debouce.select";
+import viVN from 'antd/es/date-picker/locale/vi_VN';
 import { userApi, roleApi, restaurantApi } from "@/config/api";
 import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
@@ -47,17 +49,18 @@ export interface IRestaurantSelect {
     key?: string;
 }
 
-interface IUserLogo {
-    name: string;
+interface IUserAvatar {
+    name: string | null;
     uid: string;
 }
 
 const ModalUser = (props: IProps) => {
+    const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
     const [form] = Form.useForm();
     const [roles, setRoles] = useState<IRestaurantSelect[]>([]);
     const [restaurants, setRestaurants] = useState<IRestaurantSelect[]>([]);
-    const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
 
+    const [desc, setDesc] = useState<string>("");
     const [animation, setAnimation] = useState<string>('open');
     const currentUser = useAppSelector(state => state.account.user);
     const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
@@ -67,7 +70,7 @@ const ModalUser = (props: IProps) => {
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
-    const [dataLogo, setDataLogo] = useState<IUserLogo[]>([
+    const [dataAvatar, setDataAvatar] = useState<IUserAvatar[]>([
         { name: "", uid: "" }
     ]);
 
@@ -82,15 +85,15 @@ const ModalUser = (props: IProps) => {
             }
 
             if (dataInit.role) {
-                setRoles([
-                    {
-                        label: dataInit.role?.name,
-                        value: dataInit.role?.id,
-                        key: dataInit.role?.id,
-                    }
-                ])
+                setRoles([{
+                    label: dataInit.role?.name,
+                    value: dataInit.role?.id,
+                    key: dataInit.role?.id,
+                }])
             }
 
+            setDesc(dataInit.description || "");
+            setDataAvatar([{ name: dataInit.avatar, uid: uuidv4() }]);
             form.setFieldsValue({
                 ...dataInit,
                 role: { label: dataInit.role?.name, value: dataInit.role?.id },
@@ -108,28 +111,35 @@ const ModalUser = (props: IProps) => {
     }
 
     const submitUser = async (valuesForm: any) => {
-        const { name, email, password, age, gender, address, role, restaurant } = valuesForm;
+        const { name, email, gender, address, password, birthDate, phoneNumber, role, restaurant } = valuesForm;
 
         const restaurantValue = isRoleOwner ? restaurant : {
             value: currentRestaurant?.id,
             label: currentRestaurant?.name
         };
+        const formattedBirthDate = birthDate ? moment(birthDate, "DD/MM/YYYY").format("YYYY-MM-DD") : null;
 
         const user = {
             id: dataInit?.id,
             name,
             email,
-            password,
-            age,
+            avatar: dataAvatar[0].name || null,
             gender,
             address,
-            role: { id: role.value, name: "" },
+            password,
+            birthDate: formattedBirthDate,
+            phoneNumber,
+            description: desc,
+            role: {
+                id: role.value,
+                name: ""
+            },
             restaurant: {
                 id: restaurantValue?.value,
                 name: restaurantValue?.label
             }
         };
-
+        console.log(user);
         const res = dataInit?.id
             ? await userApi.callUpdate(user)
             : await userApi.callCreate(user);
@@ -222,29 +232,29 @@ const ModalUser = (props: IProps) => {
                             <Form.Item
                                 labelCol={{ span: 24 }}
                                 label="Chọn Ảnh"
-                                // name="image"
+                                name="avatar"
                                 rules={[{
                                     required: true,
                                     message: 'Vui lòng không bỏ trống',
                                     validator: () => {
-                                        if (dataLogo.length > 0) return Promise.resolve();
+                                        if (dataAvatar.length > 0) return Promise.resolve();
                                         else return Promise.reject(false);
                                     }
                                 }]}
                             >
                                 <ConfigProvider locale={enUS}>
                                     <Upload
-                                        name="image"
+                                        name="avatar"
                                         listType="picture-card"
                                         className="avatar-uploader"
                                         maxCount={1}
                                         multiple={false}
                                         customRequest={({ file, onSuccess, onError }) => {
-                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataAvatar);
                                         }}
                                         beforeUpload={beforeUpload}
                                         onChange={(info) => handleChange(info, setLoadingUpload)}
-                                        onRemove={() => handleRemoveFile(setDataLogo)}
+                                        onRemove={() => handleRemoveFile(setDataAvatar)}
                                         onPreview={(file) => {
                                             const fileUrl = file.url || '';
                                             if (!file.originFileObj) {
@@ -263,10 +273,9 @@ const ModalUser = (props: IProps) => {
                                             dataInit?.id
                                                 ? [{
                                                     uid: uuidv4(),
-                                                    // name: dataInit?.image ?? "",
-                                                    name: "",
+                                                    name: dataInit?.avatar ?? "",
                                                     status: "done",
-                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataInit?.image}`,
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.avatar}`,
                                                 }]
                                                 : []
                                         }
@@ -324,21 +333,22 @@ const ModalUser = (props: IProps) => {
                             <ProFormText
                                 name="name"
                                 label="Tên hiển thị"
-                                rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                                 placeholder="Nhập tên hiển thị"
-                            />
-                        </Col>
-
-                        <Col lg={12} md={12} sm={24}>
-                            <ProFormDigit
-                                name="age"
-                                label="Số tuổi"
                                 rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
-                                placeholder="Nhập số tuổi"
                             />
                         </Col>
 
-                        <Col lg={12} md={12} sm={24}>
+                        <Col lg={6} md={6} sm={12}>
+                            <ProFormDatePicker
+                                name="birthDate"
+                                label="Ngày sinh"
+                                placeholder="Chọn ngày sinh"
+                                fieldProps={{ format: 'DD/MM/YYYY', locale: viVN }}
+                                rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
+                            />
+                        </Col>
+
+                        <Col lg={6} md={6} sm={12}>
                             <ProFormSelect
                                 name="gender"
                                 label="Giới Tính"
@@ -364,7 +374,7 @@ const ModalUser = (props: IProps) => {
                                     value={roles}
                                     defaultValue={roles}
                                     style={{ width: '100%' }}
-                                    placeholder="Chọn công vai trò"
+                                    placeholder="Chọn vai trò"
                                     fetchOptions={fetchRoleList}
                                     onChange={(newValue: any) => {
                                         if (newValue?.length === 0 || newValue?.length === 1) {
@@ -373,6 +383,24 @@ const ModalUser = (props: IProps) => {
                                     }}
                                 />
                             </ProForm.Item>
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormText
+                                name="phoneNumber"
+                                label="Số điện thoại"
+                                placeholder="Nhập số điện thoại"
+                                rules={[{ required: false, message: '' }]}
+                            />
+                        </Col>
+
+                        <Col lg={12} md={12} sm={24}>
+                            <ProFormText
+                                name="address"
+                                label="Địa chỉ"
+                                placeholder="Nhập địa chỉ"
+                                rules={[{ required: false, message: '' }]}
+                            />
                         </Col>
 
                         {isRoleOwner && (
@@ -414,22 +442,15 @@ const ModalUser = (props: IProps) => {
                             </Col>
                         )}
 
-                        <Col span={24}>
-                            <ProFormTextArea
-                                label="Địa chỉ"
-                                name="address"
-                                rules={[{ required: false, message: '' }]}
-                                placeholder="Nhập địa chỉ"
-                            />
-                        </Col>
-
                         <Col span={24} style={{ "marginBottom": "30px" }}>
                             <ProForm.Item
                                 label="Mô tả"
-                                // name="description"
                                 rules={[{ required: false, message: '' }]}
                             >
-                                <ReactQuill theme="snow" />
+                                <ReactQuill
+                                    theme="snow"
+                                    value={desc}
+                                    onChange={setDesc} />
                             </ProForm.Item>
                         </Col>
                     </Row>

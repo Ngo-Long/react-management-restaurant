@@ -239,13 +239,13 @@ const ModalRestaurant = (props: IProps) => {
                             </Col>
 
                             <ProCard
+                                size="small"
                                 title="Miêu tả"
+                                bordered
+                                headerBordered
                                 // subTitle="mô tả nhà hàng"
                                 headStyle={{ color: '#d81921' }}
                                 style={{ marginBottom: 20 }}
-                                headerBordered
-                                size="small"
-                                bordered
                             >
                                 <Col span={24}>
                                     <ReactQuill

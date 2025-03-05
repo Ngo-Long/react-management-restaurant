@@ -59,10 +59,13 @@ export interface IUser {
     id?: string;
     name: string;
     email: string;
-    password?: string;
-    age?: number;
+    avatar: string | null;
     gender?: string;
     address?: string;
+    password?: string;
+    birthDate?: string;
+    phoneNumber?: string;
+    description?: string;
     role?: {
         id: string;
         name: string;
@@ -255,7 +258,7 @@ export interface IUnit {
         id?: string;
         name?: string;
     }
-    unitDetails: Array<{
+    unitDetails?: Array<{
         id?: string;
         quantity?: number;
         unit?: {
@@ -297,10 +300,13 @@ export interface IReceipt {
     status?: string;
     active?: boolean;
     restaurant?: {
-        id: string;
-        name: string;
+        id?: string;
+        name?: string;
     }
-
+    supplier?: {
+        id?: string;
+        name?: string;
+    }
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
