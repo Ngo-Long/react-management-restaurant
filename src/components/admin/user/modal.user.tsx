@@ -78,16 +78,16 @@ const ModalUser = (props: IProps) => {
         if (dataInit?.id) {
             if (dataInit.restaurant) {
                 setRestaurants([{
-                    label: dataInit.restaurant.name,
-                    value: dataInit.restaurant.id,
+                    label: dataInit.restaurant.name || "",
+                    value: dataInit.restaurant.id || "",
                     key: dataInit.restaurant.id,
                 }])
             }
 
             if (dataInit.role) {
                 setRoles([{
-                    label: dataInit.role?.name,
-                    value: dataInit.role?.id,
+                    label: dataInit.role?.name || "",
+                    value: dataInit.role?.id || "",
                     key: dataInit.role?.id,
                 }])
             }
@@ -127,7 +127,7 @@ const ModalUser = (props: IProps) => {
             gender,
             address,
             password,
-            birthDate: formattedBirthDate,
+            birthDate: formattedBirthDate ?? undefined,
             phoneNumber,
             description: desc,
             role: {

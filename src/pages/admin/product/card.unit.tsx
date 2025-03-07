@@ -117,7 +117,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
 
     // <-- ingredient
     const handleQuantityChange = (id: string, value: number) => {
-        const isIngredientSelected = unitCurrent?.unitDetails.some(detail => detail.ingredient?.id === id);
+        const isIngredientSelected = unitCurrent?.unitDetails?.some(detail => detail.ingredient?.id === id) ?? false;
         if (!isIngredientSelected) {
             message.warning('Vui lòng chọn nguyên liệu trước.');
             return;
@@ -129,7 +129,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
                 if (unit.id === unitCurrent?.id) {
                     return {
                         ...unit,
-                        unitDetails: unit.unitDetails.map(detail =>
+                        unitDetails: unit.unitDetails?.map(detail =>
                             detail?.ingredient?.id === id ? { ...detail, quantity: newQuantity } : detail
                         )
                     };
@@ -142,7 +142,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             if (!prevUnit) return null;
             return {
                 ...prevUnit,
-                unitDetails: prevUnit.unitDetails.map(detail =>
+                unitDetails: prevUnit.unitDetails?.map(detail =>
                     detail?.ingredient?.id === id ? { ...detail, quantity: newQuantity } : detail
                 )
             };
@@ -173,7 +173,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             title: "Chọn",
             width: 50,
             render: (_, record) => <Checkbox
-                checked={unitCurrent?.unitDetails.some(detail => detail.ingredient?.id === record.id)}
+                checked={unitCurrent?.unitDetails?.some(detail => detail.ingredient?.id === record.id)}
                 onChange={(e) => handleIngredientSelect(record, e.target.checked)}
             />
         },
@@ -187,7 +187,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             title: "Số lượng",
             width: 200,
             render: (_, record) => {
-                const quantity = unitCurrent?.unitDetails.find(detail => detail.ingredient?.id === record.id)?.quantity || 1;
+                const quantity = unitCurrent?.unitDetails?.find(detail => detail.ingredient?.id === record.id)?.quantity || 1;
                 return (
                     <Flex align="center" justify="space-between" style={{ width: '150px' }}>
                         <Button
@@ -234,7 +234,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             align: "center",
             dataIndex: 'price',
             render(_, record) {
-                const quantity = unitCurrent?.unitDetails.find(detail => detail.ingredient?.id === record.id)?.quantity || 1;
+                const quantity = unitCurrent?.unitDetails?.find(detail => detail.ingredient?.id === record.id)?.quantity || 1;
                 const totalPrice = ((quantity) * (record?.price || 1)) + "";
                 return <>{totalPrice?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>;
             },

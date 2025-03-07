@@ -67,12 +67,12 @@ export interface IUser {
     phoneNumber?: string;
     description?: string;
     role?: {
-        id: string;
-        name: string;
+        id?: string;
+        name?: string;
     }
     restaurant?: {
-        id: string;
-        name: string;
+        id?: string;
+        name?: string;
     }
     createdBy?: string;
     isDeleted?: boolean;

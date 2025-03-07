@@ -52,7 +52,6 @@ const initialState: IState = {
         id: "",
         note: "",
         totalPrice: 0,
-        optional: "",
         status: ""
     }
 };
@@ -66,7 +65,6 @@ export const orderSlide = createSlice({
                 id: "",
                 note: "",
                 totalPrice: 0,
-                optional: "",
                 status: ""
             }
         }
@@ -112,7 +110,6 @@ export const orderSlide = createSlice({
                 id: "",
                 note: "",
                 totalPrice: 0,
-                optional: "",
                 status: ""
             }
         });
@@ -123,7 +120,6 @@ export const orderSlide = createSlice({
                 id: "",
                 note: "",
                 totalPrice: 0,
-                optional: "",
                 status: ""
             }
         });
