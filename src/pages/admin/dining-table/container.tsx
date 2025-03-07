@@ -1,9 +1,13 @@
 
 import {
-    ModalForm, ProFormDigit,
-    ProFormSelect, ProFormSwitch, ProFormText,
+    ModalForm,
+    ProFormDigit,
+    ProFormSelect,
+    ProFormSwitch,
+    ProFormText,
     ProFormTextArea,
-    ProFormUploadDragger, ProTable
+    ProFormUploadDragger,
+    ProTable
 } from "@ant-design/pro-components";
 import {
     Button, Col, Divider, Form, Input, Row,
