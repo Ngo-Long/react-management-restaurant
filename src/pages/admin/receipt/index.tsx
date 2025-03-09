@@ -159,7 +159,7 @@ const ReceiptPage = () => {
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(action, rows): any => [
-                    <Button type="primary">
+                    <Button type="primary" onClick={() => navigate('upsert')}>
                         <PlusOutlined />Tạo biên lai
                     </Button>
                 ]}

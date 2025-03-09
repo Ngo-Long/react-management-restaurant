@@ -3,6 +3,11 @@ import groupBy from 'lodash/groupBy';
 import { IPermission } from '../types/backend';
 import { grey, green, blue, red, orange } from '@ant-design/colors';
 
+export const formatPrice = (price?: string | number) => {
+    const numericPrice = Number(price);
+    return new Intl.NumberFormat('vi-VN').format(isNaN(numericPrice) ? 0 : numericPrice);
+};
+
 export const nonAccentVietnamese = (str: string) => {
     str = str.replace(/A|Á|À|Ã|Ạ|Â|Ấ|Ầ|Ẫ|Ậ|Ă|Ắ|Ằ|Ẵ|Ặ/g, "A");
     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
