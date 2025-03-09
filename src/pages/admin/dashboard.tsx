@@ -1,6 +1,11 @@
+import {
+    Col,
+    Row,
+    Card,
+    Statistic
+} from "antd";
 import CountUp from 'react-countup';
 import { useAppSelector } from "@/redux/hooks";
-import { Card, Col, Row, Statistic } from "antd";
 
 const DashboardPage = () => {
     const metaOrder = useAppSelector(state => state.order.meta);
