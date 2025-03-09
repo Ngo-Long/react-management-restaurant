@@ -1,18 +1,31 @@
 import {
-    Button, Col, DatePicker, Divider, Drawer,
-    Flex, message, notification, Radio, Row, Space, Table, TimePicker
+    Col,
+    Row,
+    Flex,
+    Radio,
+    Space,
+    Table,
+    Drawer,
+    Button,
+    Divider,
+    message,
+    DatePicker,
+    TimePicker,
+    notification,
 } from "antd";
+import Search from "antd/es/input/Search";
+import { ColumnType } from "antd/es/table";
+import { UserOutlined } from '@ant-design/icons';
+
 import dayjs from 'dayjs';
 import jsPDF from 'jspdf';
 import '@/styles/client.table.scss';
 import html2canvas from 'html2canvas';
 import { useRef, useState } from "react";
-import Search from "antd/es/input/Search";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { invoiceApi } from "@/config/api";
-import { ColumnType } from "antd/es/table";
-import { UserOutlined } from '@ant-design/icons';
+import { formatPrice } from "@/utils/format";
 import { IOrder, IOrderDetail } from "@/types/backend";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
@@ -36,16 +49,13 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
     setActiveTabKey
 }) => {
     const dispatch = useAppDispatch();
+    const invoiceRef = useRef<HTMLDivElement | null>(null);
     const meta = useAppSelector(state => state.orderDetail.meta);
 
-    const invoiceRef = useRef<HTMLDivElement | null>(null);
     const [customerPaid, setCustomerPaid] = useState(0);
-
     const [returnAmount, setReturnAmount] = useState(0);
     const [methodPaid, setMethodPaid] = useState<string>('CASH');
-
     const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
-    const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price);
 
     const handleSetCustomerPaid = (amount: number) => {
         setCustomerPaid(amount);
@@ -121,8 +131,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             width: 90,
             align: "center" as const,
             render: (_, record) => {
-                const price = record.unit?.price;
-                return (price ? price.toLocaleString() : '0')
+                return formatPrice(record.unit?.price);
             }
         },
         {
@@ -133,11 +142,9 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             align: "center" as const,
             render: (_, record) => {
                 const price = record.unit?.price;
-                const total = price ? record.quantity! * Number(price) : 0;
+                const total = record.quantity! * Number(price);
                 return (
-                    <Space>
-                        {total ? total.toLocaleString() : '0'}
-                    </Space>
+                    <Space> {formatPrice(total)} </Space>
                 );
             }
         }
@@ -246,7 +253,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                             <div className='invoice-col'>
                                 <div className='invoice-title m4'>Tổng tiền:</div>
                                 <div className='invoice-price m4'>
-                                    {formatPrice(currentOrder?.totalPrice!)}
+                                    {formatPrice(currentOrder?.totalPrice)}
                                 </div>
                             </div>
 
@@ -263,7 +270,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                             <div className='invoice-col'>
                                 <p className='invoice-title m4' style={{ fontWeight: '500' }}>Tổng thanh toán:</p>
                                 <p className='invoice-price invoice-price__bold m4'>
-                                    {formatPrice(currentOrder?.totalPrice!)}
+                                    {formatPrice(currentOrder?.totalPrice)}
                                 </p>
                             </div>
                         </div>
@@ -285,7 +292,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                     <div className='invoice-col'>
                         <p className='invoice-title'>Tổng tiền</p>
                         <p className='invoice-price'>
-                            {formatPrice(currentOrder?.totalPrice!)}
+                            {formatPrice(currentOrder?.totalPrice)}
                         </p>
                     </div>
 
@@ -302,7 +309,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                     <div className='invoice-col'>
                         <p className='invoice-title invoice-title__bold'>Khách cần trả</p>
                         <p className='invoice-price  invoice-price__bold m4'>
-                            {formatPrice(currentOrder?.totalPrice!)}
+                            {formatPrice(currentOrder?.totalPrice)}
                         </p>
                     </div>
 
@@ -324,7 +331,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                     <Flex wrap gap="small" className="invoice-wrap" style={{ padding: '14px 0' }}>
                         {[0, 20000, 50000, 100000, 200000, 300000, 400000, 500000].map((increment) => (
                             <Button key={increment} onClick={() => handleSetCustomerPaid((currentOrder?.totalPrice || 0) + increment)}>
-                                {formatPrice((currentOrder?.totalPrice || 0) + increment)}
+                                {formatPrice(currentOrder?.totalPrice! + increment)}
                             </Button>
                         ))}
                     </Flex>
@@ -334,7 +341,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                         <input
                             className="invoice-price invoice-price__input"
                             type="text"
-                            value={new Intl.NumberFormat('vi-VN').format(customerPaid)}
+                            value={formatPrice(customerPaid)}
                             onChange={(e) => {
                                 const rawValue = e.target.value.replace(/\./g, '');
                                 const numericValue = parseFloat(rawValue) || 0;

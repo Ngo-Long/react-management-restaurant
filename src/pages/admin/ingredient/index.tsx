@@ -1,10 +1,17 @@
 import {
-    Button, Popconfirm, Space,
-    Switch, message, notification
+    Space,
+    Switch,
+    Button,
+    message,
+    Popconfirm,
+    notification
 } from "antd";
 import {
-    DeleteOutlined, DownloadOutlined,
-    EditOutlined, PlusOutlined, UploadOutlined
+    EditOutlined,
+    PlusOutlined,
+    DeleteOutlined,
+    UploadOutlined,
+    DownloadOutlined,
 } from "@ant-design/icons";
 import dayjs from 'dayjs';
 import queryString from 'query-string';

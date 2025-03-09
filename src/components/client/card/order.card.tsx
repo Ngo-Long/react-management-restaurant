@@ -1,20 +1,35 @@
 import {
-    EditOutlined, MinusOutlined, PlusOutlined,
-    AlertOutlined, DollarOutlined, ShoppingCartOutlined
-} from '@ant-design/icons';
-import {
-    Card, Table, Space, Button, message,
-    notification, Modal, InputNumber, Flex, Row, Col,
+    Row,
+    Col,
+    Card,
+    Flex,
+    Modal,
+    Table,
+    Space,
+    Button,
+    message,
+    InputNumber,
+    notification,
 } from 'antd';
+import {
+    EditOutlined,
+    PlusOutlined,
+    MinusOutlined,
+    AlertOutlined,
+    DollarOutlined,
+    ShoppingCartOutlined
+} from '@ant-design/icons';
 import { ColumnType } from 'antd/es/table';
 import TextArea from 'antd/es/input/TextArea';
-import { useSelector } from 'react-redux';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import InvoiceCard from './invoice.card';
+import { RootState } from '@/redux/store';
+import { useSelector } from 'react-redux';
+import { formatPrice } from '@/utils/format';
+import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { IOrder, IOrderDetail } from '@/types/backend';
 import { orderApi, orderDetailApi } from '@/config/api';
-import { RootState } from '@/redux/store';
 import DropdownMenu from '@/components/share/dropdown.menu';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
@@ -179,7 +194,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             align: "center" as const,
             render: (_, record) => (
                 <Space>
-                    {(record.quantity! * record.unit?.price!).toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    {formatPrice(record.quantity! * record.unit?.price!)}
                 </Space>
             ),
         }
@@ -361,7 +376,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                             <div className='modal-card__title'>Đơn giá:</div>
                         </Col>
                         <Col span={18} style={{ fontSize: '16px' }}>
-                            {new Intl.NumberFormat().format(orderDetail?.unit?.price!)} ₫
+                            {formatPrice(orderDetail?.unit?.price!)} ₫
                         </Col>
                     </Row>
 
@@ -370,7 +385,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                             <div className='modal-card__title'>Thành tiền:</div>
                         </Col>
                         <Col span={18} style={{ fontWeight: 500, fontSize: '16px' }}>
-                            {new Intl.NumberFormat().format(totalPriceItem)} ₫
+                            {formatPrice(totalPriceItem)} ₫
                         </Col>
                     </Row>
 

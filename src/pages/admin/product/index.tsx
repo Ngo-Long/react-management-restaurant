@@ -20,9 +20,10 @@ import {
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { productApi } from '@/config/api';
 import { IProduct } from "@/types/backend";
+import { formatPrice } from "@/utils/format";
+import { useNavigate } from 'react-router-dom';
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
@@ -152,8 +153,7 @@ const ProductPage = () => {
             render(_, record) {
                 const units = record?.units || [];
                 const selectedUnit = units.find(c => c.id === selectedUnits[Number(record.id)]) || units.find(c => c.isDefault) || units[0];
-                const price = selectedUnit?.price || 0;
-                return <>{price.toLocaleString()} ₫</>;
+                return <>{formatPrice(selectedUnit.price)} ₫</>
             },
         },
         {
