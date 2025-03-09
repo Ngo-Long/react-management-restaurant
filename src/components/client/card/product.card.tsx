@@ -1,5 +1,6 @@
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
+import { formatPrice } from '@/utils/format';
 import TextArea from 'antd/es/input/TextArea';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
@@ -134,7 +135,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                                 <div className="item-card">
                                     <p className="item-card__title">{product.name}</p>
                                     <p className="item-card__price">
-                                        {new Intl.NumberFormat().format(getDefaultUnitPrice(product) ?? 0)} ₫
+                                        {formatPrice(getDefaultUnitPrice(product))} ₫
                                     </p>
                                 </div>
                             </div>
@@ -245,7 +246,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                             <div className='modal-card__title'>Đơn giá:</div>
                         </Col>
                         <Col span={18} style={{ fontSize: '16px' }}>
-                            {new Intl.NumberFormat().format(getSelectedUnitDetailPrice() ?? 0)} ₫
+                            {formatPrice(getSelectedUnitDetailPrice())} ₫
                         </Col>
                     </Row>
 
@@ -254,7 +255,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                             <div className='modal-card__title'>Thành tiền:</div>
                         </Col>
                         <Col span={18} style={{ fontWeight: 500, fontSize: '16px' }}>
-                            {new Intl.NumberFormat().format(totalPrice)} ₫
+                            {formatPrice(totalPrice)} ₫
                         </Col>
                     </Row>
 

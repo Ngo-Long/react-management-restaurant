@@ -17,12 +17,9 @@ import { paginationConfigure } from '@/utils/paginator';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { fetchReceiptByRestaurant } from "@/redux/slice/receiptSlide";
-import { useNavigate } from "react-router-dom";
 
 const ReceiptPage = () => {
-    const navigate = useNavigate();
     const tableRef = useRef<ActionType>();
-    const [loading, setLoading] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IReceipt | null>(null);
 
@@ -159,7 +156,7 @@ const ReceiptPage = () => {
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(action, rows): any => [
-                    <Button type="primary">
+                    <Button type="primary" onClick={() => navigate('upsert')}>
                         <PlusOutlined />Tạo biên lai
                     </Button>
                 ]}

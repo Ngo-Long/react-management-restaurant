@@ -27,15 +27,18 @@ import {
     CheckSquareOutlined
 } from '@ant-design/icons';
 import {
-    beforeUpload, getBase64, handleChange,
-    handleRemoveFile, handleUploadFileLogo
+    getBase64,
+    beforeUpload,
+    handleChange,
+    handleRemoveFile,
+    handleUploadFileLogo
 } from "@/utils/image";
 import enUS from 'antd/lib/locale/en_US';
 import Title from "antd/es/typography/Title";
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import CategoryCard from "./card.unit";
+import 'react-quill/dist/quill.snow.css';
 import styles from 'styles/admin.module.scss';
 import { IUnit, IProduct } from "@/types/backend";
 import { unitApi, productApi } from "@/config/api";
