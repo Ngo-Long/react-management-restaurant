@@ -1,20 +1,30 @@
+import {
+    Tag,
+    Modal,
+    Space,
+    Button,
+} from "antd";
+import {
+    ActionType,
+    ProColumns,
+    ProFormSelect
+} from '@ant-design/pro-components';
+import {
+    CheckCircleOutlined,
+    CloseCircleOutlined
+} from '@ant-design/icons';
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
-import { useState, useRef, useEffect } from 'react';
-import { IInvoice, IOrder } from "@/types/backend";
-import { Button, Modal, Space, Tag } from "antd";
+import { useState, useRef } from 'react';
+import { IInvoice } from "@/types/backend";
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
 import DataTable from "@/components/client/data-table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { fetchInvoice } from '@/redux/slice/invoiceSlide';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
-import {
-    CheckCircleOutlined,
-    CloseCircleOutlined
-} from '@ant-design/icons';
-import { orderApi } from '@/config/api';
+
 const InvoicePage = () => {
     const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();

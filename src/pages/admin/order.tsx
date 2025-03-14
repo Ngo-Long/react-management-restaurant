@@ -1,3 +1,16 @@
+import {
+    Space,
+    Popconfirm,
+} from "antd";
+import {
+    ActionType,
+    ProColumns,
+    ProFormSelect,
+} from '@ant-design/pro-components';
+import {
+    DeleteOutlined
+} from "@ant-design/icons";
+
 import dayjs from 'dayjs';
 import { useState, useRef } from 'react';
 import queryString from 'query-string';
@@ -7,10 +20,7 @@ import Access from "@/components/share/access";
 import DataTable from "@/components/client/data-table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchOrder, fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
-import { Popconfirm, Space, message, notification } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import { fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
 
 const OrderPage = () => {
     const tableRef = useRef<ActionType>();

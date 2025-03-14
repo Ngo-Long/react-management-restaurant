@@ -1,24 +1,26 @@
-import dayjs from 'dayjs';
-import queryString from 'query-string';
-import { useState, useRef } from 'react';
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
-    Button,
-    Popconfirm,
     Space,
+    Button,
     Switch,
     message,
+    Popconfirm,
     notification
 } from "antd";
 import {
-    DeleteOutlined,
-    DownloadOutlined,
     EditOutlined,
     PlusOutlined,
-    UploadOutlined
+    UploadOutlined,
+    DeleteOutlined,
+    DownloadOutlined,
 } from "@ant-design/icons";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
+import {
+    ActionType,
+    ProColumns
+} from '@ant-design/pro-components';
 
+import dayjs from 'dayjs';
+import queryString from 'query-string';
+import { useState, useRef } from 'react';
 import { diningTableApi } from '@/config/api';
 import { IDiningTable } from '@/types/backend';
 import Access from "@/components/share/access";
@@ -26,6 +28,7 @@ import DataTable from "@/components/client/data-table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { ModalBatchImport, ModalDiningTable } from './container';
 import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
 

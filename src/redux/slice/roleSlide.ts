@@ -11,12 +11,12 @@ interface IState {
         total: number;
     },
     result: IRole[];
-    isFetchSingle: boolean;
-    singleRole: IRole
+    // isFetchSingle: boolean;
+    // singleRole: IRole
 }
 // First, create the thunk
 export const fetchRole = createAsyncThunk(
-    'resume/fetchRole',
+    'role/fetchRole',
     async ({ query }: { query: string }) => {
         const response = await roleApi.callFetchFilter(query);
         return response;
@@ -24,7 +24,7 @@ export const fetchRole = createAsyncThunk(
 )
 
 export const fetchRoleById = createAsyncThunk(
-    'resume/fetchRoleById',
+    'role/fetchRoleById',
     async (id: string) => {
         const response = await roleApi.callFetchById(id);
         return response;
@@ -33,7 +33,7 @@ export const fetchRoleById = createAsyncThunk(
 
 const initialState: IState = {
     isFetching: true,
-    isFetchSingle: true,
+    // isFetchSingle: true,
     meta: {
         page: 1,
         pageSize: 10,
@@ -41,13 +41,13 @@ const initialState: IState = {
         total: 0
     },
     result: [],
-    singleRole: {
-        id: "",
-        name: "",
-        description: "",
-        active: false,
-        permissions: []
-    }
+    // singleRole: {
+    //     id: "",
+    //     name: "",
+    //     description: "",
+    //     active: false,
+    //     permissions: []
+    // }
 };
 
 
@@ -56,15 +56,15 @@ export const roleSlide = createSlice({
     initialState,
     // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        resetSingleRole: (state, action) => {
-            state.singleRole = {
-                id: "",
-                name: "",
-                description: "",
-                active: false,
-                permissions: []
-            }
-        }
+        // resetSingleRole: (state, action) => {
+        //     state.singleRole = {
+        //         id: "",
+        //         name: "",
+        //         description: "",
+        //         active: false,
+        //         permissions: []
+        //     }
+        // }
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed
@@ -91,44 +91,44 @@ export const roleSlide = createSlice({
             // state.courseOrder = action.payload;
         })
 
-        builder.addCase(fetchRoleById.pending, (state, action) => {
-            state.isFetchSingle = true;
-            state.singleRole = {
-                id: "",
-                name: "",
-                description: "",
-                active: false,
-                permissions: []
-            }
-            // Add user to the state array
-            // state.courseOrder = action.payload;
-        })
+        // builder.addCase(fetchRoleById.pending, (state, action) => {
+        //     state.isFetchSingle = true;
+        //     state.singleRole = {
+        //         id: "",
+        //         name: "",
+        //         description: "",
+        //         active: false,
+        //         permissions: []
+        //     }
+        //     // Add user to the state array
+        //     // state.courseOrder = action.payload;
+        // })
 
-        builder.addCase(fetchRoleById.rejected, (state, action) => {
-            state.isFetchSingle = false;
-            state.singleRole = {
-                id: "",
-                name: "",
-                description: "",
-                active: false,
-                permissions: []
-            }
-            // Add user to the state array
-            // state.courseOrder = action.payload;
-        })
+        // builder.addCase(fetchRoleById.rejected, (state, action) => {
+        //     state.isFetchSingle = false;
+        //     state.singleRole = {
+        //         id: "",
+        //         name: "",
+        //         description: "",
+        //         active: false,
+        //         permissions: []
+        //     }
+        //     // Add user to the state array
+        //     // state.courseOrder = action.payload;
+        // })
 
-        builder.addCase(fetchRoleById.fulfilled, (state, action) => {
-            if (action.payload && action.payload.data) {
-                state.isFetchSingle = false;
-                state.singleRole = action.payload.data;
-            }
-        })
+        // builder.addCase(fetchRoleById.fulfilled, (state, action) => {
+        //     if (action.payload && action.payload.data) {
+        //         state.isFetchSingle = false;
+        //         state.singleRole = action.payload.data;
+        //     }
+        // })
     },
 
 });
 
 export const {
-    resetSingleRole
+    // resetSingleRole
 } = roleSlide.actions;
 
 export default roleSlide.reducer;

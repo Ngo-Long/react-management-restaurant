@@ -1,3 +1,17 @@
+import {
+    Col,
+    Row,
+    Form,
+    message,
+    notification
+} from "antd";
+import {
+    ProTable,
+    ModalForm,
+    ProFormText,
+    ProFormSwitch,
+    ProFormUploadDragger,
+} from "@ant-design/pro-components";
 
 import 'react-quill/dist/quill.snow.css';
 import { supplierApi } from "@/config/api";
@@ -6,8 +20,6 @@ import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
 import { handleImportXlsx } from '@/utils/file';
 import { useEffect, useCallback, useState } from 'react';
-import { Col, Form, Row, message, notification } from "antd";
-import { ProFormSwitch, ProFormText, ModalForm, ProFormUploadDragger, ProTable } from "@ant-design/pro-components";
 
 interface IProps {
     openModal: boolean;

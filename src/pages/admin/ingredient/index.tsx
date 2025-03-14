@@ -13,6 +13,11 @@ import {
     UploadOutlined,
     DownloadOutlined,
 } from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns
+} from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
@@ -24,7 +29,6 @@ import DataTable from "@/components/client/data-table";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from "@/utils/file";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
 import { ModalBatchImport, ModalIngredient } from '@/pages/admin/ingredient/container';
 
