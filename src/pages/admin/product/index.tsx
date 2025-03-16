@@ -27,7 +27,7 @@ import { formatPrice } from "@/utils/format";
 import { useNavigate } from 'react-router-dom';
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';

@@ -1,20 +1,26 @@
-
+import {
+    Card,
+    Flex,
+    Button,
+    message,
+    notification
+} from 'antd';
 import { Table } from 'antd/lib';
+import { ColumnType } from 'antd/es/table';
+
 import '@/styles/client.table.scss';
-import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { ColumnType } from 'antd/es/table';
 import { orderDetailApi } from '@/config/api';
 import { useAppDispatch } from '@/redux/hooks';
+import React, { useEffect, useState } from 'react';
 import { IOrderDetail } from '../../types/backend';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import DropdownMenu from '@/components/share/dropdown.menu';
-import { Card, Button, Flex, message, notification } from 'antd';
 import { fetchOrderDetailsByRestaurant } from '@/redux/slice/orderDetailSlide';
 
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 
@@ -64,20 +70,20 @@ const KitchenClient: React.FC = () => {
             key: 'quantity',
             dataIndex: 'quantity',
             width: 200,
-            align: "center" as const,
+            align: 'center',
         },
         {
             title: 'Phòng/bàn',
             width: 200,
             key: 'diningTables',
             dataIndex: 'diningTables',
-            align: "center" as const,
+            align: 'center',
         },
         {
             title: 'Thời gian',
             width: 200,
             dataIndex: 'lastModifiedDate',
-            align: "center" as const,
+            align: 'center',
             render: (_, record) => {
                 return (
                     <>

@@ -22,7 +22,7 @@ import { colorMethod } from "@/utils/format";
 import { permissionApi } from "@/config/api";
 import { IPermission } from "@/types/backend";
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from "@/utils/paginator";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";

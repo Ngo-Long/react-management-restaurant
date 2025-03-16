@@ -25,7 +25,7 @@ import { supplierApi } from "@/config/api";
 import { ISupplier } from "@/types/backend";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { ModalSupplier, ModalBatchImport } from './container';

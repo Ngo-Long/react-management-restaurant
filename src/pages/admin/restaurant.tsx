@@ -25,7 +25,7 @@ import { IRestaurant } from "@/types/backend";
 import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchRestaurant } from "@/redux/slice/restaurantSlide";
 import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";

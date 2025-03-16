@@ -1,4 +1,4 @@
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { IPermission, IRole } from "@/types/backend";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";

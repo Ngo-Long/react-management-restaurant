@@ -1,32 +1,34 @@
 import RolePage from './pages/admin/role';
 import UserPage from './pages/admin/user';
 import LoginPage from './pages/auth/login';
+import InvoicePage from './pages/admin/invoice';
+import ReceiptPage from './pages/admin/receipt';
 import ProductPage from './pages/admin/product';
 import RegisterPage from './pages/auth/register';
+import SupplierPage from './pages/admin/supplier';
 import DashboardPage from './pages/admin/dashboard';
+import IngredientPage from './pages/admin/ingredient';
 import RestaurantPage from './pages/admin/restaurant';
 import PermissionPage from './pages/admin/permission';
 import DiningTablePage from './pages/admin/dining-table';
+import ViewUpsertReceipt from './pages/admin/receipt/container';
+import ViewUpsertProduct from './pages/admin/product/container';
+
+import SaleClient from './pages/client/sales';
+import HomePage from './pages/client/home.client';
+import ReceptionClient from './pages/client/reception';
 import KitchenClient from './pages/client/kitchen.client';
 
 import NotFound from './components/share/not.found';
 import LayoutApp from './components/share/layout.app';
-import HomePage from './pages/client/home.client';
-import SaleClient from './pages/client/sale.client';
 import LayoutAdmin from './components/admin/layout.admin';
-import ProtectedRoute from './components/share/protected-route.ts';
+import ProtectedRoute from './components/share/protected-route';
 
 import './styles/reset.scss';
 import { useEffect, useRef } from 'react';
-import InvoicePage from './pages/admin/invoice';
-import SupplierPage from './pages/admin/supplier';
-import IngredientPage from './pages/admin/ingredient';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import ViewUpsertProduct from './pages/admin/product/container';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
-import ReceiptPage from './pages/admin/receipt';
-import ViewUpsertReceipt from './pages/admin/receipt/container';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -82,6 +84,13 @@ export default function App() {
           element:
             <ProtectedRoute>
               <KitchenClient />
+            </ProtectedRoute>
+        },
+        {
+          path: "/sales/reception",
+          element:
+            <ProtectedRoute>
+              <ReceptionClient />
             </ProtectedRoute>
         }
       ],

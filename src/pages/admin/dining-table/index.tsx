@@ -24,7 +24,7 @@ import { useState, useRef } from 'react';
 import { diningTableApi } from '@/config/api';
 import { IDiningTable } from '@/types/backend';
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
@@ -44,7 +44,7 @@ const DiningTablePage = () => {
     const diningTables = useAppSelector(state => state.diningTable.result)
         .filter(table => table.name!.toLowerCase() !== "mang về");
     const isFetching = useAppSelector(state => state.diningTable.isFetching);
-    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
+    const currentRestaurant = useAppSelector(state => state?.account.user?.restaurant);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
@@ -113,7 +113,6 @@ const DiningTablePage = () => {
                 name: currentRestaurant.name ?? ''
             }
         }));
-        console.log('data: ', formattedData);
 
         try {
             await diningTableApi.callBatchImport(formattedData);
@@ -295,7 +294,7 @@ const DiningTablePage = () => {
                         <DownloadOutlined /> Export
                     </Button>,
 
-                    <Button type="primary" onClick={() => setOpenModal(true)} >
+                    <Button type="primary" onClick={() => setOpenModal(true)}>
                         <PlusOutlined /> Thêm mới
                     </Button>
                 ]}

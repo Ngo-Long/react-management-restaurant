@@ -20,7 +20,7 @@ import { useState, useRef } from 'react';
 import { IInvoice } from "@/types/backend";
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { fetchInvoice } from '@/redux/slice/invoiceSlide';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";

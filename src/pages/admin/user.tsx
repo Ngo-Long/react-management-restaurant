@@ -23,7 +23,7 @@ import { IUser } from "@/types/backend";
 import { useState, useRef } from 'react';
 import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from "@/utils/paginator";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import ModalUser from "@/components/admin/user/modal.user";
