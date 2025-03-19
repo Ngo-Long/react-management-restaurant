@@ -10,7 +10,6 @@ import {
     CoffeeOutlined,
     GatewayOutlined
 } from '@ant-design/icons';
-
 import '@/styles/client.table.scss';
 import React, { useState } from 'react';
 import { IOrder } from '@/types/backend';

@@ -31,8 +31,10 @@ import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import viVN from 'antd/locale/vi_VN';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import ModalClient from '@/components/client/modal.client';
+import { fetchClientByRestaurant } from "@/redux/slice/userSlide";
+import { fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
 
 declare type IProps = {
     openModal: boolean;
@@ -48,19 +50,26 @@ export const ModalOrderScheduled = (props: IProps) => {
 
     const [locations, setLocations] = useState<string[]>([]);
     const [newLocation, setNewLocation] = useState<string>('');
-    const currentUser = useAppSelector(state => state.account.user);
-    const tables = useSelector((state: RootState) => state.diningTable.result);
-    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
     const [openClientModal, setOpenClientModal] = useState(false);
     const [selectedClient, setSelectedClient] = useState<any>(null);
 
+    const currentUser = useAppSelector(state => state.account.user);
+    const clients = useSelector((state: RootState) => state.user.result);
+    const tables = useSelector((state: RootState) => state.diningTable.result);
+    const currentRestaurant = useAppSelector(state => state.account?.user?.restaurant);
+    const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
+    const [selectedTime, setSelectedTime] = useState<Dayjs>(dayjs());
+
     useEffect(() => {
+        dispatch(fetchClientByRestaurant({ query: '' }));
         dispatch(fetchDiningTableByRestaurant({ query: '' }));
     }, [dispatch]);
 
     const handleReset = async () => {
         form.resetFields();
         setOpenModal(false);
+        setSelectedDate(dayjs());
+        setSelectedTime(dayjs());
     }
 
     const handleClientModalClose = () => {
@@ -72,26 +81,30 @@ export const ModalOrderScheduled = (props: IProps) => {
         form.setFieldValue('user', client.id);
         setSelectedClient(client);
         handleClientModalClose();
+        dispatch(fetchClientByRestaurant({ query: '' }));
     }
 
     const submitOrderScheduled = async (valuesForm: IOrder) => {
         try {
-            const { user, reservationTime, diningTables, guestCount, note } = valuesForm;
-
-            if (!reservationTime || !diningTables) {
-                throw new Error('Missing required fields');
+            const { diningTables, guestCount, note } = valuesForm;
+            if (!selectedDate || !selectedTime || !diningTables) {
+                throw new Error('Lỗi dữ liệu!');
             }
 
-            // Convert to ISO string format for Java Instant parsing
-            const isoDateTime = dayjs(reservationTime).toISOString();
+            // Kết hợp ngày và giờ
+            const reservationTime = selectedDate
+                .hour(selectedTime.hour())
+                .minute(selectedTime.minute())
+                .second(0);
 
             const orderScheduled: IOrder = {
                 note,
                 guestCount,
+                option: 'SCHEDULED',
                 status: 'RESERVED',
-                reservationTime: isoDateTime,
+                reservationTime: reservationTime.toISOString(),
                 user: {
-                    id: typeof user === 'string' ? user : user?.id
+                    id: typeof selectedClient === 'string' ? selectedClient : selectedClient?.id
                 },
                 diningTables: Array.isArray(diningTables) ? diningTables.map((tableId) => {
                     return {
@@ -102,10 +115,10 @@ export const ModalOrderScheduled = (props: IProps) => {
             };
 
             const res = await orderApi.callCreate(orderScheduled);
-
             if (res.data) {
                 message.success('Đặt bàn thành công');
                 handleReset();
+                dispatch(fetchOrderByRestaurant({ query: "filter=status~'RESERVED'&sort=reservationTime,asc" }));
                 reloadTable();
             }
         } catch (error: any) {
@@ -139,21 +152,30 @@ export const ModalOrderScheduled = (props: IProps) => {
                 <Row gutter={[20, 20]}>
                     <Col span={24} md={12}>
                         <Form.Item
-                            name="user"
                             label="Khách hàng"
-                        // rules={[{ required: true, message: "Vui lòng chọn khách" }]}
+                            rules={[{ required: true, message: "Vui lòng chọn khách" }]}
                         >
                             <Select
+                                showSearch
                                 style={{ width: '100%' }}
-                                placeholder="Tìm tên khách hàng"
+                                placeholder="Tìm tên hoặc số điện thoại khách hàng"
                                 suffixIcon={
                                     <PlusOutlined
                                         style={{ fontSize: 20, color: '#555', cursor: 'pointer' }}
                                         onClick={() => setOpenClientModal(true)}
                                     />
                                 }
-                                value={selectedClient?.id}
-                                disabled
+                                filterOption={(input, option) =>
+                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                }
+                                options={clients.map((client) => ({
+                                    value: client.id,
+                                    label: client.name || client.phoneNumber,
+                                }))}
+                                onChange={(value) => {
+                                    const selected = clients.find((c) => c.id === value);
+                                    setSelectedClient(selected);
+                                }}
                             />
                         </Form.Item>
                     </Col>
@@ -178,9 +200,7 @@ export const ModalOrderScheduled = (props: IProps) => {
 
                     <Col span={24} md={12}>
                         <Form.Item
-                            name="reservationTime"
                             label="Giờ đến"
-                            initialValue={dayjs()}
                             rules={[
                                 { required: true, message: 'Vui lòng không bỏ trống' }
                             ]}
@@ -194,14 +214,15 @@ export const ModalOrderScheduled = (props: IProps) => {
                                         disabledDate={(current) => {
                                             return current && current < dayjs().startOf('day');
                                         }}
-                                        showTime={true}
-                                        defaultValue={dayjs()}
+                                        value={selectedDate}
+                                        onChange={(date) => date && setSelectedDate(date)}
                                     />
                                     <TimePicker
                                         format="HH:mm"
                                         placeholder="Chọn giờ"
                                         style={{ width: '40%' }}
-                                        defaultValue={dayjs()}
+                                        value={selectedTime}
+                                        onChange={(time) => time && setSelectedTime(time)}
                                     />
                                 </Space.Compact>
                             </ConfigProvider>
@@ -270,7 +291,7 @@ export const ModalOrderScheduled = (props: IProps) => {
                 setOpenModal={handleClientModalClose}
                 dataInit={null}
                 setDataInit={handleClientSelect}
-                reloadTable={() => { }}
+                reloadTable={() => dispatch(fetchClientByRestaurant({ query: '' }))}
             />
         </>
     )

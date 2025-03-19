@@ -82,7 +82,10 @@ const UserPage = () => {
             dataIndex: ["role", "name"],
             sorter: true,
             align: "center",
-            hideInSearch: true
+            hideInSearch: true,
+            render: (_, record) => {
+                return record.role ? record.role.name : 'Khách hàng';
+            }
         },
         {
             title: 'Email',

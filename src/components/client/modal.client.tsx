@@ -2,20 +2,14 @@ import {
     Row,
     Col,
     Form,
-    Input,
     message,
     notification,
     ConfigProvider,
     Upload
 } from "antd";
 import {
-    ProForm,
     ProFormText,
     ProFormSelect,
-    ProFormTextArea,
-    DrawerForm,
-    FooterToolbar,
-    ProFormSwitch,
     ProFormDatePicker,
     ModalForm,
 } from "@ant-design/pro-components";
@@ -33,7 +27,7 @@ import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
 import viVN from 'antd/es/date-picker/locale/vi_VN';
 import { userApi, roleApi, restaurantApi } from "@/config/api";
-import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { DebounceSelect } from "../admin/user/debouce.select";
 
 interface IProps {
@@ -58,8 +52,6 @@ interface IUserAvatar {
 const ModalClient = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
     const [form] = Form.useForm();
-    const [roles, setRoles] = useState<IRestaurantSelect[]>([]);
-
     const [desc, setDesc] = useState<string>("");
     const [animation, setAnimation] = useState<string>('open');
     const currentUser = useAppSelector(state => state.account?.user);
@@ -75,33 +67,13 @@ const ModalClient = (props: IProps) => {
 
     useEffect(() => {
         if (dataInit?.id) {
-            if (dataInit.role) {
-                setRoles([{
-                    label: dataInit.role?.name || "",
-                    value: dataInit.role?.id || "",
-                    key: dataInit.role?.id,
-                }])
-            }
-
             setDesc(dataInit.description || "");
             setDataAvatar([{ name: dataInit.avatar, uid: uuidv4() }]);
-            form.setFieldsValue({
-                ...dataInit,
-                role: { label: dataInit.role?.name, value: dataInit.role?.id },
-                restaurant: { label: dataInit.restaurant?.name, value: dataInit.restaurant?.id },
-            })
         }
     }, [dataInit]);
 
-    const handleReset = async () => {
-        form.resetFields();
-        setDataInit(null);
-        setRoles([]);
-        setOpenModal(false);
-    }
-
     const submitUser = async (valuesForm: any) => {
-        const { name, email, gender, address, password, birthDate, phoneNumber, role, restaurant } = valuesForm;
+        const { name, email, gender, address, password, birthDate, phoneNumber } = valuesForm;
         const formattedBirthDate = birthDate ? moment(birthDate, "DD/MM/YYYY").format("YYYY-MM-DD") : null;
 
         const user = {
@@ -114,25 +86,22 @@ const ModalClient = (props: IProps) => {
             password,
             birthDate: formattedBirthDate ?? undefined,
             phoneNumber,
+            active: true,
             description: desc,
-            role: {
-                id: role.value,
-                name: ""
-            },
             restaurant: {
                 id: currentRestaurant?.id,
                 name: currentRestaurant?.name
             }
         };
-        console.log(user);
+
         const res = dataInit?.id
             ? await userApi.callUpdate(user)
-            : await userApi.callCreate(user);
+            : await userApi.callCreateClient(user);
 
         if (res.data) {
             message.success(dataInit?.id ? "Cập nhật khách hàng thành công" : "Thêm mới khách hàng thành công");
-            handleReset();
             reloadTable();
+            setOpenModal(false);
         } else {
             notification.error({
                 message: 'Có lỗi xảy ra!',
@@ -151,8 +120,8 @@ const ModalClient = (props: IProps) => {
             title={<>{dataInit?.id ? "Cập nhật khách hàng" : "Tạo mới khách hàng"}</>}
             initialValues={{ dataInit }}
             modalProps={{
-                onCancel: () => handleReset(),
-                afterClose: () => handleReset(),
+                onCancel: () => setOpenModal(false),
+                afterClose: () => setOpenModal(false),
                 destroyOnClose: true,
                 width: isMobile ? "100%" : 700,
                 keyboard: false,
@@ -215,19 +184,6 @@ const ModalClient = (props: IProps) => {
                                     </Upload>
                                 </ConfigProvider>
                             </Form.Item>
-                        </Col>
-
-                        <Col span={24} md={24}>
-                            <ProFormSwitch
-                                name="active"
-                                label="Hoạt động"
-                                checkedChildren="ACTIVE"
-                                unCheckedChildren="INACTIVE"
-                                initialValue={true}
-                                fieldProps={{ defaultChecked: true }}
-                                hidden
-                                noStyle
-                            />
                         </Col>
                     </Row>
                 </Col>

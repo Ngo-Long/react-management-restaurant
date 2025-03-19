@@ -29,6 +29,14 @@ export const fetchUserByRestaurant = createAsyncThunk(
     }
 )
 
+export const fetchClientByRestaurant = createAsyncThunk(
+    'user/fetchClientByRestaurant',
+    async ({ query }: { query: string }) => {
+        const response = await userApi.callFetchClientByRestaurant(query);
+        return response;
+    }
+)
+
 const initialState: IState = {
     isFetching: true,
     meta: {
@@ -74,6 +82,22 @@ export const userSlide = createSlice({
         })
 
         builder.addCase(fetchUserByRestaurant.fulfilled, (state, action) => {
+            if (action.payload && action.payload.data) {
+                state.isFetching = false;
+                state.meta = action.payload.data.meta;
+                state.result = action.payload.data.result;
+            }
+        })
+
+        builder.addCase(fetchClientByRestaurant.pending, (state, action) => {
+            state.isFetching = true;
+        })
+
+        builder.addCase(fetchClientByRestaurant.rejected, (state, action) => {
+            state.isFetching = false;
+        })
+
+        builder.addCase(fetchClientByRestaurant.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;

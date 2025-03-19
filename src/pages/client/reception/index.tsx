@@ -7,7 +7,10 @@ import {
     Input,
     Button,
     message,
-    notification
+    notification,
+    Calendar,
+    CalendarProps,
+    BadgeProps
 } from 'antd';
 import {
     FileExcelOutlined,
@@ -25,20 +28,18 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { orderDetailApi } from '@/config/api';
 import { useAppDispatch } from '@/redux/hooks';
+import { ModalOrderScheduled } from './container';
 import React, { useEffect, useRef, useState } from 'react';
 import DropdownMenu from '@/components/share/dropdown.menu';
 import { IOrder, IOrderDetail } from '../../../types/backend';
+import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { fetchOrderByRestaurant } from '@/redux/slice/orderSlide';
 
-import { convertCSV, handleExportAsXlsx } from '@/utils/file';
-import { ModalOrderScheduled } from './container';
-
-import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import dayjs, { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-// Configure dayjs
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -160,9 +161,9 @@ const ReceptionClient: React.FC = () => {
             dataIndex: 'status',
             render: (status) => {
                 const statusConfig = {
-                    RESERVED: { color: '#52c41a', text: 'Đang chờ' },
+                    RESERVED: { color: '#fa8c16', text: 'Đang chờ' },
                     CANCELED: { color: '#ff4d4f', text: 'Đã hủy' },
-                    CONFIRMED: { color: '#1890ff', text: 'Hoàn thành' }
+                    PENDING: { color: '#52c41a', text: 'Đã nhận bàn' }
                 } as const;
                 const config = statusConfig[status as keyof typeof statusConfig] || { color: '#ff4d4f', text: 'Đã hủy' };
 
@@ -193,11 +194,91 @@ const ReceptionClient: React.FC = () => {
         },
     ];
 
+    // Thêm các hàm mới cho Calendar
+    const getListData = (value: Dayjs) => {
+        // Lọc các đơn đặt bàn trong ngày được chọn
+        const ordersInDay = orders.filter(order => {
+            const orderDate = dayjs(order.reservationTime);
+            return orderDate.isSame(value, 'day');
+        });
+
+        // Chuyển đổi orders thành listData
+        return ordersInDay.map(order => {
+            // Xác định type dựa vào status
+            let type: string;
+            switch (order.status) {
+                case 'RESERVED':
+                    type = 'warning';
+                    break;
+                case 'PENDING':
+                    type = 'success';
+                    break;
+                case 'CANCELED':
+                    type = 'error';
+                    break;
+                default:
+                    type = 'warning';
+            }
+
+            // Format nội dung hiển thị
+            const time = dayjs(order.reservationTime).format('HH:mm');
+            const tables = order.diningTables?.map(t => t.name).join(', ');
+            const content = `${time} - ${order.user?.name || 'Khách hàng'} - ${tables}`;
+
+            return {
+                type,
+                content
+            };
+        });
+    };
+
+
+    // Cập nhật hàm getMonthData để hiển thị tổng số đơn trong tháng
+    const getMonthData = (value: Dayjs) => {
+        const ordersInMonth = orders.filter(order => {
+            const orderDate = dayjs(order.reservationTime);
+            return orderDate.isSame(value, 'month');
+        });
+
+        return ordersInMonth.length > 0 ? ordersInMonth.length : null;
+    };
+
+    // Cập nhật monthCellRender để hiển thị đẹp hơn
+    const monthCellRender = (value: Dayjs) => {
+        const num = getMonthData(value);
+        return num ? (
+            <div className="notes-month">
+                <section>{num}</section>
+                <span>Đơn đặt bàn</span>
+            </div>
+        ) : null;
+    };
+
+    const dateCellRender = (value: Dayjs) => {
+        const listData = getListData(value);
+        return (
+            <ul className="events">
+                {listData.map((item) => (
+                    <li key={item.content}>
+                        <Badge status={item.type as BadgeProps['status']} text={item.content} />
+                    </li>
+                ))}
+            </ul>
+        );
+    };
+
+    const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
+        if (info.type === 'date') return dateCellRender(current);
+        if (info.type === 'month') return monthCellRender(current);
+        return info.originNode;
+    };
+
     const contentList: Record<string, React.ReactNode> = {
-        tab1:
-            <Card type="inner" title="Inner Card title" extra={<a href="#">More</a>}>
-                Inner Card content
-            </Card>,
+        tab1: (
+            <Card type="inner" title="Lịch đặt bàn">
+                <Calendar cellRender={cellRender} />
+            </Card>
+        ),
         tab2:
             <>
                 <Flex gap="middle" justify="space-between" style={{ marginBottom: 16 }}>
@@ -227,7 +308,7 @@ const ReceptionClient: React.FC = () => {
                     className="order-table"
                     rowClassName="order-table-row"
                     rowKey={(record) => record.id || ''}
-                    scroll={{ y: 50 * 10 }}
+                    scroll={{ y: 50 * 9 }}
                 />
             </>
     };
