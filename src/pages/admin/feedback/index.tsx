@@ -1,40 +1,40 @@
+import {
+    Space,
+    Button,
+    message,
+    Popconfirm,
+} from "antd";
+import {
+    EditOutlined,
+    PlusOutlined,
+    DeleteOutlined,
+    DownloadOutlined,
+} from "@ant-design/icons";
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
-    Button,
-    Popconfirm,
-    Space,
-    message,
-} from "antd";
-import {
-    DeleteOutlined,
-    DownloadOutlined,
-    EditOutlined,
-    PlusOutlined,
-} from "@ant-design/icons";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
-
 import { feedbackApi } from '@/config/api';
-import { IFeedback} from '@/types/backend';
+import { ModalFeedback } from './container';
+import { IFeedback } from '@/types/backend';
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data-table";
+import DataTable from '@/components/client/data.table';
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
-import { convertCSV, handleExportAsXlsx } from '@/utils/file';
-import { ModalFeedback } from './container';
 import { fetchFeedback } from "@/redux/slice/feedbackSlide";
+import { convertCSV, handleExportAsXlsx } from '@/utils/file';
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { ActionType, ProColumns } from '@ant-design/pro-components';
 
 const FeedbackPage = () => {
     const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
-    const [openModal, setOpenModal] = useState<boolean>(false);
     const meta = useAppSelector(state => state.feedback.meta);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IFeedback | null>(null);
     const feedbacks = useAppSelector(state => state.feedback.result);
     const isFetching = useAppSelector(state => state.feedback.isFetching);
-    
+
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
@@ -198,7 +198,6 @@ const FeedbackPage = () => {
                     <Button onClick={handleExportAsXlsx(feedbacks, formatCSV)}>
                         <DownloadOutlined /> Export
                     </Button>,
-
                     <Button type="primary" onClick={() => setOpenModal(true)} >
                         <PlusOutlined /> Thêm mới
                     </Button>
