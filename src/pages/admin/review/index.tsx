@@ -1,93 +1,133 @@
 import {
     Space,
     Button,
+    Switch,
     message,
     Popconfirm,
+    notification
 } from "antd";
 import {
     EditOutlined,
     PlusOutlined,
+    UploadOutlined,
     DeleteOutlined,
     DownloadOutlined,
 } from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns
+} from '@ant-design/pro-components';
 
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import { feedbackApi } from '@/config/api';
-import { ModalFeedback } from './container';
-import { IFeedback } from '@/types/backend';
+import { reviewApi } from '@/config/api';
+import { IReview } from '@/types/backend';
 import Access from "@/components/share/access";
-import DataTable from '@/components/client/data.table';
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
-import { fetchFeedback } from "@/redux/slice/feedbackSlide";
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
+import { fetchReview } from "@/redux/slice/reviewSlide";
+import DataTable from "@/components/client/data.table";
+import { ModalReview } from "./container";
 
-const FeedbackPage = () => {
-    const dispatch = useAppDispatch();
+
+
+const ReviewPage = () => {
     const tableRef = useRef<ActionType>();
-    const meta = useAppSelector(state => state.feedback.meta);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<IFeedback | null>(null);
-    const feedbacks = useAppSelector(state => state.feedback.result);
-    const isFetching = useAppSelector(state => state.feedback.isFetching);
+    const [openUpload, setOpenUpload] = useState<boolean>(false);
+
+    const dispatch = useAppDispatch();
+    const meta = useAppSelector(state => state.review.meta);
+    const [dataInit, setDataInit] = useState<IReview | null>(null);
+    const reviews = useAppSelector(state => state.review.result);
+    const isFetching = useAppSelector(state => state.review.isFetching);
+
+
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
+    const handleToggleActive = async (record: IReview, checked: boolean) => {
+        const updatedRecord = { ...record, active: checked };
+        await reviewApi.callUpdate(updatedRecord);
+        message.success('Cập nhật trạng thái thành công');
+        reloadTable();
+    };
+
     const handleDeleteFeedback = async (id: string | undefined) => {
         if (id) {
-            await feedbackApi.callDelete(id);
-            message.success('Xóa thành công');
+            await reviewApi.callDelete(id);
+            message.success('Xóa bài thành công');
             reloadTable();
         }
     }
 
-    const formatCSV = (data: IFeedback[]) => {
+    const formatCSV = (data: IReview[]) => {
         const excludeKeys = [
             'id', 'status', 'active', 'createdBy',
             'createdDate', 'lastModifiedDate', 'lastModifiedBy', 'restaurant'
         ];
         return data.map((row) => {
-            return (Object.keys(row) as Array<keyof IFeedback>)
+            return (Object.keys(row) as Array<keyof IReview>)
                 .filter((key) => !excludeKeys.includes(key as string))
                 .reduce((newRow, key) => {
                     newRow[key] = convertCSV(row[key]);
                     return newRow;
-                }, {} as Record<keyof IFeedback, any>)
+                }, {} as Record<keyof IReview, any>)
         })
     }
 
-    const columns: ProColumns<IFeedback>[] = [
+    const columns: ProColumns<IReview>[] = [
         {
-            width: 50,
             title: 'STT',
             key: 'index',
+            width: 50,
             align: "center",
-            hideInSearch: true,
-            render: (text, record, index) => {
-                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)} </>)
+            render: (_, record, index) => {
+                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
+            hideInSearch: true,
         },
         {
             title: 'Tiêu đề',
-            dataIndex: 'subject',
+            dataIndex: 'title',
             sorter: true,
         },
         {
-            title: 'Nội dung',
-            dataIndex: 'content',
-            sorter: true,
+            title: 'Mô tả',
+            align: "center",
+            dataIndex: 'description',
+            hideInSearch: true,
+           
+        },
+        {
+            title: 'Ảnh',
+            dataIndex: 'images',
+            align: "center",
+            hideInSearch: true,
+        },
+        {
+            title: 'Màu nền',
+            dataIndex: 'background_color',
+            align: "center",
+            hideInSearch: true,
         },
         {
             title: 'Hoạt động',
             align: "center",
             dataIndex: 'active',
             hideInSearch: true,
+            render: (_, record, index) => [
+                <Switch
+                    key={`switch-${index + 1}`}
+                    defaultChecked={record?.active}
+                    onChange={(checked: boolean) => handleToggleActive(record, checked)}
+                />
+            ]
         },
         {
             title: 'Ngày tạo',
@@ -131,8 +171,8 @@ const FeedbackPage = () => {
                     <Access permission={ALL_PERMISSIONS.DININGTABLES.DELETE} hideChildren >
                         <Popconfirm
                             placement="leftTop"
-                            title={"Xác nhận xóa đánh giá"}
-                            description={"Bạn có chắc chắn muốn xóa đánh giá này ?"}
+                            title={"Xác nhận xóa bàn ăn"}
+                            description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
                             onConfirm={() => handleDeleteFeedback(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
@@ -182,34 +222,40 @@ const FeedbackPage = () => {
 
     return (
         <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
-            <DataTable<IFeedback>
+            <DataTable<IReview>
                 rowKey="id"
                 actionRef={tableRef}
-                headerTitle="Danh sách đánh giá"
+                headerTitle="Danh sách bàn ăn"
                 loading={isFetching}
                 columns={columns}
-                dataSource={feedbacks}
+                dataSource={reviews}
                 request={async (params, sort, filter): Promise<any> => {
                     const query = buildQuery(params, sort, filter);
-                    dispatch(fetchFeedback({ query }))
+                    dispatch(fetchReview({ query }))
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
+                    <Button onClick={handleExportAsXlsx(reviews, formatCSV)}>
+                        <DownloadOutlined /> Export
+                    </Button>,
+
                     <Button type="primary" onClick={() => setOpenModal(true)} >
                         <PlusOutlined /> Thêm mới
                     </Button>
                 ]}
             />
 
-            <ModalFeedback
+            <ModalReview
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
+
         </Access>
     )
 }
 
-export default FeedbackPage;
+export default ReviewPage;
+

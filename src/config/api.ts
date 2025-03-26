@@ -3,7 +3,7 @@ import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
     IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit,
-    IFeedback
+    IFeedback, IReview
 } from '../types/backend';
 
 /**
@@ -467,5 +467,27 @@ export const feedbackApi = {
 
     callFetchFilter(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IFeedback>>>(`/api/v1/feedbacks?${query}`);
+    },
+}
+
+export const reviewApi = {
+    callCreate(review: IReview) {
+        return axios.post<IBackendRes<IReview>>('/api/v1/reviews', { ...review });
+    },
+
+    callUpdate(review: IReview) {
+        return axios.put<IBackendRes<IReview>>('/api/v1/reviews', { ...review });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IReview>>(`/api/v1/reviews/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IReview>>(`/api/v1/reviews/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IReview>>>(`/api/v1/reviews?${query}`);
     },
 }

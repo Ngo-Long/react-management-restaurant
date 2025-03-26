@@ -2,6 +2,7 @@ import RolePage from './pages/admin/role';
 import UserPage from './pages/admin/user';
 import LoginPage from './pages/auth/login';
 import InvoicePage from './pages/admin/invoice';
+
 import RegisterPage from './pages/auth/register';
 import SupplierPage from './pages/admin/supplier';
 import DashboardPage from './pages/admin/dashboard';
@@ -15,9 +16,7 @@ import HomePage from './pages/client/home';
 import OrderPage from './pages/admin/order';
 import ClientPage from './pages/admin/client';
 import SaleClient from './pages/client/sales';
-import ProductPage from './pages/admin/product';
-import ReceiptPage from './pages/admin/receipt';
-import FeedbackPage from './pages/admin/feedback';
+
 import KitchenClient from './pages/client/kitchen';
 import ReceptionClient from './pages/client/reception';
 import ViewUpsertReceipt from './pages/admin/receipt/container';
@@ -31,7 +30,12 @@ import './styles/reset.scss';
 import { useEffect, useRef } from 'react';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
+import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom";
+
+import ProductPage from './pages/admin/product';
+import ReceiptPage from './pages/admin/receipt';
+import FeedbackPage from './pages/admin/feedback';
+import ReviewPage from './pages/admin/review';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -178,6 +182,10 @@ export default function App() {
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>
+        },  
+        {
+          path: "review",
+          element: <ProtectedRoute> <ReviewPage /> </ProtectedRoute>
         },
         {
           path: "feedback",
