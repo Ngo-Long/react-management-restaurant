@@ -163,6 +163,12 @@ const LayoutAdmin: React.FC = () => {
                     onClick: () => navigate('/admin/invoice')
                 }] : []),
 
+                ...(viewOrder || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/feedback'>Đánh giá</Link>,
+                    key: '/admin/feedback',
+                    icon: <BarChartOutlined />
+                }] : []),
+
                 ...(viewReceipt || ACL_ENABLE === 'false' ? [{
                     label: 'Biên lai',
                     key: '/admin/receipt',
