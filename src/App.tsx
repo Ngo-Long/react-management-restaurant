@@ -36,6 +36,7 @@ import ProductPage from './pages/admin/product';
 import ReceiptPage from './pages/admin/receipt';
 import FeedbackPage from './pages/admin/feedback';
 import ReviewPage from './pages/admin/review';
+import ShiftPage from './pages/admin/shift';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -182,7 +183,7 @@ export default function App() {
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>
-        },  
+        },
         {
           path: "review",
           element: <ProtectedRoute> <ReviewPage /> </ProtectedRoute>
@@ -190,6 +191,10 @@ export default function App() {
         {
           path: "feedback",
           element: <ProtectedRoute> <FeedbackPage /> </ProtectedRoute>
+        },
+        {
+          path: "shift",
+          element: <ProtectedRoute> <ShiftPage /> </ProtectedRoute>
         },
         {
           path: "receipt",

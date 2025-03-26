@@ -357,3 +357,17 @@ export interface IFeedback {
     lastModifiedDate?: string;
 }
 
+export interface IShift {
+    id?: string;
+    name?: string;
+    inTime?: string;
+    outTime?: string;
+    description?: string;
+    active?: boolean;
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+

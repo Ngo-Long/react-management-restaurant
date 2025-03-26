@@ -32,20 +32,14 @@ import { fetchReview } from "@/redux/slice/reviewSlide";
 import DataTable from "@/components/client/data.table";
 import { ModalReview } from "./container";
 
-
-
 const ReviewPage = () => {
-    const tableRef = useRef<ActionType>();
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [openUpload, setOpenUpload] = useState<boolean>(false);
-
     const dispatch = useAppDispatch();
+    const tableRef = useRef<ActionType>();
     const meta = useAppSelector(state => state.review.meta);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IReview | null>(null);
     const reviews = useAppSelector(state => state.review.result);
     const isFetching = useAppSelector(state => state.review.isFetching);
-
-
 
     const reloadTable = () => {
         tableRef?.current?.reload();
@@ -102,7 +96,7 @@ const ReviewPage = () => {
             align: "center",
             dataIndex: 'description',
             hideInSearch: true,
-           
+
         },
         {
             title: 'Ảnh',

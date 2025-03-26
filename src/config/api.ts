@@ -3,7 +3,8 @@ import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
     IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit,
-    IFeedback, IReview
+    IFeedback, IReview,
+    IShift
 } from '../types/backend';
 
 /**
@@ -490,4 +491,30 @@ export const reviewApi = {
     callFetchFilter(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IReview>>>(`/api/v1/reviews?${query}`);
     },
+}
+
+export const shiftApi = {
+    callCreate(shift: IShift) {
+        return axios.post<IBackendRes<IShift>>('/api/v1/shifts', { ...shift });
+    },
+
+    callUpdate(shift: IShift) {
+        return axios.put<IBackendRes<IShift>>('/api/v1/shifts', { ...shift });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IShift>>(`/api/v1/shifts/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IShift>>(`/api/v1/shifts/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IShift>>>(`/api/v1/shifts?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IShift>>>(`/api/v1/shifts/by-restaurant?${query}`);
+    }
 }
