@@ -313,3 +313,27 @@ export interface IReceipt {
     createdDate?: string;
     lastModifiedDate?: string;
 }
+
+
+export interface IReview {
+    id?: string;
+    title?: string;
+    description?: string;
+    images?: string;
+    background_color?: string;
+    active?: boolean;
+    restaurant?: {
+        id?: string;
+        name?: string;
+    }
+    supplier?: {
+        id?: string;
+        name?: string;
+    }
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+

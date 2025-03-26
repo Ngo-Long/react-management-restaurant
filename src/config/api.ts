@@ -2,7 +2,8 @@ import axios from '../config/axios-customize';
 import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
-    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit
+    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit,
+    IReview
 } from '../types/backend';
 
 /**
@@ -433,4 +434,26 @@ export const receiptApi = {
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IReceipt>>>(`/api/v1/receipts/by-restaurant?${query}`);
     }
+}
+
+export const reviewApi = {
+    callCreate(review: IReview) {
+        return axios.post<IBackendRes<IReview>>('/api/v1/reviews', { ...review });
+    },
+
+    callUpdate(review: IReview) {
+        return axios.put<IBackendRes<IReview>>('/api/v1/reviews', { ...review });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IReview>>(`/api/v1/reviews/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IReview>>(`/api/v1/reviews/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IReview>>>(`/api/v1/reviews?${query}`);
+    },
 }
