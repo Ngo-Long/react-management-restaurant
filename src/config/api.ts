@@ -3,7 +3,7 @@ import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
     IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit,
-    IReview
+    IFeedback, IReview
 } from '../types/backend';
 
 /**
@@ -81,6 +81,10 @@ export const restaurantApi = {
 Module User
  */
 export const userApi = {
+    callCreateClient(user: IUser) {
+        return axios.post<IBackendRes<IUser>>('/api/v1/users/clients', { ...user });
+    },
+
     callCreate(user: IUser) {
         return axios.post<IBackendRes<IUser>>('/api/v1/users', { ...user });
     },
@@ -99,6 +103,10 @@ export const userApi = {
 
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users/by-restaurant?${query}`);
+    },
+
+    callFetchClientByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/clients/by-restaurant?${query}`);
     }
 }
 
@@ -205,6 +213,14 @@ export const orderApi = {
         return axios.delete<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
     },
 
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
+    },
+
+    callFetchByTable(id: string) {
+        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/by-table/${id}`)
+    },
+
     callFetchFilter(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IOrder>>>(`/api/v1/orders?${query}`);
     },
@@ -212,14 +228,6 @@ export const orderApi = {
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IOrder>>>(`/api/v1/orders/by-restaurant?${query}`);
     },
-
-    callFetchById(id: string) {
-        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
-    },
-
-    callFetchByTable(id: string) {
-        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/by-table/${id}`)
-    }
 }
 
 /**
@@ -434,6 +442,32 @@ export const receiptApi = {
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IReceipt>>>(`/api/v1/receipts/by-restaurant?${query}`);
     }
+}
+
+/**
+ *
+Module Feedback
+ */
+export const feedbackApi = {
+    callCreate(feedback: IFeedback) {
+        return axios.post<IBackendRes<IFeedback>>('/api/v1/feedbacks', { ...feedback });
+    },
+
+    callUpdate(feedback: IFeedback) {
+        return axios.put<IBackendRes<IFeedback>>('/api/v1/feedbacks', { ...feedback });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IFeedback>>(`/api/v1/feedbacks/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IFeedback>>(`/api/v1/feedbacks/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IFeedback>>>(`/api/v1/feedbacks?${query}`);
+    },
 }
 
 export const reviewApi = {

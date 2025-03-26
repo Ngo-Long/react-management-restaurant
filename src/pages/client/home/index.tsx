@@ -1,10 +1,10 @@
-import '../../styles/client.home.scss';
 import { useState } from "react";
+import '../../../styles/client.home.scss';
 import { Button, Flex, Layout } from "antd";
 import { Footer } from "antd/es/layout/layout";
 import { useNavigate } from 'react-router-dom';
-import LoginModal from "../auth/LoginModal";
-import RegisterModal from "../auth/RegisterModal";
+import LoginModal from "../../auth/LoginModal";
+import RegisterModal from "../../auth/RegisterModal";
 
 const HomePage = () => {
     const navigate = useNavigate();

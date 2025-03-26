@@ -18,7 +18,7 @@ import { IReceipt } from "@/types/backend";
 import { useNavigate } from "react-router-dom";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from '@/utils/paginator';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchReceiptByRestaurant } from "@/redux/slice/receiptSlide";

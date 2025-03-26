@@ -133,11 +133,14 @@ export interface IOrder {
     id?: string;
     note?: string;
     totalPrice?: number;
+    guestCount?: number;
+    reservationTime?: string;
     option?: string;
     status?: string;
     user?: {
         id?: string;
         name?: string;
+        phoneNumber?: string;
     };
     diningTables?: {
         id?: string | null;
@@ -152,17 +155,21 @@ export interface IOrder {
 
 export interface IOrderDetail {
     id?: string;
-    price?: string;
+    price?: string | number;
     quantity?: number;
+    note?: string;
     status?: string;
     order?: {
         id?: string | null;
     };
     unit?: {
-        id?: string;
+        id?: string | null;
         name?: string;
         price?: number;
-        productName?: string;
+    }
+    product?: {
+        name?: string;
+        station?: string;
     }
     diningTables?: {
         id?: string | null;
@@ -202,6 +209,7 @@ export interface IProduct {
     name?: string;
     type: string;
     image: string | null;
+    station: string;
     category: string;
     shortDesc?: string;
     detailDesc?: string;
@@ -330,6 +338,13 @@ export interface IReview {
         id?: string;
         name?: string;
     }
+}
+
+export interface IFeedback {
+    id?: string;
+    subject?: string;
+    content?: string;
+    status?: string;
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

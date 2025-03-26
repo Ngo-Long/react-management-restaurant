@@ -1,14 +1,24 @@
+import {
+    Row,
+    Col,
+    Card,
+    message,
+    Checkbox,
+    notification
+} from 'antd';
+import {
+    CoffeeOutlined,
+    GatewayOutlined
+} from '@ant-design/icons';
 import '@/styles/client.table.scss';
+import OrderCard from './order.card';
 import React, { useState } from 'react';
 import { IOrder } from '@/types/backend';
+import ProductCard from './product.card';
+import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
-import { IOrderDetail } from '../../types/backend';
+import { IOrderDetail } from '../../../types/backend';
 import { orderApi, orderDetailApi } from "@/config/api";
-import OrderCard from '../../components/client/card/order.card';
-import ProductCard from '../../components/client/card/product.card';
-import { CoffeeOutlined, GatewayOutlined } from '@ant-design/icons';
-import DiningTableCard from '../../components/client/card/table.card';
-import { Row, Col, Card, Checkbox, message, notification } from 'antd';
 import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
 
@@ -73,8 +83,6 @@ const SaleClient: React.FC = () => {
         const res = await orderDetailApi.callCreate(newItem);
         if (res.data) {
             dispatch(fetchOrderDetailsByOrderId(order.id));
-
-            // update order
             const updatedOrder = await orderApi.callUpdate({ ...order, status: 'PENDING' });
             setCurrentOrder(updatedOrder.data!);
         } else {
@@ -99,8 +107,8 @@ const SaleClient: React.FC = () => {
                         { key: 'tab1', tab: 'Phòng bàn', icon: <GatewayOutlined /> },
                         { key: 'tab2', tab: 'Thực đơn', icon: <CoffeeOutlined /> }
                     ]}
-                    activeTabKey={activeTabKey}
                     bordered={true}
+                    activeTabKey={activeTabKey}
                     onTabChange={(key) => setActiveTabKey(key)}
                     tabBarExtraContent={
                         <Checkbox

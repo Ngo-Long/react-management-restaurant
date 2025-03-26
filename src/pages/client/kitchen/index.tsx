@@ -1,35 +1,53 @@
-
+import {
+    Card,
+    Flex,
+    Space,
+    Button,
+    message,
+    notification,
+} from 'antd';
 import { Table } from 'antd/lib';
+import { ColumnType } from 'antd/es/table';
+
 import '@/styles/client.table.scss';
-import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { ColumnType } from 'antd/es/table';
 import { orderDetailApi } from '@/config/api';
 import { useAppDispatch } from '@/redux/hooks';
-import { IOrderDetail } from '../../types/backend';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import React, { useEffect, useState } from 'react';
+import { IOrderDetail } from '../../../types/backend';
 import DropdownMenu from '@/components/share/dropdown.menu';
-import { Card, Button, Flex, message, notification } from 'antd';
 import { fetchOrderDetailsByRestaurant } from '@/redux/slice/orderDetailSlide';
 
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { fetchProductsByRestaurant } from '@/redux/slice/productSlide';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 
 const KitchenClient: React.FC = () => {
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
+    const [activeTabKey, setActiveTabKey] = useState<string>('');
+    const products = useSelector((state: RootState) => state.product.result);
     const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
+    const stations = [...new Set(products.map(product => product.station))].filter(Boolean);
 
     useEffect(() => {
         fetchData();
     }, [dispatch]);
 
+    useEffect(() => {
+        if (stations.length > 0 && !activeTabKey) {
+            setActiveTabKey(stations[0]);
+        }
+    }, [stations, activeTabKey]);
+
     const fetchData = async () => {
         setLoading(true);
         try {
+            await dispatch(fetchProductsByRestaurant({ query: '' }));
             await dispatch(fetchOrderDetailsByRestaurant({ query: "filter=status~'PENDING'&sort=createdDate,asc" }));
         } catch (error: any) {
             notification.error({ message: "Lỗi khi tải dữ liệu", description: error.message });
@@ -52,10 +70,15 @@ const KitchenClient: React.FC = () => {
         {
             title: 'Tên món ăn',
             key: 'name',
-            dataIndex: 'unit',
             render: (_, record) => (
                 <div className='btn-name'>
-                    {`${record.unit?.productName} (${record.unit?.name})`}
+                    {`${record.product?.name} (${record.unit?.name})`}
+                    {record?.note && (
+                        <>
+                            <br />
+                            {`⤷ ${record.note}`}
+                        </>
+                    )}
                 </div>
             )
         },
@@ -63,25 +86,22 @@ const KitchenClient: React.FC = () => {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
-            width: 200,
-            align: "center" as const,
+            align: 'center',
         },
         {
             title: 'Phòng/bàn',
-            width: 200,
             key: 'diningTables',
             dataIndex: 'diningTables',
-            align: "center" as const,
+            align: 'center',
         },
         {
             title: 'Thời gian',
-            width: 200,
             dataIndex: 'lastModifiedDate',
-            align: "center" as const,
+            align: 'center',
             render: (_, record) => {
                 return (
                     <>
-                        {dayjs(record.lastModifiedDate).format('HH:mm:ss DD-MM-YYYY')} <br />
+                        {dayjs(record.lastModifiedDate).format('HH:mm:ss - DD/MM/YYYY')} <br />
                         <small>{`( ${dayjs(record.lastModifiedDate).fromNow()} )`}</small>
                     </>
                 );
@@ -89,14 +109,13 @@ const KitchenClient: React.FC = () => {
         },
         {
             title: 'Tác vụ',
-            width: 200,
             align: "center",
             render: (_, record) => (
                 <Flex wrap gap="small">
                     <Button danger onClick={() => handleUpdateStatus(record, 'CANCELED')}>
-                        Hủy
+                        Xóa
                     </Button>
-                    <Button type="primary" danger onClick={() => handleUpdateStatus(record, 'CONFIRMED')}>
+                    <Button danger type="primary" onClick={() => handleUpdateStatus(record, 'CONFIRMED')}>
                         Hoàn thành
                     </Button>
                 </Flex>
@@ -104,26 +123,52 @@ const KitchenClient: React.FC = () => {
         },
     ];
 
-    return (
-        <Card
-            title='Chờ chế biến'
-            bordered={true}
-            className={'no-select'}
-            style={{ height: '100vh' }}
-            extra={<DropdownMenu />}
-        >
+    const contentList: Record<string, React.ReactNode> = stations.reduce((acc, station, index) => {
+        acc[station] = (
             <Table<IOrderDetail>
-                key={orderDetails.length}
+                size='large'
+                key={`kitchen-${index}`}
                 loading={loading}
                 columns={columns}
-                dataSource={orderDetails}
                 pagination={false}
-                size='large'
                 className="order-table"
-                rowKey={(record) => record.id || ''}
                 rowClassName="order-table-row"
-                scroll={{ y: 50 * 10 }}
+                rowKey={(record) => record.id || ''}
+                scroll={{ y: 'calc(100vh - 160px)' }}
+                dataSource={orderDetails.filter(order => order.product?.station === station)}
             />
+        );
+        return acc;
+    }, {} as Record<string, React.ReactNode>);
+
+    return (
+        <Card
+            tabList={stations.map(station => ({ key: station, tab: station }))}
+            bordered={true}
+            className={'no-select'}
+            activeTabKey={activeTabKey}
+            tabBarExtraContent={
+                <Space>
+                    <Button type='primary' onClick={() => fetchData()}>
+                        Lịch sử
+                    </Button>
+                    <Button type='primary' onClick={() => fetchData()}>
+                        Nguyên liệu
+                    </Button>
+                    <DropdownMenu />
+                </Space>
+            }
+            onTabChange={(key) => setActiveTabKey(key)}
+            style={{
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column'
+            }}
+            bodyStyle={{
+                overflow: 'hidden'
+            }}
+        >
+            {contentList[activeTabKey]}
         </Card>
     );
 };
