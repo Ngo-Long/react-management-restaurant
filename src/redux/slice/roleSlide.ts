@@ -16,7 +16,7 @@ interface IState {
 }
 // First, create the thunk
 export const fetchRole = createAsyncThunk(
-    'resume/fetchRole',
+    'role/fetchRole',
     async ({ query }: { query: string }) => {
         const response = await roleApi.callFetchFilter(query);
         return response;
@@ -24,7 +24,7 @@ export const fetchRole = createAsyncThunk(
 )
 
 export const fetchRoleById = createAsyncThunk(
-    'resume/fetchRoleById',
+    'role/fetchRoleById',
     async (id: string) => {
         const response = await roleApi.callFetchById(id);
         return response;
@@ -49,7 +49,6 @@ const initialState: IState = {
         permissions: []
     }
 };
-
 
 export const roleSlide = createSlice({
     name: 'role',
@@ -128,7 +127,7 @@ export const roleSlide = createSlice({
 });
 
 export const {
-    resetSingleRole
+    // resetSingleRole
 } = roleSlide.actions;
 
 export default roleSlide.reducer;

@@ -1,25 +1,33 @@
-
 import {
+    Col,
+    Row,
+    Form,
+    Input,
+    Space,
+    Button,
+    Divider,
+    message,
+    InputRef,
+    notification,
+} from "antd";
+import {
+    ProTable,
     ModalForm,
+    ProFormText,
     ProFormDigit,
     ProFormSelect,
     ProFormSwitch,
-    ProFormText,
     ProFormTextArea,
     ProFormUploadDragger,
-    ProTable
 } from "@ant-design/pro-components";
-import {
-    Button, Col, Divider, Form, Input, Row,
-    Space, message, notification, InputRef
-} from "antd";
+import { PlusOutlined } from '@ant-design/icons';
+
 import 'react-quill/dist/quill.snow.css';
 import { diningTableApi } from "@/config/api";
 import { useAppSelector } from "@/redux/hooks";
 import { isMobile } from 'react-device-detect';
 import { IDiningTable } from "@/types/backend";
 import { handleImportXlsx } from "@/utils/file";
-import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 
 declare type IProps = {

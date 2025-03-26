@@ -1,21 +1,35 @@
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
-import { IUser } from "@/types/backend";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, message, notification } from "antd";
-import { useState, useRef } from 'react';
+import {
+    Space,
+    Button,
+    message,
+    Popconfirm,
+    notification
+} from "antd";
+import {
+    EditOutlined,
+    PlusOutlined,
+    DeleteOutlined,
+} from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns,
+} from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
+import moment from "moment";
 import { userApi } from "@/config/api";
 import queryString from 'query-string';
+import { IUser } from "@/types/backend";
+import { useState, useRef } from 'react';
+import Access from "@/components/share/access";
+import { sfLike } from "spring-filter-query-builder";
+import DataTable from "@/components/client/data.table";
+import { paginationConfigure } from "@/utils/paginator";
+import { ALL_PERMISSIONS } from "@/config/permissions";
 import ModalUser from "@/components/admin/user/modal.user";
 import ViewDetailUser from "@/components/admin/user/view.user";
-import Access from "@/components/share/access";
-import { ALL_PERMISSIONS } from "@/config/permissions";
-import { sfLike } from "spring-filter-query-builder";
-import DataTable from "@/components/client/data-table";
-import { paginationConfigure } from "@/utils/paginator";
-import moment from "moment";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
 
 const UserPage = () => {
     const dispatch = useAppDispatch();
@@ -68,7 +82,10 @@ const UserPage = () => {
             dataIndex: ["role", "name"],
             sorter: true,
             align: "center",
-            hideInSearch: true
+            hideInSearch: true,
+            render: (_, record) => {
+                return record.role ? record.role.name : 'Khách hàng';
+            }
         },
         {
             title: 'Email',

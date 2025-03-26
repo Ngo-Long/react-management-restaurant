@@ -1,27 +1,46 @@
 
 import {
-    ProFormSelect,
-    ProFormSwitch,
-    ProFormText,
-    FooterToolbar,
-    ModalForm,
-    ProForm,
-    ProFormDigit,
-    DrawerForm,
-    ProFormUploadDragger,
-    ProTable
-} from "@ant-design/pro-components";
-import {
-    Button, Col, ConfigProvider, Divider, Form, Input,
-    InputRef, Row, Space, Upload, message, notification
+    Col,
+    Row,
+    Form,
+    Input,
+    Space,
+    Button,
+    Upload,
+    message,
+    Divider,
+    InputRef,
+    notification,
+    ConfigProvider,
 } from "antd";
 import {
-    beforeUpload, getBase64, handleChange,
-    handleRemoveFile, handleUploadFileLogo
+    getBase64,
+    beforeUpload,
+    handleChange,
+    handleRemoveFile,
+    handleUploadFileLogo
 } from "@/utils/image";
+import {
+    PlusOutlined,
+    LoadingOutlined,
+    CheckSquareOutlined,
+} from '@ant-design/icons';
+import {
+    ProForm,
+    ProTable,
+    ModalForm,
+    DrawerForm,
+    ProFormText,
+    ProFormDigit,
+    FooterToolbar,
+    ProFormSelect,
+    ProFormSwitch,
+    ProFormUploadDragger,
+} from "@ant-design/pro-components";
+import enUS from 'antd/lib/locale/en_US';
+
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
-import enUS from 'antd/lib/locale/en_US';
 import 'react-quill/dist/quill.snow.css';
 import { ingredientApi } from "@/config/api";
 import { IIngredient } from "@/types/backend";
@@ -30,7 +49,6 @@ import { handleImportXlsx } from "@/utils/file";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
-import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 interface IProps {
     openModal: boolean;

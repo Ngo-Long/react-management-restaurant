@@ -177,8 +177,6 @@ const LayoutAdmin: React.FC = () => {
         }
     }, [permissions]);
 
-
-
     return (
         <>
             <Layout style={{ minHeight: '100vh' }}>

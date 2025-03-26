@@ -264,13 +264,13 @@ const ViewUpsertReceipt = () => {
                             <Col span={24} md={12}>
                                 <ProFormSelect
                                     label="Loại phiếu"
-                                    name="category"
+                                    name="type"
                                     placeholder="Chọn loại phiếu"
                                     rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                     options={[
-                                        { label: "Phiếu nhập", value: "phieu_nhap" },
-                                        { label: "Phiếu trả", value: "phieu_tra" },
-                                        { label: "Phiếu tạm", value: "phieu_tam" },
+                                        { label: "Phiếu nhập", value: "IN" },
+                                        { label: "Phiếu trả", value: "OUT" },
+                                        { label: "Phiếu tạm", value: "TEMPORARY" },
                                     ]}
                                 />
                             </Col>
@@ -294,18 +294,20 @@ const ViewUpsertReceipt = () => {
 
                             <Col span={24} md={12}>
                                 <ProFormSelect
+                                    name="status"
                                     label="Trạng thái"
                                     placeholder="Chọn thanh toán"
                                     rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                                     options={[
-                                        { label: "Thanh toán ngay", value: "thanh_toan_ngay" },
-                                        { label: "Chưa thanh toán", value: "chưa thanh toán" },
+                                        { label: "Thanh toán ngay", value: "PAID" },
+                                        { label: "Chưa thanh toán", value: "UNPAID" },
                                     ]}
                                 />
                             </Col>
 
                             <Col span={24} md={12}>
                                 <ProFormText
+                                    name="note"
                                     label="Ghi chú"
                                     placeholder="Nhập ghi chú"
                                 />

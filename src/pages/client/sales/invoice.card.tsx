@@ -121,7 +121,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             title: 'SL',
             dataIndex: 'quantity',
             key: 'quantity',
-            align: "center" as const,
+            align: 'center',
             width: 50
         },
         {
@@ -129,7 +129,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             dataIndex: 'price',
             key: 'price',
             width: 90,
-            align: "center" as const,
+            align: 'center',
             render: (_, record) => {
                 return formatPrice(record.unit?.price);
             }
@@ -139,7 +139,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             dataIndex: 'price',
             key: 'price',
             width: 90,
-            align: "center" as const,
+            align: 'center',
             render: (_, record) => {
                 const price = record.unit?.price;
                 const total = record.quantity! * Number(price);

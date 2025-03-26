@@ -13,20 +13,23 @@ import {
     DeleteOutlined,
     DownloadOutlined
 } from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns
+} from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
 import { supplierApi } from "@/config/api";
 import { ISupplier } from "@/types/backend";
 import Access from "@/components/share/access";
-import { sfIn } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { ModalSupplier, ModalBatchImport } from './container';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { fetchSupplierByRestaurant } from "@/redux/slice/supplierSlide";
 
 const SupplierPage = () => {

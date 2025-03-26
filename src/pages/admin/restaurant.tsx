@@ -1,16 +1,31 @@
+import {
+    Tag,
+    Space,
+    Button,
+    message,
+    Popconfirm,
+    notification
+} from "antd";
+import {
+    EditOutlined,
+    PlusOutlined,
+    DeleteOutlined,
+} from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns,
+    ProFormSelect
+} from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, Tag, message, notification } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-
 import { restaurantApi } from "@/config/api";
 import { IRestaurant } from "@/types/backend";
 import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchRestaurant } from "@/redux/slice/restaurantSlide";
 import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";

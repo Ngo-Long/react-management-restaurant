@@ -6,19 +6,25 @@ import {
     EditOutlined,
     PlusOutlined,
 } from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns
+} from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
 import { IReceipt } from "@/types/backend";
+import { useNavigate } from "react-router-dom";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from '@/utils/paginator';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { fetchReceiptByRestaurant } from "@/redux/slice/receiptSlide";
 
 const ReceiptPage = () => {
+    const navigate = useNavigate();
     const tableRef = useRef<ActionType>();
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IReceipt | null>(null);

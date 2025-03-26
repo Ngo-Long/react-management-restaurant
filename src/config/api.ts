@@ -81,6 +81,10 @@ export const restaurantApi = {
 Module User
  */
 export const userApi = {
+    callCreateClient(user: IUser) {
+        return axios.post<IBackendRes<IUser>>('/api/v1/users/clients', { ...user });
+    },
+
     callCreate(user: IUser) {
         return axios.post<IBackendRes<IUser>>('/api/v1/users', { ...user });
     },
@@ -99,6 +103,10 @@ export const userApi = {
 
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users/by-restaurant?${query}`);
+    },
+
+    callFetchClientByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/clients/by-restaurant?${query}`);
     }
 }
 

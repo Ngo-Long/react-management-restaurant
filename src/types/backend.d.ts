@@ -133,6 +133,8 @@ export interface IOrder {
     id?: string;
     note?: string;
     totalPrice?: number;
+    guestCount?: number;
+    reservationTime?: string;
     option?: string;
     status?: string;
     user?: {

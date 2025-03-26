@@ -1,13 +1,25 @@
+import {
+    Col,
+    Row,
+    Flex,
+    Modal,
+    Radio,
+    Button,
+    InputNumber,
+} from 'antd';
+import {
+    PlusOutlined,
+    MinusOutlined,
+} from '@ant-design/icons';
+import TextArea from 'antd/es/input/TextArea';
+
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { formatPrice } from '@/utils/format';
-import TextArea from 'antd/es/input/TextArea';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
 import { IOrderDetail, IProduct } from '@/types/backend';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
-import { Button, Col, Flex, InputNumber, Modal, Radio, Row } from 'antd';
 
 interface ProductCardProps {
     handleItemSelect: (item: IOrderDetail) => void;

@@ -183,7 +183,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             title: 'Số lượng',
             dataIndex: 'quantity',
             key: 'quantity',
-            align: "center" as const,
+            align: 'center',
             width: 90
         },
         {
@@ -191,7 +191,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             dataIndex: 'price',
             key: 'price',
             width: 90,
-            align: "center" as const,
+            align: 'center',
             render: (_, record) => (
                 <Space>
                     {formatPrice(record.quantity! * record.unit?.price!)}
