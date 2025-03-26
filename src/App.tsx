@@ -27,6 +27,7 @@ import ViewUpsertProduct from './pages/admin/product/container';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
 import ReceiptPage from './pages/admin/receipt';
 import ViewUpsertReceipt from './pages/admin/receipt/container';
+import FeedbackPage from './pages/admin/feedback';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -132,6 +133,10 @@ export default function App() {
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>
+        },
+        {
+          path: "feedback",
+          element: <ProtectedRoute> <FeedbackPage /> </ProtectedRoute>
         },
         {
           path: "receipt",
