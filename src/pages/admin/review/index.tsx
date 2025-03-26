@@ -20,20 +20,22 @@ import {
 
 import dayjs from 'dayjs';
 import queryString from 'query-string';
-import { useState, useRef, useEffect } from 'react';
-import { receiptApi } from '@/config/api';
+import { useState, useRef } from 'react';
+import { reviewApi } from '@/config/api';
 import { IReview } from '@/types/backend';
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data-table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchReview } from "@/redux/slice/reviewSlide";
+import DataTable from "@/components/client/data.table";
+import { ModalReview } from "./container";
+
+
 
 const ReviewPage = () => {
     const tableRef = useRef<ActionType>();
-    const [loading, setLoading] = useState<boolean>(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openUpload, setOpenUpload] = useState<boolean>(false);
 
@@ -42,44 +44,25 @@ const ReviewPage = () => {
     const [dataInit, setDataInit] = useState<IReview | null>(null);
     const reviews = useAppSelector(state => state.review.result);
     const isFetching = useAppSelector(state => state.review.isFetching);
-    const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
+
+
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
-    const fetch = () => {
-        setLoading(true);
-        dispatch(fetchReview({ query: '' }));
-    };
-
     const handleToggleActive = async (record: IReview, checked: boolean) => {
         const updatedRecord = { ...record, active: checked };
-        const res = await receiptApi.callUpdate(updatedRecord);
-
-        if (res && +res.statusCode === 200) {
-            message.success('Cập nhật trạng thái thành công');
-            reloadTable();
-        } else {
-            notification.error({
-                message: 'Có lỗi xảy ra!',
-                description: 'Không thể cập nhật trạng thái!'
-            });
-        }
+        await reviewApi.callUpdate(updatedRecord);
+        message.success('Cập nhật trạng thái thành công');
+        reloadTable();
     };
 
     const handleDeleteFeedback = async (id: string | undefined) => {
         if (id) {
-            const res = await receiptApi.callDelete(id);
-            if (res && +res.statusCode === 200) {
-                message.success('Xóa bài thành công');
-                reloadTable();
-            } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra!',
-                    description: 'Bàn đã được sử dụng không thể xóa được!'
-                });
-            }
+            await reviewApi.callDelete(id);
+            message.success('Xóa bài thành công');
+            reloadTable();
         }
     }
 
@@ -96,23 +79,6 @@ const ReviewPage = () => {
                     return newRow;
                 }, {} as Record<keyof IReview, any>)
         })
-    }
-
-    const batchImportConfigHandler = async (data: IReview[]) => {
-        if (!data || data?.length <= 0) return;
-        setLoading(true);
-
-        const formattedData = data.map(item => ({
-            ...item,
-            status: 'AVAILABLE',
-            active: true,
-            restaurant: {
-                id: currentRestaurant.id ?? '',
-                name: currentRestaurant.name ?? ''
-            }
-        }));
-        console.log('data: ', formattedData);
-
     }
 
     const columns: ProColumns<IReview>[] = [
@@ -269,10 +235,6 @@ const ReviewPage = () => {
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
-                    <Button onClick={() => setOpenUpload(true)}>
-                        <UploadOutlined /> Import
-                    </Button>,
-
                     <Button onClick={handleExportAsXlsx(reviews, formatCSV)}>
                         <DownloadOutlined /> Export
                     </Button>,
@@ -282,14 +244,14 @@ const ReviewPage = () => {
                     </Button>
                 ]}
             />
-{/* 
-            <ModalDiningTable
+
+            <ModalReview
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
                 dataInit={dataInit}
                 setDataInit={setDataInit}
-            /> */}
+            />
 
         </Access>
     )

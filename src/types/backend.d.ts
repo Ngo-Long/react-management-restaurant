@@ -327,7 +327,7 @@ export interface IReview {
     id?: string;
     title?: string;
     description?: string;
-    images?: string;
+    images: string;
     background_color?: string;
     active?: boolean;
     restaurant?: {
@@ -338,6 +338,11 @@ export interface IReview {
         id?: string;
         name?: string;
     }
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
 }
 
 export interface IFeedback {

@@ -2,7 +2,6 @@ import RolePage from './pages/admin/role';
 import UserPage from './pages/admin/user';
 import LoginPage from './pages/auth/login';
 import InvoicePage from './pages/admin/invoice';
-import ReceiptPage from './pages/admin/receipt';
 import ProductPage from './pages/admin/product';
 import RegisterPage from './pages/auth/register';
 import SupplierPage from './pages/admin/supplier';
@@ -31,9 +30,10 @@ import { useEffect, useRef } from 'react';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
-import ReceiptPage from './pages/admin/receipt';
-import ViewUpsertReceipt from './pages/admin/receipt/container';
+
 import ReviewPage from './pages/admin/review';
+import FeedbackPage from './pages/admin/feedback';
+import ReceiptPage from './pages/admin/receipt';
 
 
 const LayoutClient = () => {

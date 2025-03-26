@@ -19,12 +19,12 @@ import { ActionType, ProColumns } from '@ant-design/pro-components';
 import { feedbackApi } from '@/config/api';
 import { IFeedback} from '@/types/backend';
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data-table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { ModalFeedback } from './container';
 import { fetchFeedback } from "@/redux/slice/feedbackSlide";
+import DataTable from '@/components/client/data.table';
 
 const FeedbackPage = () => {
     const dispatch = useAppDispatch();
