@@ -212,6 +212,14 @@ export const orderApi = {
         return axios.delete<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
     },
 
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
+    },
+
+    callFetchByTable(id: string) {
+        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/by-table/${id}`)
+    },
+
     callFetchFilter(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IOrder>>>(`/api/v1/orders?${query}`);
     },
@@ -219,14 +227,6 @@ export const orderApi = {
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IOrder>>>(`/api/v1/orders/by-restaurant?${query}`);
     },
-
-    callFetchById(id: string) {
-        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
-    },
-
-    callFetchByTable(id: string) {
-        return axios.get<IBackendRes<IOrder>>(`/api/v1/orders/by-table/${id}`)
-    }
 }
 
 /**

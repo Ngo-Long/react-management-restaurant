@@ -11,9 +11,9 @@ import {
     GatewayOutlined
 } from '@ant-design/icons';
 import '@/styles/client.table.scss';
+import OrderCard from './order.card';
 import React, { useState } from 'react';
 import { IOrder } from '@/types/backend';
-import OrderCard from './order.card';
 import ProductCard from './product.card';
 import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
@@ -83,8 +83,6 @@ const SaleClient: React.FC = () => {
         const res = await orderDetailApi.callCreate(newItem);
         if (res.data) {
             dispatch(fetchOrderDetailsByOrderId(order.id));
-
-            // update order
             const updatedOrder = await orderApi.callUpdate({ ...order, status: 'PENDING' });
             setCurrentOrder(updatedOrder.data!);
         } else {

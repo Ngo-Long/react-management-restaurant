@@ -11,6 +11,9 @@ import {
     TimePicker,
     ConfigProvider,
     Select,
+    Badge,
+    Card,
+    Calendar,
 } from "antd";
 import {
     ModalForm,
@@ -35,6 +38,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import ModalClient from '@/components/client/modal.client';
 import { fetchClientByRestaurant } from "@/redux/slice/userSlide";
 import { fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
+import { BadgeProps } from "antd/lib";
 
 declare type IProps = {
     openModal: boolean;
@@ -296,3 +300,55 @@ export const ModalOrderScheduled = (props: IProps) => {
         </>
     )
 }
+
+interface CalendarBookingProps {
+    orders: IOrder[];
+}
+
+export const CalendarBooking: React.FC<CalendarBookingProps> = ({ orders }) => {
+    const getListData = (value: Dayjs) => {
+        const ordersInDay = orders.filter(order => dayjs(order.reservationTime).isSame(value, 'day'));
+
+        return ordersInDay.map(order => {
+            let type: BadgeProps['status'];
+            switch (order.status) {
+                case 'RESERVED':
+                    type = 'warning';
+                    break;
+                case 'PENDING':
+                    type = 'success';
+                    break;
+                case 'CANCELED':
+                    type = 'error';
+                    break;
+                default:
+                    type = 'warning';
+            }
+
+            const time = dayjs(order.reservationTime).format('HH:mm');
+            const tables = order.diningTables?.map(t => t.name).join(', ');
+            const content = `${time} - ${order.user?.name || 'Khách hàng'} - ${tables}`;
+
+            return { type, content };
+        });
+    };
+
+    const dateCellRender = (value: Dayjs) => {
+        const listData = getListData(value);
+        return (
+            <ul className="events">
+                {listData.map((item) => (
+                    <li key={item.content}>
+                        <Badge status={item.type} text={item.content} />
+                    </li>
+                ))}
+            </ul>
+        );
+    };
+
+    return (
+        <Card type="inner" title="Lịch đặt bàn">
+            <Calendar dateCellRender={dateCellRender} />
+        </Card>
+    );
+};

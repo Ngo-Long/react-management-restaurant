@@ -26,6 +26,7 @@ import Access from "@/components/share/access";
 import { sfLike } from "spring-filter-query-builder";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import DataTable from "@/components/client/data.table";
+import { paginationConfigure } from "@/utils/paginator";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchRestaurant } from "@/redux/slice/restaurantSlide";
 import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";
@@ -33,13 +34,11 @@ import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";
 const RestaurantPage = () => {
     const tableRef = useRef<ActionType>();
     const dispatch = useAppDispatch();
-
+    const meta = useAppSelector(state => state.restaurant.meta);
+    const restaurants = useAppSelector(state => state.restaurant.result);
+    const isFetching = useAppSelector(state => state.restaurant.isFetching);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IRestaurant | null>(null);
-
-    const meta = useAppSelector(state => state.restaurant.meta);
-    const isFetching = useAppSelector(state => state.restaurant.isFetching);
-    const restaurants = useAppSelector(state => state.restaurant.result);
 
     const handleDeleteRestaurant = async (id: string | undefined) => {
         if (!id) {
@@ -219,52 +218,29 @@ const RestaurantPage = () => {
     }
 
     return (
-        <div>
-            <Access
-                permission={ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE}
-            >
-                <DataTable<IRestaurant>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách nhà hàng"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={restaurants}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchRestaurant({ query }))
-                        }
-                    }
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                    toolBarRender={(_action, _rows): any => {
-                        return (
-                            <Access
-                                permission={ALL_PERMISSIONS.RESTAURANTS.CREATE}
-                                hideChildren
-                            >
-                                <Button
-                                    icon={<PlusOutlined />}
-                                    type="primary"
-                                    onClick={() => setOpenModal(true)}
-                                >
-                                    Thêm mới
-                                </Button>
-                            </Access>
-                        );
-                    }}
-                />
-            </Access>
+        <Access
+            permission={ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE}
+        >
+            <DataTable<IRestaurant>
+                rowKey="RestaurantId"
+                headerTitle="Danh sách nhà hàng"
+                columns={columns}
+                actionRef={tableRef}
+                loading={isFetching}
+                dataSource={restaurants}
+                pagination={paginationConfigure(meta)}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchRestaurant({ query }))
+                }}
+                toolBarRender={(_action, _rows): any => [
+                    <Access permission={ALL_PERMISSIONS.RESTAURANTS.CREATE} hideChildren>
+                        <Button type="primary" onClick={() => setOpenModal(true)}>
+                            <PlusOutlined />  Thêm mới
+                        </Button>
+                    </Access>
+                ]}
+            />
 
             <ModalRestaurant
                 openModal={openModal}
@@ -273,7 +249,7 @@ const RestaurantPage = () => {
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-        </div >
+        </Access>
     )
 }
 

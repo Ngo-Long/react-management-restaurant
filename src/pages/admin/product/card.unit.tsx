@@ -90,8 +90,6 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
         }
     };
 
-    console.log(unitList);
-
     const handleUnitChange = (id: any, key: string, value: any) => {
         if (key === 'default') {
             const updatedUnitList = unitList.map(unit => ({

@@ -23,10 +23,8 @@ const RolePage = () => {
 
     const meta = useAppSelector(state => state.role.meta);
     const roles = useAppSelector(state => state.role.result);
-
     const isFetching = useAppSelector(state => state.role.isFetching);
     const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
-
     const currentUser = useAppSelector(state => state.account.user);
     const isRoleOwner: boolean = Number(currentUser?.role?.id) === 1;
 

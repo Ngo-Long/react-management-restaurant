@@ -7,17 +7,17 @@ import {
     Input,
     Button,
     message,
-    notification,
     Calendar,
+    BadgeProps,
+    notification,
     CalendarProps,
-    BadgeProps
 } from 'antd';
 import {
-    FileExcelOutlined,
-    FileTextOutlined,
     PlusOutlined,
+    SearchOutlined,
     ScheduleOutlined,
-    SearchOutlined
+    FileTextOutlined,
+    FileExcelOutlined,
 } from '@ant-design/icons';
 import { Table } from 'antd/lib';
 import { ColumnType } from 'antd/es/table';
@@ -39,7 +39,6 @@ import 'dayjs/locale/vi';
 import dayjs, { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -49,12 +48,8 @@ const ReceptionClient: React.FC = () => {
     const tableRef = useRef<ActionType>();
     const [loading, setLoading] = useState(false);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [activeTabKey, setActiveTabKey] = useState<string>('tab2');
-    const orders = useSelector((state: RootState) => state.order.result);
-
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
+    const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
+    const orders = useSelector((state: RootState) => state.order?.result);
 
     useEffect(() => {
         fetchData();
@@ -70,6 +65,10 @@ const ReceptionClient: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const reloadTable = () => {
+        tableRef?.current?.reload();
+    }
 
     const handleUpdateStatus = async (orderDetail: IOrderDetail, status: 'CANCELED' | 'CONFIRMED') => {
         try {
@@ -101,32 +100,39 @@ const ReceptionClient: React.FC = () => {
             title: 'Mã đặt bàn',
             key: 'id',
             dataIndex: 'id',
-            width: 110,
+            render: (_, record) => {
+                return (
+                    <>
+                        DB-{record.id}
+                    </>
+                );
+            }
         },
         {
             title: 'Thời gian đến',
             key: 'reservationTime',
             dataIndex: 'reservationTime',
-            width: 180,
             render: (_, record) => {
                 const date = dayjs(record.reservationTime);
                 return (
                     <>
                         {date.format('HH:mm DD-MM-YYYY')} <br />
-                        <small>{date.fromNow()}</small>
+                        bởi {record.user?.name}
                     </>
                 );
             }
         },
         {
             title: 'Khách hàng',
-            key: 'user.name',
-            dataIndex: ['user', 'name']
-        },
-        {
-            title: 'Điện thoại',
-            key: 'user.phoneNumber',
-            dataIndex: ['user', 'phoneNumber']
+            key: 'user',
+            dataIndex: 'user',
+            render: (_, record) => {
+                return (
+                    <>
+                        {`${record.user?.name} (${record.user?.phoneNumber || 'Không có số'})`}
+                    </>
+                );
+            }
         },
         {
             title: 'Số khách',
@@ -137,7 +143,6 @@ const ReceptionClient: React.FC = () => {
             title: 'Phòng/bàn',
             key: 'order.diningTable',
             dataIndex: ['order', 'diningTable'],
-            width: 170,
             render: (_, { diningTables = [] }) => (
                 <Space size="small" wrap>
                     {diningTables.map((table) => (
@@ -179,15 +184,11 @@ const ReceptionClient: React.FC = () => {
         },
         {
             title: 'Tác vụ',
-            width: 200,
             align: "center",
             render: (_, record) => (
                 <Flex wrap gap="small">
-                    <Button danger onClick={() => handleUpdateStatus(record, 'CANCELED')}>
-                        Hủy
-                    </Button>
                     <Button type="primary" danger onClick={() => handleUpdateStatus(record, 'CONFIRMED')}>
-                        Hoàn thành
+                        Cập nhật
                     </Button>
                 </Flex>
             ),
@@ -223,7 +224,7 @@ const ReceptionClient: React.FC = () => {
             // Format nội dung hiển thị
             const time = dayjs(order.reservationTime).format('HH:mm');
             const tables = order.diningTables?.map(t => t.name).join(', ');
-            const content = `${time} - ${order.user?.name || 'Khách hàng'} - ${tables}`;
+            const content = `${tables} (${time})`;
 
             return {
                 type,
@@ -231,7 +232,6 @@ const ReceptionClient: React.FC = () => {
             };
         });
     };
-
 
     // Cập nhật hàm getMonthData để hiển thị tổng số đơn trong tháng
     const getMonthData = (value: Dayjs) => {
@@ -257,13 +257,14 @@ const ReceptionClient: React.FC = () => {
     const dateCellRender = (value: Dayjs) => {
         const listData = getListData(value);
         return (
-            <ul className="events">
+            <div className="events">
                 {listData.map((item) => (
-                    <li key={item.content}>
-                        <Badge status={item.type as BadgeProps['status']} text={item.content} />
-                    </li>
+                    <div key={item.content}>
+                        <Badge size='small' status={item.type as BadgeProps['status']} />
+                        <small>{" " + item.content}</small>
+                    </div>
                 ))}
-            </ul>
+            </div>
         );
     };
 
@@ -275,11 +276,11 @@ const ReceptionClient: React.FC = () => {
 
     const contentList: Record<string, React.ReactNode> = {
         tab1: (
-            <Card type="inner" title="Lịch đặt bàn">
+            <Card type="inner">
                 <Calendar cellRender={cellRender} />
             </Card>
         ),
-        tab2:
+        tab2: (
             <>
                 <Flex gap="middle" justify="space-between" style={{ marginBottom: 16 }}>
                     <Input.Search
@@ -311,10 +312,19 @@ const ReceptionClient: React.FC = () => {
                     scroll={{ y: 50 * 9 }}
                 />
             </>
+        )
+    };
+
+    const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>['mode']) => {
+        console.log(value.format('YYYY-MM-DD'), mode);
     };
 
     return (
-        <>
+        <Flex>
+            <Card title="Lịch đặt bàn" style={{ width: 300 }}>
+                <Calendar fullscreen={false} onPanelChange={onPanelChange} />
+            </Card>
+
             <Card
                 tabList={[
                     { key: 'tab1', tab: 'Theo lịch', icon: <ScheduleOutlined /> },
@@ -335,7 +345,7 @@ const ReceptionClient: React.FC = () => {
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
             />
-        </>
+        </Flex>
     );
 };
 

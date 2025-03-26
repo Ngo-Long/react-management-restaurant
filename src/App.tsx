@@ -14,10 +14,12 @@ import DiningTablePage from './pages/admin/dining-table';
 import ViewUpsertReceipt from './pages/admin/receipt/container';
 import ViewUpsertProduct from './pages/admin/product/container';
 
+import OrderPage from './pages/admin/order';
+import ClientPage from './pages/admin/client';
+import HomePage from './pages/client/home';
 import SaleClient from './pages/client/sales';
-import HomePage from './pages/client/home.client';
 import ReceptionClient from './pages/client/reception';
-import KitchenClient from './pages/client/kitchen.client';
+import KitchenClient from './pages/client/kitchen';
 
 import NotFound from './components/share/not.found';
 import LayoutApp from './components/share/layout.app';
@@ -29,6 +31,7 @@ import { useEffect, useRef } from 'react';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
+
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -98,46 +101,80 @@ export default function App() {
 
     {
       path: "/admin",
-      element: (<LayoutApp><LayoutAdmin /> </LayoutApp>),
+      element:
+        <LayoutApp>
+          <LayoutAdmin />
+        </LayoutApp>,
       errorElement: <NotFound />,
       children: [
         {
           index: true,
-          element: <ProtectedRoute> <DashboardPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
         },
         {
           path: "restaurant",
-          element: <ProtectedRoute> <RestaurantPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <RestaurantPage />
+            </ProtectedRoute>
         },
         {
           path: "user",
-          element: <ProtectedRoute> <UserPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "client",
+          element:
+            <ProtectedRoute>
+              <ClientPage />
+            </ProtectedRoute>
         },
         {
           path: "dining-table",
-          element: <ProtectedRoute> <DiningTablePage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <DiningTablePage />
+            </ProtectedRoute>
         },
         {
           path: "product",
           children: [
             {
               index: true,
-              element: <ProtectedRoute> <ProductPage /> </ProtectedRoute>
+              element:
+                <ProtectedRoute>
+                  <ProductPage />
+                </ProtectedRoute>
             },
             {
               path: "upsert",
-              element: <ProtectedRoute> <ViewUpsertProduct /></ProtectedRoute>
+              element:
+                <ProtectedRoute>
+                  <ViewUpsertProduct />
+                </ProtectedRoute>
             }
           ]
         },
         {
           path: "ingredient",
-          element: <ProtectedRoute> <IngredientPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <IngredientPage />
+            </ProtectedRoute>
         },
-        // {
-        //   path: "order",
-        //   element: <ProtectedRoute> <OrderPage /> </ProtectedRoute>
-        // },
+        {
+          path: "order",
+          element:
+            <ProtectedRoute>
+              <OrderPage />
+            </ProtectedRoute>
+        },
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>

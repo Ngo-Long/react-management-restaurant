@@ -32,7 +32,7 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
+import { fetchProductsByRestaurant } from "@/redux/slice/productSlide";
 
 const ProductPage = () => {
     const navigate = useNavigate();
@@ -121,7 +121,14 @@ const ProductPage = () => {
         {
             title: 'Danh mục',
             dataIndex: 'category',
-            sorter: true,
+            align: "center",
+            hideInSearch: false,
+            valueEnum: {
+                'FOOD': { text: 'Món ăn' },
+                'DRINK': { text: 'Đồ uống' },
+                'DESSERT': { text: 'Tráng miệng' },
+                'OTHER': { text: 'Khác' }
+            }
         },
         {
             title: 'Đơn vị tính',
@@ -160,7 +167,12 @@ const ProductPage = () => {
         {
             title: 'Phân loại',
             dataIndex: 'type',
-            sorter: true,
+            align: "center",
+            hideInSearch: true,
+        },
+        {
+            title: 'Khu chế biến',
+            dataIndex: 'station',
             align: "center",
             hideInSearch: true,
         },
@@ -285,11 +297,11 @@ const ProductPage = () => {
                 loading={isFetching}
                 dataSource={products}
                 headerTitle="Danh sách món ăn"
+                pagination={paginationConfigure(meta)}
                 request={async (params, sort, filter): Promise<any> => {
                     const query = buildQuery(params, sort, filter);
-                    dispatch(fetchProductByRestaurant({ query }))
+                    dispatch(fetchProductsByRestaurant({ query }))
                 }}
-                pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
                     <Button onClick={handleExportAsXlsx(products, formatCSV)}>
                         <DownloadOutlined /> Export

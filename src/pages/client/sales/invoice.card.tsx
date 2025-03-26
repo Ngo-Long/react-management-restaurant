@@ -59,7 +59,6 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
 
     const handleSetCustomerPaid = (amount: number) => {
         setCustomerPaid(amount);
-
         const total = currentOrder?.totalPrice || 0;
         setReturnAmount(Math.max(0, amount - total));
     };
@@ -101,19 +100,18 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
 
     const columns: ColumnType<IOrderDetail>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
-            width: 30,
+            width: 40,
             align: "center",
             render: (_, record, index) => (index + 1) + (meta.page - 1) * meta.pageSize
         },
         {
             title: 'Tên món ăn',
             key: 'name',
-            dataIndex: 'product',
             render: (_, record) => (
                 <div className='btn-name'>
-                    {`${record.unit?.productName} (${record.unit?.name})`}
+                    {`${record.product?.name} (${record.unit?.name})`}
                 </div>
             )
         },
@@ -176,8 +174,8 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
         <Drawer
             open={open}
             width='950'
-            onClose={() => setOpen(false)}
             className='container-invoice'
+            onClose={() => setOpen(false)}
             title={`Thanh toán - ${currentTable.name} `}
         >
             <Row gutter={40}>
@@ -199,15 +197,15 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                         </div>
 
                         <Table<IOrderDetail>
-                            columns={columns}
-                            dataSource={orderDetails}
-                            pagination={false}
-                            size='middle'
                             bordered
-                            scroll={orderDetails.length > 10 ? { y: 48 * 10 } : undefined}
-                            rowKey={(record) => record.id || ''}
-                            rowClassName="order-table-row"
+                            size='middle'
+                            columns={columns}
+                            pagination={false}
                             className="order-table"
+                            dataSource={orderDetails}
+                            rowClassName="order-table-row"
+                            rowKey={(record) => record.id || ''}
+                            scroll={{ y: 'calc(100vh - 200px)' }}
                         />
                     </div>
 
@@ -329,9 +327,12 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                     </Flex>
 
                     <Flex wrap gap="small" className="invoice-wrap" style={{ padding: '14px 0' }}>
-                        {[0, 20000, 50000, 100000, 200000, 300000, 400000, 500000].map((increment) => (
-                            <Button key={increment} onClick={() => handleSetCustomerPaid((currentOrder?.totalPrice || 0) + increment)}>
-                                {formatPrice(currentOrder?.totalPrice! + increment)}
+                        {[(currentOrder?.totalPrice || 0), 50000, 100000, 200000, 300000, 400000, 500000, 1000000].map((increment) => (
+                            <Button
+                                key={increment}
+                                onClick={() => handleSetCustomerPaid(increment)}
+                            >
+                                {formatPrice(increment)}
                             </Button>
                         ))}
                     </Flex>
