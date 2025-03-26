@@ -142,6 +142,12 @@ const LayoutAdmin: React.FC = () => {
                     icon: <BarChartOutlined />
                 }] : []),
 
+                ...(viewOrder || ACL_ENABLE === 'false' ? [{
+                    label: <Link to='/admin/feedback'>Đánh giá</Link>,
+                    key: '/admin/feedback',
+                    icon: <BarChartOutlined />
+                }] : []),
+
                 ...(viewReceipt || ACL_ENABLE === 'false' ? [{
                     label: <Link to='/admin/receipt'>Biên lai</Link>,
                     key: '/admin/receipt',

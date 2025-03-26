@@ -315,3 +315,16 @@ export interface IReceipt {
     createdDate?: string;
     lastModifiedDate?: string;
 }
+
+
+export interface IFeedback {
+    id?: string;
+    subject?: string;
+    content?: string;
+    status?: string;
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}

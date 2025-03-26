@@ -2,7 +2,8 @@ import axios from '../config/axios-customize';
 import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
-    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit
+    IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit,
+    IFeedback
 } from '../types/backend';
 
 /**
@@ -441,4 +442,30 @@ export const receiptApi = {
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IReceipt>>>(`/api/v1/receipts/by-restaurant?${query}`);
     }
+}
+
+/**
+ *
+Module Feedback
+ */
+export const feedbackApi = {
+    callCreate(feedback: IFeedback) {
+        return axios.post<IBackendRes<IFeedback>>('/api/v1/feedbacks', { ...feedback });
+    },
+
+    callUpdate(feedback: IFeedback) {
+        return axios.put<IBackendRes<IFeedback>>('/api/v1/feedbacks', { ...feedback });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IFeedback>>(`/api/v1/feedbacks/${id}`);
+    },
+
+    callFetchById(id: string) {
+        return axios.get<IBackendRes<IFeedback>>(`/api/v1/feedbacks/${id}`);
+    },
+
+    callFetchFilter(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IFeedback>>>(`/api/v1/feedbacks?${query}`);
+    },
 }

@@ -29,6 +29,8 @@ import { useEffect, useRef } from 'react';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
+import ReceiptPage from './pages/admin/receipt';
+import ViewUpsertReceipt from './pages/admin/receipt/container';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -141,6 +143,10 @@ export default function App() {
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>
+        },
+        {
+          path: "feedback",
+          element: <ProtectedRoute> <FeedbackPage /> </ProtectedRoute>
         },
         {
           path: "receipt",
