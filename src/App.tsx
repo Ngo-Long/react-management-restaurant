@@ -1,32 +1,42 @@
 import RolePage from './pages/admin/role';
 import UserPage from './pages/admin/user';
 import LoginPage from './pages/auth/login';
-import ProductPage from './pages/admin/product';
+import InvoicePage from './pages/admin/invoice';
+
 import RegisterPage from './pages/auth/register';
+import SupplierPage from './pages/admin/supplier';
 import DashboardPage from './pages/admin/dashboard';
+import IngredientPage from './pages/admin/ingredient';
 import RestaurantPage from './pages/admin/restaurant';
 import PermissionPage from './pages/admin/permission';
 import DiningTablePage from './pages/admin/dining-table';
-import KitchenClient from './pages/client/kitchen.client';
+import ViewUpsertProduct from './pages/admin/product/container';
+
+import HomePage from './pages/client/home';
+import OrderPage from './pages/admin/order';
+import ClientPage from './pages/admin/client';
+import SaleClient from './pages/client/sales';
+
+import KitchenClient from './pages/client/kitchen';
+import ReceptionClient from './pages/client/reception';
+import ViewUpsertReceipt from './pages/admin/receipt/container';
 
 import NotFound from './components/share/not.found';
 import LayoutApp from './components/share/layout.app';
-import HomePage from './pages/client/home.client';
-import SaleClient from './pages/client/sale.client';
 import LayoutAdmin from './components/admin/layout.admin';
-import ProtectedRoute from './components/share/protected-route.ts';
+import ProtectedRoute from './components/share/protected-route';
 
 import './styles/reset.scss';
 import { useEffect, useRef } from 'react';
-import InvoicePage from './pages/admin/invoice';
-import SupplierPage from './pages/admin/supplier';
-import IngredientPage from './pages/admin/ingredient';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import ViewUpsertProduct from './pages/admin/product/container';
-import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
+import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom";
+
+import ProductPage from './pages/admin/product';
 import ReceiptPage from './pages/admin/receipt';
-import ViewUpsertReceipt from './pages/admin/receipt/container';
+import FeedbackPage from './pages/admin/feedback';
+import ReviewPage from './pages/admin/review';
+import ShiftPage from './pages/admin/shift';
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -83,55 +93,108 @@ export default function App() {
             <ProtectedRoute>
               <KitchenClient />
             </ProtectedRoute>
+        },
+        {
+          path: "/sales/reception",
+          element:
+            <ProtectedRoute>
+              <ReceptionClient />
+            </ProtectedRoute>
         }
       ],
     },
 
     {
       path: "/admin",
-      element: (<LayoutApp><LayoutAdmin /> </LayoutApp>),
+      element:
+        <LayoutApp>
+          <LayoutAdmin />
+        </LayoutApp>,
       errorElement: <NotFound />,
       children: [
         {
           index: true,
-          element: <ProtectedRoute> <DashboardPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
         },
         {
           path: "restaurant",
-          element: <ProtectedRoute> <RestaurantPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <RestaurantPage />
+            </ProtectedRoute>
         },
         {
           path: "user",
-          element: <ProtectedRoute> <UserPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "client",
+          element:
+            <ProtectedRoute>
+              <ClientPage />
+            </ProtectedRoute>
         },
         {
           path: "dining-table",
-          element: <ProtectedRoute> <DiningTablePage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <DiningTablePage />
+            </ProtectedRoute>
         },
         {
           path: "product",
           children: [
             {
               index: true,
-              element: <ProtectedRoute> <ProductPage /> </ProtectedRoute>
+              element:
+                <ProtectedRoute>
+                  <ProductPage />
+                </ProtectedRoute>
             },
             {
               path: "upsert",
-              element: <ProtectedRoute> <ViewUpsertProduct /></ProtectedRoute>
+              element:
+                <ProtectedRoute>
+                  <ViewUpsertProduct />
+                </ProtectedRoute>
             }
           ]
         },
         {
           path: "ingredient",
-          element: <ProtectedRoute> <IngredientPage /> </ProtectedRoute>
+          element:
+            <ProtectedRoute>
+              <IngredientPage />
+            </ProtectedRoute>
         },
-        // {
-        //   path: "order",
-        //   element: <ProtectedRoute> <OrderPage /> </ProtectedRoute>
-        // },
+        {
+          path: "order",
+          element:
+            <ProtectedRoute>
+              <OrderPage />
+            </ProtectedRoute>
+        },
         {
           path: "invoice",
           element: <ProtectedRoute> <InvoicePage /> </ProtectedRoute>
+        },
+        {
+          path: "review",
+          element: <ProtectedRoute> <ReviewPage /> </ProtectedRoute>
+        },
+        {
+          path: "feedback",
+          element: <ProtectedRoute> <FeedbackPage /> </ProtectedRoute>
+        },
+        {
+          path: "shift",
+          element: <ProtectedRoute> <ShiftPage /> </ProtectedRoute>
         },
         {
           path: "receipt",

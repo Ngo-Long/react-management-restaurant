@@ -27,22 +27,26 @@ import {
     CheckSquareOutlined
 } from '@ant-design/icons';
 import {
-    beforeUpload, getBase64, handleChange,
-    handleRemoveFile, handleUploadFileLogo
+    getBase64,
+    beforeUpload,
+    handleChange,
+    handleRemoveFile,
+    handleUploadFileLogo
 } from "@/utils/image";
 import enUS from 'antd/lib/locale/en_US';
 import Title from "antd/es/typography/Title";
+
 import { v4 as uuidv4 } from 'uuid';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import CategoryCard from "./card.unit";
+import 'react-quill/dist/quill.snow.css';
 import styles from 'styles/admin.module.scss';
 import { IUnit, IProduct } from "@/types/backend";
 import { unitApi, productApi } from "@/config/api";
 import { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
+import { fetchProductsByRestaurant } from "@/redux/slice/productSlide";
 
 interface IProductLogo {
     uid: string;
@@ -69,6 +73,8 @@ const ViewUpsertProduct = () => {
     const [newType, setNewType] = useState<string>('');
     const [categories, setCategories] = useState<string[]>([]);
     const [newCategory, setNewCategory] = useState<string>('');
+    const [stations, setStations] = useState<string[]>([]);
+    const [newStation, setNewStation] = useState<string>('');
 
     //modal animation
     const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
@@ -81,7 +87,7 @@ const ViewUpsertProduct = () => {
 
     useEffect(() => {
         if (currentRestaurant?.id) {
-            dispatch(fetchProductByRestaurant({ query: '' }));
+            dispatch(fetchProductsByRestaurant({ query: '' }));
         }
     }, [currentRestaurant, dispatch]);
 
@@ -93,6 +99,10 @@ const ViewUpsertProduct = () => {
         // set types
         const uniqueTypes = [...new Set(products.map(product => product.type))];
         setTypes(uniqueTypes);
+
+        // set stations
+        const uniqueStations = [...new Set(products.map(product => product.station))];
+        setStations(uniqueStations);
     }, [products]);
 
     useEffect(() => {
@@ -150,8 +160,6 @@ const ViewUpsertProduct = () => {
         return () => form.resetFields();
     }, [productId]);
 
-    console.log(dataLogo);
-
     // add a new category
     const addCategory = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
         e.preventDefault();
@@ -172,6 +180,14 @@ const ViewUpsertProduct = () => {
         }
     };
 
+    // add a new station
+    const addStation = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (newStation && !stations.includes(newStation)) {
+            setStations([...stations, newStation]);
+        }
+    };
+
     const hasIngredients = (unit: IUnit) => {
         return unit.unitDetails && unit.unitDetails.length > 0;
     };
@@ -185,11 +201,12 @@ const ViewUpsertProduct = () => {
         const hasEmptyUnit = unitList.some(unit => !hasIngredients(unit));
         if (hasEmptyUnit) return message.error('Vui lòng chọn nguyên liệu!');
 
-        const { name, type, category, shortDesc, detailDesc, active } = valuesForm;
+        const { name, type, station, category, shortDesc, detailDesc, active } = valuesForm;
         const product = {
             id: dataProduct?.id,
             name,
             type,
+            station,
             image: dataLogo[0].name || null,
             category,
             shortDesc,
@@ -408,12 +425,42 @@ const ViewUpsertProduct = () => {
                                 </Col>
 
                                 <Col span={24} md={12}>
+                                    <ProFormSelect
+                                        label="Khu chế biến"
+                                        name="station"
+                                        placeholder="Chọn khu chế biến"
+                                        rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                        options={stations.map(station => ({ label: station, value: station }))}
+                                        fieldProps={{
+                                            dropdownRender: (menu) => (
+                                                <>
+                                                    {menu}
+                                                    <Divider style={{ margin: '8px 0' }} />
+                                                    <Space style={{ padding: '0 8px 4px' }}>
+                                                        <Input
+                                                            placeholder="Thêm khu chế biến mới"
+                                                            value={newStation}
+                                                            onChange={(e) => setNewStation(e.target.value)}
+                                                            onKeyDown={(e) => e.stopPropagation()}
+                                                            ref={inputRef}
+                                                        />
+                                                        <Button type="default" icon={<PlusOutlined />} onClick={addStation}>
+                                                            Thêm
+                                                        </Button>
+                                                    </Space>
+                                                </>
+                                            ),
+                                        }}
+                                    />
+                                </Col>
+
+                                {/* <Col span={24} md={12}>
                                     <ProFormText
                                         label="Mô tả"
                                         name="shortDesc"
                                         placeholder="Nhập mô tả"
                                     />
-                                </Col>
+                                </Col> */}
 
                                 <Col span={24}>
                                     <ProForm.Item

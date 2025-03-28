@@ -1,18 +1,32 @@
 import {
-    Button, Col, InputNumber, Row,
-    Checkbox, Card, Tabs, Input, message, Flex
+    Col,
+    Row,
+    Tabs,
+    Flex,
+    Card,
+    Input,
+    Button,
+    message,
+    Checkbox,
+    InputNumber,
 } from 'antd';
 import {
-    DeleteOutlined, MinusOutlined,
-    PlusOutlined, SearchOutlined
+    PlusOutlined,
+    MinusOutlined,
+    SearchOutlined,
+    DeleteOutlined,
 } from '@ant-design/icons';
+import {
+    ProForm,
+    ProFormText,
+} from '@ant-design/pro-components';
 import { Table } from 'antd/lib';
-import { v4 as uuidv4 } from 'uuid';
 import { ColumnType } from 'antd/es/table';
+
+import { v4 as uuidv4 } from 'uuid';
 import { ingredientApi } from "@/config/api";
 import { IUnit, IIngredient } from '@/types/backend';
 import React, { useEffect, useRef, useState } from 'react';
-import { ProFormText, ProForm } from '@ant-design/pro-components';
 
 interface UnitCardProps {
     unitList: IUnit[];
@@ -75,8 +89,6 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             }
         }
     };
-
-    console.log(unitList);
 
     const handleUnitChange = (id: any, key: string, value: any) => {
         if (key === 'default') {

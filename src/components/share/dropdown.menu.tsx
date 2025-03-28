@@ -32,6 +32,10 @@ const DropdownMenu = () => {
             key: "kitchen",
         },
         {
+            label: <Link to={"/sales/reception"}>Lễ tân</Link>,
+            key: "reception",
+        },
+        {
             label: (
                 <span style={{ cursor: "pointer" }} onClick={handleLogout}>
                     Đăng xuất

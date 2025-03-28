@@ -21,8 +21,8 @@ export const fetchProduct = createAsyncThunk(
     }
 )
 
-export const fetchProductByRestaurant = createAsyncThunk(
-    'product/fetchProductByRestaurant',
+export const fetchProductsByRestaurant = createAsyncThunk(
+    'product/fetchProductsByRestaurant',
     async ({ query }: { query: string }) => {
         const response = await productApi.callFetchByRestaurant(query);
         return response;
@@ -66,16 +66,16 @@ export const productSlide = createSlice({
             }
         })
 
-        // Handle fetchProductByRestaurant actions
-        builder.addCase(fetchProductByRestaurant.pending, (state) => {
+        // Handle fetchProductsByRestaurant actions
+        builder.addCase(fetchProductsByRestaurant.pending, (state) => {
             state.isFetching = true;
         });
 
-        builder.addCase(fetchProductByRestaurant.rejected, (state) => {
+        builder.addCase(fetchProductsByRestaurant.rejected, (state) => {
             state.isFetching = false;
         });
 
-        builder.addCase(fetchProductByRestaurant.fulfilled, (state, action) => {
+        builder.addCase(fetchProductsByRestaurant.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;

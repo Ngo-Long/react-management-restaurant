@@ -16,6 +16,9 @@ import permissionReducer from './slice/permissionSlide';
 import ingredientReducer from './slice/ingredientSlide';
 import orderDetailReducer from './slice/orderDetailSlide';
 import diningTableReducer from './slice/diningTableSlide';
+import reviewReducer from './slice/reviewSlide';
+import feedbackReducer from './slice/feedbackSlide';
+import shiftReducer from './slice/shiftSlide';
 
 // Configure the Redux store with various slice reducers
 export const store = configureStore({
@@ -33,6 +36,9 @@ export const store = configureStore({
     restaurant: restaurantReducer,
     diningTable: diningTableReducer,
     orderDetail: orderDetailReducer,
+    review: reviewReducer,
+    feedback: feedbackReducer,
+    shift: shiftReducer,
   },
 });
 

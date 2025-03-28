@@ -1,34 +1,46 @@
-import DataTable from "@/components/client/data-table";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { IPermission } from "@/types/backend";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, message, notification } from "antd";
-import { useState, useRef } from 'react';
+import {
+    Button,
+    Space,
+    message,
+    Popconfirm,
+    notification
+} from "antd";
+import {
+    EditOutlined,
+    PlusOutlined,
+    DeleteOutlined,
+} from "@ant-design/icons";
+import {
+    ActionType,
+    ProColumns
+} from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
-import { permissionApi } from "@/config/api";
 import queryString from 'query-string';
-import { fetchPermission } from "@/redux/slice/permissionSlide";
-import ViewDetailPermission from "@/components/admin/permission/view.permission";
-import ModalPermission from "@/components/admin/permission/modal.permission";
+import { useState, useRef } from 'react';
 import { colorMethod } from "@/utils/format";
+import { permissionApi } from "@/config/api";
+import { IPermission } from "@/types/backend";
 import Access from "@/components/share/access";
+import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from "@/utils/paginator";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchPermission } from "@/redux/slice/permissionSlide";
+import ModalPermission from "@/components/admin/permission/modal.permission";
+import ViewDetailPermission from "@/components/admin/permission/view.permission";
 
 const PermissionPage = () => {
     const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
+    const meta = useAppSelector(state => state.permission.meta);
+    const permissions = useAppSelector(state => state.permission.result);
+    const isFetching = useAppSelector(state => state.permission.isFetching);
+    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
 
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IPermission | null>(null);
     const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
-
-    const meta = useAppSelector(state => state.permission.meta);
-    const permissions = useAppSelector(state => state.permission.result);
-
-    const isFetching = useAppSelector(state => state.permission.isFetching);
-    const userRoleId = Number(useAppSelector(state => state.account.user?.role?.id));
 
     const handleDeletePermission = async (id: string | undefined) => {
         if (id) {
@@ -207,31 +219,27 @@ const PermissionPage = () => {
     }
 
     return (
-        <div>
-            <Access
-                permission={ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE}
-            >
-                <DataTable<IPermission>
-                    rowKey="id"
-                    columns={columns}
-                    actionRef={tableRef}
-                    loading={isFetching}
-                    dataSource={permissions}
-                    headerTitle="Danh sách quyền hạn"
-                    request={async (params, sort, filter): Promise<any> => {
-                        const query = buildQuery(params, sort, filter);
-                        dispatch(fetchPermission({ query }))
-                    }}
-                    pagination={paginationConfigure(meta)}
-                    toolBarRender={(_action, _rows): any => [
-                        <Access permission={ALL_PERMISSIONS.PERMISSIONS.CREATE} hideChildren>
-                            <Button type="primary" onClick={() => setOpenModal(true)}>
-                                <PlusOutlined /> Thêm mới
-                            </Button>
-                        </Access>
-                    ]}
-                />
-            </Access>
+        <Access permission={ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE}>
+            <DataTable<IPermission>
+                rowKey="id"
+                headerTitle="Danh sách quyền hạn"
+                columns={columns}
+                actionRef={tableRef}
+                loading={isFetching}
+                dataSource={permissions}
+                pagination={paginationConfigure(meta)}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchPermission({ query }))
+                }}
+                toolBarRender={(_action, _rows): any => [
+                    <Access permission={ALL_PERMISSIONS.PERMISSIONS.CREATE} hideChildren>
+                        <Button type="primary" onClick={() => setOpenModal(true)}>
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>
+                ]}
+            />
 
             <ModalPermission
                 openModal={openModal}
@@ -247,7 +255,7 @@ const PermissionPage = () => {
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-        </div>
+        </Access>
     )
 }
 

@@ -1,40 +1,78 @@
 import {
+    Col,
+    Row,
+    Card,
+    Form,
+    Flex,
+    Input,
+    Badge,
+    Space,
+    Table,
+    Select,
+    Button,
+    Divider,
+    message,
+    Checkbox,
     Breadcrumb,
-    Button, Col, ConfigProvider, DatePicker, Divider,
-    Flex, message, notification, Radio, Row, Space, Table, TimePicker
+    DatePicker,
+    TimePicker,
+    InputNumber,
+    notification,
 } from "antd";
-import dayjs from 'dayjs';
-import jsPDF from 'jspdf';
-import '@/styles/client.table.scss';
-import '../../../styles/client.table.scss'
-import html2canvas from 'html2canvas';
-import { useRef, useState } from "react";
-import Search from "antd/es/input/Search";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { invoiceApi } from "@/config/api";
+import {
+    PlusOutlined,
+    FormOutlined,
+    DiffOutlined,
+    MinusOutlined,
+    SearchOutlined,
+    CheckSquareOutlined,
+} from '@ant-design/icons';
+import {
+    ProForm,
+    ProFormText,
+    FooterToolbar,
+    ProFormSelect,
+} from "@ant-design/pro-components";
 import { ColumnType } from "antd/es/table";
-import { UserOutlined } from '@ant-design/icons';
-import { IOrder, IOrderDetail } from "@/types/backend";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
-import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
+
+import dayjs from 'dayjs';
+import { receiptApi } from "@/config/api";
+import '../../../styles/client.table.scss';
+import { formatPrice } from "@/utils/format";
 import styles from 'styles/admin.module.scss';
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import enUS from 'antd/lib/locale/en_US';
-import Title from "antd/es/typography/Title";
+import { IIngredient, IReceipt } from "@/types/backend";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
+import { fetchSupplierByRestaurant } from "@/redux/slice/supplierSlide";
+import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
 
 const ViewUpsertReceipt = () => {
+    const [form] = Form.useForm();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const invoiceRef = useRef<HTMLDivElement | null>(null);
-    const meta = useAppSelector(state => state.orderDetail.meta);
 
     const [customerPaid, setCustomerPaid] = useState(0);
     const [returnAmount, setReturnAmount] = useState(0);
-    const [methodPaid, setMethodPaid] = useState<string>('CASH');
-    const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
-    const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price);
+    const [ingredientList, setIngredientList] = useState<IIngredient[]>([]);
+
+    const users = useAppSelector(state => state.user.result);
+    const currentUser = useAppSelector(state => state.account.user);
+    const suppliers = useAppSelector(state => state.supplier.result);
+    const ingredients = useAppSelector(state => state.ingredient.result);
+    const currentRestaurant = useAppSelector(state => state.account.user.restaurant);
+
+    useEffect(() => {
+        fetch();
+    }, [dispatch]);
+
+    const fetch = () => {
+        dispatch(fetchUserByRestaurant({ query: '?page=1&size=100' }));
+        dispatch(fetchSupplierByRestaurant({ query: '?page=1&size=100' }));
+        dispatch(fetchIngredientByRestaurant({ query: '?page=1&size=100' }));
+    };
 
     const handleSetCustomerPaid = (amount: number) => {
         setCustomerPaid(amount);
@@ -43,325 +81,302 @@ const ViewUpsertReceipt = () => {
         // setReturnAmount(Math.max(0, amount - total));
     };
 
-    const handleCreateInvoice = async (currentOrder: IOrder) => {
-        if (!currentOrder) return;
+    const handleQuantityChange = (id: string, value: number) => {
+        const newQuantity = Math.max(1, Math.min(99, value));
+        setIngredientList(prevList =>
+            prevList.map(ingredient =>
+                ingredient.id === id ? { ...ingredient, quantity: newQuantity } : ingredient
+            )
+        );
+    };
 
-        if (customerPaid < currentOrder?.totalPrice!) {
-            message.error("Số tiền khách đưa không đủ");
-            return;
-        }
+    const submitReceipt = async (valuesForm: any) => {
+        const { type, note, totalAmount, status } = valuesForm;
 
         // create invoice
-        const res = await invoiceApi.callCreate({
-            totalAmount: currentOrder.totalPrice,
-            customerPaid,
-            returnAmount,
-            method: methodPaid,
-            status: 'PAID',
-            order: { id: currentOrder.id }
+        const res = await receiptApi.callCreate({
+            type,
+            note,
+            totalAmount,
+            status,
+            restaurant: {
+                id: currentRestaurant?.id,
+                name: currentRestaurant?.name
+            }
         });
 
         if (res.data) {
-            message.success(`Thanh toán hóa đơn [ ${res.data.id} ] thành công `);
-
-            // reset data
-            setReturnAmount(0);
-            setCustomerPaid(0);
-            dispatch(fetchOrderDetailsByOrderId(''));
-            dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100' }));
+            message.success(`Tạo phiếu [ ${res.data.id} ] thành công `);
         } else {
             notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
         }
     }
 
-    const columns: ColumnType<IOrderDetail>[] = [
+    const columns: ColumnType<IIngredient>[] = [
         {
-            title: 'STT',
-            key: 'index',
-            width: 30,
+            key: "id",
+            title: "Chọn",
+            width: 50,
             align: "center",
-            render: (_, record, index) => (index + 1) + (meta.page - 1) * meta.pageSize
+            render: (_, record) => <Checkbox />
         },
         {
-            title: 'Tên món ăn',
-            key: 'name',
-            dataIndex: 'product',
-            render: (_, record) => (
-                <div className='btn-name'>
-                    {`${record.unit?.productName} (${record.unit?.name})`}
-                </div>
-            )
+            key: "name",
+            dataIndex: "name",
+            title: "Tên nguyên liệu",
         },
         {
-            title: 'SL',
-            dataIndex: 'quantity',
-            key: 'quantity',
-            align: "center" as const,
-            width: 50
-        },
-        {
-            title: 'Đơn giá',
-            dataIndex: 'price',
-            key: 'price',
-            width: 90,
-            align: "center" as const,
+            key: "quantity",
+            dataIndex: "initialQuantity",
+            title: "Số lượng",
+            width: 160,
+            align: "center",
             render: (_, record) => {
-                const price = record.unit?.price;
-                return (price ? price.toLocaleString() : '0')
-            }
-        },
-        {
-            title: 'Thành Tiền',
-            dataIndex: 'price',
-            key: 'price',
-            width: 90,
-            align: "center" as const,
-            render: (_, record) => {
-                const price = record.unit?.price;
-                const total = price ? record.quantity! * Number(price) : 0;
                 return (
-                    <Space>
-                        {total ? total.toLocaleString() : '0'}
-                    </Space>
+                    <Flex align="center" justify="space-between" style={{ width: '150px' }}>
+                        <Button
+                            size="small" color="danger" variant="outlined"
+                            onClick={() => handleQuantityChange(record.id!, (record.initialQuantity || 1) - 1)}
+                        >
+                            <MinusOutlined />
+                        </Button>
+
+                        <InputNumber
+                            style={{ width: '70px', margin: '0 6px' }}
+                            type="number" min={1} max={99}
+                            onChange={(value) => handleQuantityChange(record.id!, value || 1)}
+                        />
+
+                        <Button
+                            size="small" color="danger" variant="outlined"
+                            onClick={() => handleQuantityChange(record.id!, (record.initialQuantity || 1) + 1)}
+                        >
+                            <PlusOutlined />
+                        </Button>
+                    </Flex>
                 );
-            }
-        }
+            },
+        },
+        {
+            key: 'price',
+            dataIndex: 'price',
+            title: 'Đơn giá',
+            align: "center",
+            render(_, record) {
+                return <>{formatPrice(record.price)}</>
+            },
+        },
+        {
+            key: "price",
+            dataIndex: "price",
+            title: "Giảm giá",
+            align: "center",
+            render: (_, record) => {
+                return (
+                    <InputNumber
+                        min={1}
+                        max={99}
+                        value={0}
+                        type="number"
+                    />
+                );
+            },
+        },
+        {
+            key: 'price',
+            dataIndex: 'price',
+            title: 'Thành tiền',
+            align: "center",
+            render(_, record) {
+                return <>{formatPrice(record.price)}</>
+            },
+        },
+        {
+            title: 'Tác vụ',
+            align: "center",
+        },
     ];
 
-    const handlePrintInvoice = async () => {
-        // if (!currentOrder) return;
-
-        if (invoiceRef.current) {
-            try {
-                const canvas = await html2canvas(invoiceRef.current, { scale: 2 });
-                const imgData = canvas.toDataURL('image/png');
-
-                const doc = new jsPDF();
-                const pdfWidth = doc.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                // doc.save(`invoice_${currentOrder.id}.pdf`);
-            } catch (error) {
-                message.error('Không thể in hóa đơn, vui lòng thử lại!');
-            }
-        } else {
-            message.error('Không tìm thấy hóa đơn để in!');
-        }
-    };
-
     return (
-        <div className={styles["upsert-container"]}>
-            <div className={styles["title"]}>
+        <div className="container-invoice">
+            <div className={styles["upsert-container"]}>
                 <Breadcrumb
-                    separator=">"
                     items={[
                         { title: <Link to="/admin/receipt">Biên lai</Link> },
-                        { title: 'Tạo biên lai' },
+                        { title: 'Tạo phiếu' },
                     ]}
+                    separator=">"
+                    className={styles["title"]}
                 />
-            </div>
 
-            <ConfigProvider locale={enUS}>
-                <Row gutter={[30, 4]}>
-                    <Col span={24}>
-                        <Title level={5} style={{ marginTop: '0px' }}>{'Tạo biên lai'}</Title>
-                    </Col>
+                <ProForm
+                    form={form}
+                    onFinish={submitReceipt}
+                    submitter={{
+                        searchConfig: {
+                            resetText: "Hủy",
+                            submitText: "Tạo biên lai"
+                        },
+                        onReset: () => navigate('/admin/receipt'),
+                        render: (_: any, dom: any) => (<FooterToolbar> {dom} </FooterToolbar>),
+                        submitButtonProps: {
+                            icon: <CheckSquareOutlined />
+                        },
+                    }}
+                >
+                    <Card
+                        title={
+                            <Flex justify="space-between" align="center">
+                                <Flex align="center" gap="small">
+                                    <FormOutlined /> Thành phần
+                                </Flex>
 
-                    <Col span={14}>
-                        <div>
-                            <div className='invoice-search'>
-                                <div className='invoice-search__card' >
-                                    <UserOutlined style={{ fontSize: '20px' }} />
-                                    <div className='invoice-search__title'>Khách hàng</div>
-                                </div>
-
-                                <Space direction="vertical">
-                                    <Search
-                                        placeholder="Tìm tên hoặc điện thoại khách hàng"
-                                        allowClear
-                                        style={{ width: 350 }}
-                                    />
+                                <Space wrap>
+                                    <DatePicker value={dayjs()} format="DD/MM/YYYY" style={{ width: "120px" }} />
+                                    <TimePicker value={dayjs()} format="HH:mm" size="middle" style={{ width: "80px" }} />
                                 </Space>
-                            </div>
+                            </Flex>
+                        }
+                    >
+                        <Row gutter={[30, 4]}>
+                            <Col span={24} md={12}>
+                                <Form.Item label="Nhân viên">
+                                    <Select
+                                        defaultValue={currentUser.name}
+                                        placeholder="Chọn nhân viên"
+                                        options={users.map(user => ({
+                                            value: user.id,
+                                            label: user.name
+                                        }))}
+                                    />
+                                </Form.Item>
+                            </Col>
 
-                            <Table<IOrderDetail>
-                                columns={columns}
-                                dataSource={orderDetails}
-                                pagination={false}
-                                size='middle'
-                                bordered
-                                scroll={orderDetails.length > 10 ? { y: 48 * 10 } : undefined}
-                                rowKey={(record) => record.id || ''}
-                                rowClassName="order-table-row"
-                                className="order-table"
-                            />
-                        </div>
+                            <Col span={24} md={12}>
+                                <ProFormText
+                                    name="id"
+                                    label="Mã phiếu"
+                                    placeholder="Mã phiếu tự động"
+                                    fieldProps={{ disabled: true }}
+                                />
+                            </Col>
 
-                        <div ref={invoiceRef} className="invoice-container">
-                            <div className="invoice-header">
-                                <h2 className="invoice-header__heading" >QUẢN LÝ NHÀ HÀNG</h2>
-                                <div>Web: https://quanlynhahang.com.vn</div>
-                                <div>Địa chỉ: Công viên phần mềm Quang Trung</div>
+                            <Col span={24} md={12}>
+                                <ProFormSelect
+                                    label="Loại phiếu"
+                                    name="type"
+                                    placeholder="Chọn loại phiếu"
+                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                    options={[
+                                        { label: "Phiếu nhập", value: "IN" },
+                                        { label: "Phiếu trả", value: "OUT" },
+                                        { label: "Phiếu tạm", value: "TEMPORARY" },
+                                    ]}
+                                />
+                            </Col>
 
-                                <Divider style={{ borderColor: '#ff4d4f', }}>
-                                    <div className="invoice-header__title">Hóa Đơn Thanh Toán</div>
-                                </Divider>
-                            </div>
+                            <Col span={24} md={12}>
+                                <Form.Item
+                                    label="Nhà cung cấp"
+                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                >
+                                    <Select
+                                        style={{ width: '100%' }}
+                                        placeholder="Chọn nhà cung cấp"
+                                        suffixIcon={<PlusOutlined style={{ fontSize: 20, color: '#555' }} />}
+                                        options={suppliers.map(supplier => ({
+                                            value: supplier.id,
+                                            label: supplier.name
+                                        }))}
+                                    />
+                                </Form.Item>
+                            </Col>
 
-                            <div className="invoice-content">
-                                <div className="invoice-content__left">
-                                    {/* <p className="invoice-content__title">Mã hóa đơn: {currentOrder?.id}</p>
-                                    <p className="invoice-content__title">Phục vụ: {currentOrder?.user?.name}</p> */}
-                                    <p className="invoice-content__title">Giờ vào: {dayjs().format(' HH:mm:ss DD/MM/YYYY')}</p>
-                                </div>
+                            <Col span={24} md={12}>
+                                <ProFormSelect
+                                    name="status"
+                                    label="Trạng thái"
+                                    placeholder="Chọn thanh toán"
+                                    rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
+                                    options={[
+                                        { label: "Thanh toán ngay", value: "PAID" },
+                                        { label: "Chưa thanh toán", value: "UNPAID" },
+                                    ]}
+                                />
+                            </Col>
 
-                                <div className="invoice-content__right">
-                                    {/* <p className="invoice-content__title">Bàn ăn: {currentTable.name}</p>
-                                    <p className="invoice-content__title">Thu ngân: {currentOrder?.user?.name}</p> */}
-                                    <p className="invoice-content__title">Giờ ra: {dayjs().format('HH:mm:ss DD/MM/YYYY')}</p>
-                                </div>
-                            </div>
+                            <Col span={24} md={12}>
+                                <ProFormText
+                                    name="note"
+                                    label="Ghi chú"
+                                    placeholder="Nhập ghi chú"
+                                />
+                            </Col>
 
-                            <Divider style={{ border: '1px solid #ffa8a9', margin: '14px 0' }} />
-                            <Table<IOrderDetail>
-                                columns={columns.map(column => ({
-                                    ...column,
-                                    onCell: () => ({ style: { fontSize: '16px' } })
-                                }))}
-                                dataSource={orderDetails}
-                                pagination={false}
-                                size="small"
-                                bordered
-                            />
+                            <Col span={24}>
+                                <Divider style={{ border: '1px solid #ededed', margin: '14px 0' }} />
+                            </Col>
 
-                            <Divider style={{ border: '1px solid #ffa8a9', margin: '14px 0' }} />
-                            <div className='invoice-row'>
-                                <div className='invoice-col'>
-                                    <div className='invoice-title m4'>Tổng tiền:</div>
-                                    <div className='invoice-price m4'>
-                                        {/* {formatPrice(currentOrder?.totalPrice!)} */}
-                                    </div>
-                                </div>
+                            <Col span={24} md={12}>
+                                <ProFormText
+                                    label="Giảm giá"
+                                    placeholder="Nhập số tiền giảm giá"
+                                />
+                            </Col>
 
-                                <div className='invoice-col'>
-                                    <div className='invoice-title m4'>Thuế:</div>
-                                    <div className='invoice-price m4'>0</div>
-                                </div>
+                            <Col span={24} md={12}>
+                                <ProFormText
+                                    label={
+                                        <>
+                                            Tổng tiền
+                                            <Badge count={0} showZero style={{ marginLeft: '6px' }} />
+                                        </>
+                                    }
+                                    name="totalAmount"
+                                    initialValue={0}
+                                    fieldProps={{ disabled: true }}
+                                />
+                            </Col>
+                        </Row>
+                    </Card>
+                </ProForm>
 
-                                <div className='invoice-col'>
-                                    <p className='invoice-title m4'>Giảm giá:</p>
-                                    <p className='invoice-price m4'>0</p>
-                                </div>
+                <Card
+                    style={{ marginTop: '60px' }}
+                    title={
+                        <Flex justify="space-between" align="center">
+                            <Flex align="center" gap="small">
+                                <DiffOutlined /> Chọn nguyên liệu
+                            </Flex>
 
-                                <div className='invoice-col'>
-                                    <p className='invoice-title m4' style={{ fontWeight: '500' }}>Tổng thanh toán:</p>
-                                    <p className='invoice-price invoice-price__bold m4'>
-                                        {/* {formatPrice(currentOrder?.totalPrice!)} */}
-                                    </p>
-                                </div>
-                            </div>
+                            <Flex gap="small" align="center">
+                                <Input placeholder="Nhập tên nguyên liệu" />
 
-                            <Divider style={{ border: '1px solid #ffa8a9', margin: '14px 0' }} />
-                            <div style={{ textAlign: 'center' }}>Trân trọng cảm ơn quý khách!</div>
-                        </div>
-                    </Col>
-
-                    <Col span={10}>
-                        <div className='invoice-col' >
-                            <p></p>
-                            <Space wrap>
-                                <DatePicker value={dayjs()} format="DD/MM/YYYY" style={{ width: '120px' }} />
-                                <TimePicker value={dayjs()} format="HH:mm" size="middle" style={{ width: '80px' }} />
-                            </Space>
-                        </div>
-
-                        <div className='invoice-col'>
-                            <p className='invoice-title'>Tổng tiền</p>
-                            <p className='invoice-price'>
-                                {/* {formatPrice(currentOrder?.totalPrice!)} */}
-                            </p>
-                        </div>
-
-                        <div className='invoice-col'>
-                            <p className='invoice-title'>Thuế</p>
-                            <p className='invoice-price'>0</p>
-                        </div>
-
-                        <div className='invoice-col'>
-                            <p className='invoice-title'>Giảm giá</p>
-                            <p className='invoice-price'>0</p>
-                        </div>
-
-                        <div className='invoice-col'>
-                            <p className='invoice-title invoice-title__bold'>Khách cần trả</p>
-                            <p className='invoice-price  invoice-price__bold m4'>
-                                {/* {formatPrice(currentOrder?.totalPrice!)} */}
-                            </p>
-                        </div>
-
-                        <Divider style={{ border: '1px solid #ccc', margin: '14px 0' }} />
-
-                        <Flex vertical gap="middle" style={{ marginRight: '-15px', padding: '14px 0' }}>
-                            <Radio.Group
-                                className='invoice-col'
-                                options={[
-                                    { label: 'Tiền mặt', value: 'CASH' },
-                                    { label: 'Thẻ', value: 'CARD' },
-                                    { label: 'Chuyển khoản', value: 'TRANSFER' },
-                                ]}
-                                value={methodPaid}
-                                onChange={(e) => setMethodPaid(e.target.value)}
-                            />
-                        </Flex>
-
-                        {/* <Flex wrap gap="small" className="invoice-wrap" style={{ padding: '14px 0' }}>
-                            {[0, 20000, 50000, 100000, 200000, 300000, 400000, 500000].map((increment) => (
-                                <Button key={increment} onClick={() => handleSetCustomerPaid((currentOrder?.totalPrice || 0) + increment)}>
-                                    {formatPrice((currentOrder?.totalPrice || 0) + increment)}
+                                <Button type="primary">
+                                    <SearchOutlined /> Tìm kiếm
                                 </Button>
-                            ))}
-                        </Flex> */}
 
-                        <div className='invoice-col'>
-                            <p className='invoice-title'>Khách thanh toán:</p>
-                            <input
-                                className="invoice-price invoice-price__input"
-                                type="text"
-                                value={new Intl.NumberFormat('vi-VN').format(customerPaid)}
-                                onChange={(e) => {
-                                    const rawValue = e.target.value.replace(/\./g, '');
-                                    const numericValue = parseFloat(rawValue) || 0;
-                                    handleSetCustomerPaid(numericValue);
-                                }}
-                            />
-                        </div>
-
-                        <div className='invoice-col'>
-                            <p className='invoice-title'>Tiền thừa trả khách</p>
-                            <p className='invoice-price' style={{ color: '#f82222', fontSize: '18px' }}>
-                                {formatPrice(returnAmount)}
-                            </p>
-                        </div>
-
-                        <div className='invoice-btn'>
-                            <Button danger className='invoice-btn__alert' onClick={handlePrintInvoice}>
-                                IN HÓA ĐƠN
-                            </Button>
-
-                            {/* <Button
-                                className='invoice-btn__pay btn-green'
-                                disabled={!currentOrder}
-                                onClick={() => currentOrder && handleCreateInvoice(currentOrder)}
-                            >
-                                THANH TOÁN
-                            </Button> */}
-                        </div>
-                    </Col>
-                </Row>
-            </ConfigProvider>
-        </div >
-
+                                <Button type="primary">
+                                    <PlusOutlined />  Thêm nguyên liệu
+                                </Button>
+                            </Flex>
+                        </Flex>
+                    }
+                >
+                    <Table<IIngredient>
+                        size='middle'
+                        className="order-table"
+                        rowClassName="order-table-row"
+                        bordered
+                        columns={columns}
+                        dataSource={ingredients}
+                        pagination={{ pageSize: 5 }}
+                        rowKey={(record) => record.id || ''}
+                        scroll={ingredients.length > 10 ? { y: 48 * 10 } : undefined}
+                    />
+                </Card>
+            </div>
+        </div>
     )
 }
 

@@ -31,7 +31,7 @@ import ViewDetailUser from "@/components/admin/user/view.user";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
 
-const UserPage = () => {
+const ClientPage = () => {
     const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
     const meta = useAppSelector(state => state.user.meta);
@@ -230,7 +230,7 @@ const UserPage = () => {
             <DataTable<IUser>
                 rowKey="id"
                 actionRef={tableRef}
-                headerTitle="Danh sách người dùng"
+                headerTitle="Danh sách khách hàng"
                 loading={isFetching}
                 columns={columns}
                 dataSource={userList}
@@ -265,4 +265,4 @@ const UserPage = () => {
     )
 }
 
-export default UserPage;
+export default ClientPage;

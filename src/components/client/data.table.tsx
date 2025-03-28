@@ -1,11 +1,11 @@
 import {
-    ParamsType,
     ProTable,
+    ParamsType,
     ProTableProps,
 } from '@ant-design/pro-components';
 import vi_VN from 'antd/locale/vi_VN';
-import enUS from 'antd/lib/locale/en_US';
 import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
 const DataTable = <
     T extends Record<string, any>,

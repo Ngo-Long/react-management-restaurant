@@ -1,12 +1,25 @@
+import {
+    Col,
+    Row,
+    Flex,
+    Modal,
+    Radio,
+    Button,
+    InputNumber,
+} from 'antd';
+import {
+    PlusOutlined,
+    MinusOutlined,
+} from '@ant-design/icons';
+import TextArea from 'antd/es/input/TextArea';
+
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
-import TextArea from 'antd/es/input/TextArea';
+import { formatPrice } from '@/utils/format';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
 import { IOrderDetail, IProduct } from '@/types/backend';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { fetchProductByRestaurant } from '@/redux/slice/productSlide';
-import { Button, Col, Flex, InputNumber, Modal, Radio, Row } from 'antd';
+import { fetchProductsByRestaurant } from '@/redux/slice/productSlide';
 
 interface ProductCardProps {
     handleItemSelect: (item: IOrderDetail) => void;
@@ -14,18 +27,21 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
     const dispatch = useAppDispatch();
-    const products = useSelector((state: RootState) => state.product.result);
+    const [note, setNote] = useState<string>('');
+    const [quantity, setQuantity] = useState<number>(1);
+    const [totalPrice, setTotalPrice] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
 
-    const [quantity, setQuantity] = useState<number>(1);
-    const [totalPrice, setTotalPrice] = useState<number>(0);
     const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [selectedUnitDetailId, setSelectedCUnitDetailId] = useState<any>(null);
+    const products = useSelector((state: RootState) => state.product.result);
+    const uniqueCategories = [...new Set(products.map(product => product.category))];
+    const filteredProducts = products.filter(product => !selectedCategory || product.category === selectedCategory);
 
     useEffect(() => {
-        dispatch(fetchProductByRestaurant({ query: '?page=1&size=100&filter=active=true' }));
+        dispatch(fetchProductsByRestaurant({ query: '?page=1&size=100&filter=active=true' }));
     }, [dispatch]);
 
     useEffect(() => {
@@ -38,14 +54,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
         }
     }, [quantity, selectedUnitDetailId, selectedProduct]);
 
-    const uniqueCategories = Array.from(
-        new Set(products.map(product => product.category))
-    );
-
-    const filteredProducts = selectedCategory
-        ? products.filter(product => product.category === selectedCategory)
-        : products;
-
     const getDefaultUnitPrice = (product: IProduct) => {
         const defaultUnit = product.units?.find(unit => unit.isDefault);
         return defaultUnit ? defaultUnit.price : 0;
@@ -53,7 +61,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
 
     const showModal = (product: IProduct) => {
         setSelectedProduct(product);
-        setQuantity(1);
         const defaultUnit = product.units?.find(unit => unit.isDefault);
         setSelectedCUnitDetailId(defaultUnit?.id || null);
         setTotalPrice(getDefaultUnitPrice(product) ?? 0);
@@ -62,18 +69,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
 
     const handleSelectedProduct = () => {
         if (!selectedProduct) return;
-
         const item = {
+            note,
             quantity,
             status: 'AWAITING',
             unit: {
                 id: selectedUnitDetailId,
-            }
+            },
         };
-        handleItemSelect(item);
 
+        handleItemSelect(item);
         setConfirmLoading(true);
         setTimeout(() => {
+            setNote('');
+            setQuantity(1);
             setIsModalOpen(false);
             setConfirmLoading(false);
         }, 500);
@@ -134,7 +143,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                                 <div className="item-card">
                                     <p className="item-card__title">{product.name}</p>
                                     <p className="item-card__price">
-                                        {new Intl.NumberFormat().format(getDefaultUnitPrice(product) ?? 0)} ₫
+                                        {formatPrice(getDefaultUnitPrice(product))} ₫
                                     </p>
                                 </div>
                             </div>
@@ -169,17 +178,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 footer={[
-                    <Button key="cancel" onClick={() => setIsModalOpen(false)}>
-                        Hủy bỏ
-                    </Button>,
-
-                    <Button
-                        className="btn-green"
-                        loading={confirmLoading}
-                        onClick={handleSelectedProduct}
-                    >
-                        Thêm hàng
-                    </Button>,
+                    <Flex gap="middle" wrap justify="space-between">
+                        <Button
+                            key="cancel"
+                            style={{ flex: 1 }}
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Hủy
+                        </Button>
+                        <Button
+                            style={{ flex: 1 }}
+                            className="btn-green"
+                            loading={confirmLoading}
+                            onClick={handleSelectedProduct}
+                        >
+                            Xác nhận
+                        </Button>
+                    </Flex>
                 ]}
             >
                 <div className='modal-content'>
@@ -197,12 +212,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                                                 value: unit.id,
                                             })) || []
                                         }
-                                        defaultValue={
-                                            selectedProduct?.units?.find(unit => unit.isDefault)?.id ||
-                                            selectedProduct?.units?.[0]?.id
-                                        }
                                         optionType="button"
                                         buttonStyle="solid"
+                                        value={selectedUnitDetailId}
                                         onChange={(e) => handleUnitChange(e.target.value)}
                                     />
                                 </Col>
@@ -245,7 +257,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                             <div className='modal-card__title'>Đơn giá:</div>
                         </Col>
                         <Col span={18} style={{ fontSize: '16px' }}>
-                            {new Intl.NumberFormat().format(getSelectedUnitDetailPrice() ?? 0)} ₫
+                            {formatPrice(getSelectedUnitDetailPrice())} ₫
                         </Col>
                     </Row>
 
@@ -254,7 +266,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                             <div className='modal-card__title'>Thành tiền:</div>
                         </Col>
                         <Col span={18} style={{ fontWeight: 500, fontSize: '16px' }}>
-                            {new Intl.NumberFormat().format(totalPrice)} ₫
+                            {formatPrice(totalPrice)} ₫
                         </Col>
                     </Row>
 
@@ -266,6 +278,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                                 style={{ marginTop: '4px' }}
                                 placeholder='Tối đa 100 kí tự'
                                 autoSize={{ minRows: 2, maxRows: 2 }}
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
                             />
                         </Col>
                     </Row>

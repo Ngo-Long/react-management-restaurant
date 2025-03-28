@@ -17,20 +17,22 @@ import {
     ProColumns,
     ActionType
 } from '@ant-design/pro-components';
+
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { productApi } from '@/config/api';
 import { IProduct } from "@/types/backend";
+import { formatPrice } from "@/utils/format";
+import { useNavigate } from 'react-router-dom';
 import Access from "@/components/share/access";
 import { sfIn } from "spring-filter-query-builder";
-import DataTable from "@/components/client/data-table";
+import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { fetchProductByRestaurant } from "@/redux/slice/productSlide";
+import { fetchProductsByRestaurant } from "@/redux/slice/productSlide";
 
 const ProductPage = () => {
     const navigate = useNavigate();
@@ -119,7 +121,14 @@ const ProductPage = () => {
         {
             title: 'Danh mục',
             dataIndex: 'category',
-            sorter: true,
+            align: "center",
+            hideInSearch: false,
+            valueEnum: {
+                'FOOD': { text: 'Món ăn' },
+                'DRINK': { text: 'Đồ uống' },
+                'DESSERT': { text: 'Tráng miệng' },
+                'OTHER': { text: 'Khác' }
+            }
         },
         {
             title: 'Đơn vị tính',
@@ -152,14 +161,18 @@ const ProductPage = () => {
             render(_, record) {
                 const units = record?.units || [];
                 const selectedUnit = units.find(c => c.id === selectedUnits[Number(record.id)]) || units.find(c => c.isDefault) || units[0];
-                const price = selectedUnit?.price || 0;
-                return <>{price.toLocaleString()} ₫</>;
+                return <>{formatPrice(selectedUnit.price)} ₫</>
             },
         },
         {
             title: 'Phân loại',
             dataIndex: 'type',
-            sorter: true,
+            align: "center",
+            hideInSearch: true,
+        },
+        {
+            title: 'Khu chế biến',
+            dataIndex: 'station',
             align: "center",
             hideInSearch: true,
         },
@@ -284,11 +297,11 @@ const ProductPage = () => {
                 loading={isFetching}
                 dataSource={products}
                 headerTitle="Danh sách món ăn"
+                pagination={paginationConfigure(meta)}
                 request={async (params, sort, filter): Promise<any> => {
                     const query = buildQuery(params, sort, filter);
-                    dispatch(fetchProductByRestaurant({ query }))
+                    dispatch(fetchProductsByRestaurant({ query }))
                 }}
-                pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
                     <Button onClick={handleExportAsXlsx(products, formatCSV)}>
                         <DownloadOutlined /> Export

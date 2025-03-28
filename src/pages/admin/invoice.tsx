@@ -1,20 +1,31 @@
-import dayjs from 'dayjs';
-import queryString from 'query-string';
-import { useState, useRef, useEffect } from 'react';
-import { IInvoice, IOrder } from "@/types/backend";
-import { Button, Modal, Space, Tag } from "antd";
-import Access from "@/components/share/access";
-import { sfIn } from "spring-filter-query-builder";
-import DataTable from "@/components/client/data-table";
-import { ALL_PERMISSIONS } from "@/config/permissions";
-import { fetchInvoice } from '@/redux/slice/invoiceSlide';
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ActionType, ProColumns, ProFormSelect } from '@ant-design/pro-components';
+import {
+    Tag,
+    Modal,
+    Space,
+    Button,
+} from "antd";
+import {
+    ActionType,
+    ProColumns,
+    ProFormSelect
+} from '@ant-design/pro-components';
 import {
     CheckCircleOutlined,
     CloseCircleOutlined
 } from '@ant-design/icons';
-import { orderApi } from '@/config/api';
+
+import dayjs from 'dayjs';
+import queryString from 'query-string';
+import { useState, useRef } from 'react';
+import { IInvoice } from "@/types/backend";
+import Access from "@/components/share/access";
+import { sfIn } from "spring-filter-query-builder";
+import DataTable from "@/components/client/data.table";
+import { ALL_PERMISSIONS } from "@/config/permissions";
+import { fetchInvoice } from '@/redux/slice/invoiceSlide';
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { paginationConfigure } from "@/utils/paginator";
+
 const InvoicePage = () => {
     const dispatch = useAppDispatch();
     const tableRef = useRef<ActionType>();
@@ -207,45 +218,27 @@ const InvoicePage = () => {
     }
 
     return (
-        <div>
-            <Access permission={ALL_PERMISSIONS.INVOICES.GET_PAGINATE}>
-                <DataTable<IInvoice>
-                    actionRef={tableRef}
-                    headerTitle="Danh sách hóa đơn"
-                    rowKey="id"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={invoices}
-                    request={
-                        async (params, sort, filter): Promise<any> => {
-                            const query = buildQuery(params, sort, filter);
-                            dispatch(fetchInvoice({ query }))
-                            // (isRoleOwner
-                            //     ? dispatch(fetchInvoice({ query }))
-                            //     : dispatch(fetchInvoiceByRestaurant({ query }))
-                            // )
-                        }
-                    }
-                    scroll={{ x: true }}
-                    pagination={
-                        {
-                            current: meta.page,
-                            pageSize: meta.pageSize,
-                            showSizeChanger: true,
-                            total: meta.total,
-                            showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} hàng</div>) }
-                        }
-                    }
-                    rowSelection={false}
-                />
-            </Access>
+        <Access permission={ALL_PERMISSIONS.INVOICES.GET_PAGINATE}>
+            <DataTable<IInvoice>
+                rowKey="OrderId"
+                headerTitle="Danh sách hóa đơn"
+                columns={columns}
+                actionRef={tableRef}
+                loading={isFetching}
+                dataSource={invoices}
+                pagination={paginationConfigure(meta)}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchInvoice({ query }))
+                }}
+            />
 
             <Modal title={`Chi tiết hóa đơn [${dataInit?.id}]`} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <p>Some contents...</p>
                 <p>Some contents...</p>
                 <p>Some contents...</p>
             </Modal>
-        </div >
+        </Access>
     )
 }
 

@@ -21,143 +21,92 @@ import {
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
-import { diningTableApi } from '@/config/api';
-import { IDiningTable } from '@/types/backend';
+import { reviewApi } from '@/config/api';
+import { IReview } from '@/types/backend';
 import Access from "@/components/share/access";
-import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { ModalBatchImport, ModalDiningTable } from './container';
-import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
+import { fetchReview } from "@/redux/slice/reviewSlide";
+import DataTable from "@/components/client/data.table";
+import { ModalReview } from "./container";
 
-const DiningTablePage = () => {
-    const tableRef = useRef<ActionType>();
-    const [loading, setLoading] = useState<boolean>(false);
-    const [openModal, setOpenModal] = useState<boolean>(false);
-    const [openUpload, setOpenUpload] = useState<boolean>(false);
-
+const ReviewPage = () => {
     const dispatch = useAppDispatch();
-    const meta = useAppSelector(state => state.diningTable.meta);
-    const [dataInit, setDataInit] = useState<IDiningTable | null>(null);
-    const diningTables = useAppSelector(state => state.diningTable.result)
-        .filter(table => table.name!.toLowerCase() !== "mang về");
-    const isFetching = useAppSelector(state => state.diningTable.isFetching);
-    const currentRestaurant = useAppSelector(state => state?.account.user?.restaurant);
+    const tableRef = useRef<ActionType>();
+    const meta = useAppSelector(state => state.review.meta);
+    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [dataInit, setDataInit] = useState<IReview | null>(null);
+    const reviews = useAppSelector(state => state.review.result);
+    const isFetching = useAppSelector(state => state.review.isFetching);
 
     const reloadTable = () => {
         tableRef?.current?.reload();
     }
 
-    const fetch = () => {
-        setLoading(true);
-        dispatch(fetchDiningTableByRestaurant({ query: '' }));
-    };
-
-    const handleToggleActive = async (record: IDiningTable, checked: boolean) => {
+    const handleToggleActive = async (record: IReview, checked: boolean) => {
         const updatedRecord = { ...record, active: checked };
-        const res = await diningTableApi.callUpdate(updatedRecord);
-
-        if (res && +res.statusCode === 200) {
-            message.success('Cập nhật trạng thái thành công');
-            reloadTable();
-        } else {
-            notification.error({
-                message: 'Có lỗi xảy ra!',
-                description: 'Không thể cập nhật trạng thái!'
-            });
-        }
+        await reviewApi.callUpdate(updatedRecord);
+        message.success('Cập nhật trạng thái thành công');
+        reloadTable();
     };
 
-    const handleDeleteDiningTable = async (id: string | undefined) => {
+    const handleDeleteFeedback = async (id: string | undefined) => {
         if (id) {
-            const res = await diningTableApi.callDelete(id);
-            if (res && +res.statusCode === 200) {
-                message.success('Xóa bàn ăn thành công');
-                reloadTable();
-            } else {
-                notification.error({
-                    message: 'Có lỗi xảy ra!',
-                    description: 'Bàn đã được sử dụng không thể xóa được!'
-                });
-            }
+            await reviewApi.callDelete(id);
+            message.success('Xóa bài thành công');
+            reloadTable();
         }
     }
 
-    const formatCSV = (data: IDiningTable[]) => {
+    const formatCSV = (data: IReview[]) => {
         const excludeKeys = [
             'id', 'status', 'active', 'createdBy',
             'createdDate', 'lastModifiedDate', 'lastModifiedBy', 'restaurant'
         ];
         return data.map((row) => {
-            return (Object.keys(row) as Array<keyof IDiningTable>)
+            return (Object.keys(row) as Array<keyof IReview>)
                 .filter((key) => !excludeKeys.includes(key as string))
                 .reduce((newRow, key) => {
                     newRow[key] = convertCSV(row[key]);
                     return newRow;
-                }, {} as Record<keyof IDiningTable, any>)
+                }, {} as Record<keyof IReview, any>)
         })
     }
 
-    const batchImportConfigHandler = async (data: IDiningTable[]) => {
-        if (!data || data?.length <= 0) return;
-        setLoading(true);
-
-        const formattedData = data.map(item => ({
-            ...item,
-            status: 'AVAILABLE',
-            active: true,
-            restaurant: {
-                id: currentRestaurant.id ?? '',
-                name: currentRestaurant.name ?? ''
-            }
-        }));
-
-        try {
-            await diningTableApi.callBatchImport(formattedData);
-            message.success('Nhập danh sách thành công');
-            setOpenUpload(false);
-            fetch();
-        } catch (error) {
-            console.error('Batch import failed:', error);
-            message.error('Lỗi khi nhập danh sách, vui lòng thử lại!');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const columns: ProColumns<IDiningTable>[] = [
+    const columns: ProColumns<IReview>[] = [
         {
             title: 'STT',
+            key: 'index',
+            width: 50,
             align: "center",
-            dataIndex: 'sequence',
-            width: 70,
-            sorter: true,
-            hideInSearch: true,
-            render(_, entity) {
-                const str = "" + entity.sequence;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
+            render: (_, record, index) => {
+                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
+            hideInSearch: true,
         },
         {
-            title: 'Tên bàn ăn',
-            dataIndex: 'name',
+            title: 'Tiêu đề',
+            dataIndex: 'title',
             sorter: true,
         },
         {
-            title: 'Số ghế',
+            title: 'Mô tả',
             align: "center",
-            dataIndex: 'seats',
+            dataIndex: 'description',
             hideInSearch: true,
-            render(_, entity) {
-                const str = "" + entity.seats;
-                return <>{str?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</>
-            },
+
         },
         {
-            title: 'Vị trí',
-            dataIndex: 'location',
+            title: 'Ảnh',
+            dataIndex: 'images',
+            align: "center",
+            hideInSearch: true,
+        },
+        {
+            title: 'Màu nền',
+            dataIndex: 'background_color',
             align: "center",
             hideInSearch: true,
         },
@@ -218,7 +167,7 @@ const DiningTablePage = () => {
                             placement="leftTop"
                             title={"Xác nhận xóa bàn ăn"}
                             description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
-                            onConfirm={() => handleDeleteDiningTable(entity.id)}
+                            onConfirm={() => handleDeleteFeedback(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
@@ -252,7 +201,7 @@ const DiningTablePage = () => {
         let temp = queryString.stringify(clone);
 
         let sortBy = "";
-        const fields = ["sequence", "name", "createdDate", "lastModifiedDate"];
+        const fields = ["name", "createdDate", "lastModifiedDate"];
         if (sort) {
             for (const field of fields) {
                 if (sort[field]) {
@@ -262,45 +211,35 @@ const DiningTablePage = () => {
             }
         }
 
-        // active giảm dần (true đứng trước false)
-        if (Object.keys(sortBy).length === 0) {
-            temp = `${temp}&sort=active,desc&sort=sequence,asc`;
-        } else {
-            temp = `${temp}&sort=active,desc&${sortBy}`;
-        }
         return temp;
     }
 
     return (
         <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
-            <DataTable<IDiningTable>
+            <DataTable<IReview>
                 rowKey="id"
                 actionRef={tableRef}
                 headerTitle="Danh sách bàn ăn"
                 loading={isFetching}
                 columns={columns}
-                dataSource={diningTables}
+                dataSource={reviews}
                 request={async (params, sort, filter): Promise<any> => {
                     const query = buildQuery(params, sort, filter);
-                    dispatch(fetchDiningTableByRestaurant({ query }))
+                    dispatch(fetchReview({ query }))
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
-                    <Button onClick={() => setOpenUpload(true)}>
-                        <UploadOutlined /> Import
-                    </Button>,
-
-                    <Button onClick={handleExportAsXlsx(diningTables, formatCSV)}>
+                    <Button onClick={handleExportAsXlsx(reviews, formatCSV)}>
                         <DownloadOutlined /> Export
                     </Button>,
 
-                    <Button type="primary" onClick={() => setOpenModal(true)}>
+                    <Button type="primary" onClick={() => setOpenModal(true)} >
                         <PlusOutlined /> Thêm mới
                     </Button>
                 ]}
             />
 
-            <ModalDiningTable
+            <ModalReview
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
@@ -308,18 +247,9 @@ const DiningTablePage = () => {
                 setDataInit={setDataInit}
             />
 
-            <ModalBatchImport
-                open={openUpload}
-                onOpen={setOpenUpload}
-                loading={loading}
-                onLoading={setLoading}
-                reloadTable={reloadTable}
-                onSubmit={(values) => {
-                    batchImportConfigHandler(values);
-                }}
-            />
         </Access>
     )
 }
 
-export default DiningTablePage;
+export default ReviewPage;
+
