@@ -18,7 +18,7 @@ const HomePage = () => {
                     <nav className="nav" style={{ padding: '4px 48px' }}>
                         <a href="#" className="nav__logo">
                             <div style={{ color: '#ff403d', fontSize: '16px', fontWeight: 600 }}>
-                                Rservice
+                                .Rservice
                             </div>
                         </a>
 
