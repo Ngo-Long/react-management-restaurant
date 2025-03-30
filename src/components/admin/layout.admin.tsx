@@ -15,6 +15,9 @@ import {
     MenuUnfoldOutlined,
     RadarChartOutlined,
     CalendarOutlined,
+    ScheduleOutlined,
+    StarOutlined,
+    CommentOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 const { Header, Sider, Content } = Layout;
@@ -164,21 +167,24 @@ const LayoutAdmin: React.FC = () => {
                 }] : []),
 
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/feedback'>Đánh giá</Link>,
+                    label: 'Đánh giá',
                     key: '/admin/feedback',
-                    icon: <BarChartOutlined />
+                    icon: <CommentOutlined />,
+                    onClick: () => navigate('/admin/feedback')
                 }] : []),
 
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/review'>Review</Link>,
+                    label: 'Review',
                     key: '/admin/review',
-                    icon: <BarChartOutlined />
+                    icon: <StarOutlined />,
+                    onClick: () => navigate('/admin/review')
                 }] : []),
 
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
-                    label: <Link to='/admin/shift'>Ca làm</Link>,
+                    label: 'Ca làm',
                     key: '/admin/shift',
-                    icon: <BarChartOutlined />
+                    icon: <ScheduleOutlined />,
+                    onClick: () => navigate('/admin/shift')
                 }] : []),
 
                 ...(viewReceipt || ACL_ENABLE === 'false' ? [{

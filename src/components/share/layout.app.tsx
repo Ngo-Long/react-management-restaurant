@@ -22,7 +22,7 @@ const LayoutApp = (props: IProps) => {
             message.error(errorRefreshToken);
 
             dispatch(setRefreshTokenAction({ status: false, message: "" }))
-            navigate('/login');
+            navigate('/');
         }
     }, [isRefreshToken]);
 

@@ -1,15 +1,12 @@
 import { useState } from "react";
+import AuthModal from "@/pages/auth";
 import '../../../styles/client.home.scss';
 import { Button, Flex, Layout } from "antd";
 import { Footer } from "antd/es/layout/layout";
-import { useNavigate } from 'react-router-dom';
-import LoginModal from "../../auth/LoginModal";
-import RegisterModal from "../../auth/RegisterModal";
 
 const HomePage = () => {
-    const navigate = useNavigate();
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+    const [isLogin, setIsLogin] = useState<boolean>(false);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
 
     return (
         <>
@@ -18,7 +15,7 @@ const HomePage = () => {
                     <nav className="nav" style={{ padding: '4px 48px' }}>
                         <a href="#" className="nav__logo">
                             <div style={{ color: '#ff403d', fontSize: '16px', fontWeight: 600 }}>
-                                .Rservice
+                                Rservice
                             </div>
                         </a>
 
@@ -28,11 +25,28 @@ const HomePage = () => {
                         </ul>
 
                         <Flex wrap gap="small">
-                            <Button type="text" danger className="nav__btn" style={{ width: '90px' }} onClick={() => setIsLoginOpen(true)}>
+                            <Button
+                                danger
+                                type="text"
+                                className="nav__btn"
+                                style={{ width: '90px' }}
+                                onClick={() => {
+                                    setIsLogin(true);
+                                    setIsAuthOpen(true);
+                                }}
+                            >
                                 Đăng nhập
                             </Button>
 
-                            <Button type="primary" danger className="nav__btn" onClick={() => setIsRegisterOpen(true)}>
+                            <Button
+                                danger
+                                type="primary"
+                                className="nav__btn"
+                                onClick={() => {
+                                    setIsLogin(false);
+                                    setIsAuthOpen(true);
+                                }}
+                            >
                                 Đăng ký
                             </Button>
                         </Flex>
@@ -89,12 +103,15 @@ const HomePage = () => {
                                 hỗ trợ tối ưu hóa mọi hoạt động kinh doanh các nhà hàng nhỏ đến lớn.
                             </p>
 
-                            <div className="hero__block__btn" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div className="hero__block__btn" style={{ display: 'flex', gap: '10px' }}>
                                 <Button
-                                    type="primary"
                                     danger
+                                    type="primary"
                                     className="hero__btn"
-                                    onClick={() => setIsRegisterOpen(true)}
+                                    onClick={() => {
+                                        setIsLogin(false);
+                                        setIsAuthOpen(true);
+                                    }}
                                     style={{ color: '#ffffff', fontSize: '16px', fontWeight: 600 }}>
                                     Đăng ký ngay
                                 </Button>
@@ -102,7 +119,10 @@ const HomePage = () => {
                                 <Button
                                     type="link"
                                     className="hero-btn__link"
-                                    onClick={() => setIsLoginOpen(true)}>
+                                    onClick={() => {
+                                        setIsLogin(true);
+                                        setIsAuthOpen(true);
+                                    }}>
                                     Đăng nhập
                                 </Button>
                             </div>
@@ -113,13 +133,15 @@ const HomePage = () => {
                 <Footer style={{ textAlign: 'center' }}>
                     Rservice ©{new Date().getFullYear()} Created by NKL
                 </Footer>
+            </Layout >
 
-                {/* Login Modal */}
-                <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
-
-                {/* Register Modal */}
-                <RegisterModal open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
-            </Layout>
+            {/* Auth Modal */}
+            < AuthModal
+                open={isAuthOpen}
+                onClose={() => setIsAuthOpen(false)}
+                isLogin={isLogin}
+                setIsLogin={setIsLogin}
+            />
         </>
     );
 }

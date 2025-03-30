@@ -14,7 +14,7 @@ const DropdownMenu = () => {
         if (res && +res.statusCode === 200) {
             dispatch(setLogoutAction({}));
             message.success('Đăng xuất thành công');
-            navigate('/login')
+            navigate('/')
         }
     }
 

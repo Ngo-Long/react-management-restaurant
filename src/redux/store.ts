@@ -5,7 +5,6 @@ import {
 } from '@reduxjs/toolkit';
 import roleReducer from './slice/roleSlide';
 import userReducer from './slice/userSlide';
-import orderReducer from './slice/orderSlide';
 import receiptReducer from './slice/receiptSlide';
 import invoiceReducer from './slice/invoiceSlide';
 import accountReducer from './slice/accountSlide';
@@ -19,13 +18,13 @@ import diningTableReducer from './slice/diningTableSlide';
 import reviewReducer from './slice/reviewSlide';
 import feedbackReducer from './slice/feedbackSlide';
 import shiftReducer from './slice/shiftSlide';
+import orderReducer from './slice/orderSlide';
 
 // Configure the Redux store with various slice reducers
 export const store = configureStore({
   reducer: {
     role: roleReducer,
     user: userReducer,
-    order: orderReducer,
     account: accountReducer,
     invoice: invoiceReducer,
     product: productReducer,
@@ -39,6 +38,7 @@ export const store = configureStore({
     review: reviewReducer,
     feedback: feedbackReducer,
     shift: shiftReducer,
+    order: orderReducer,
   },
 });
 

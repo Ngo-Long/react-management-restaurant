@@ -1,9 +1,9 @@
+import HomePage from './pages/client/home';
+import OrderPage from './pages/admin/order';
+import ClientPage from './pages/admin/client';
 import RolePage from './pages/admin/role';
 import UserPage from './pages/admin/user';
-import LoginPage from './pages/auth/login';
 import InvoicePage from './pages/admin/invoice';
-
-import RegisterPage from './pages/auth/register';
 import SupplierPage from './pages/admin/supplier';
 import DashboardPage from './pages/admin/dashboard';
 import IngredientPage from './pages/admin/ingredient';
@@ -12,11 +12,7 @@ import PermissionPage from './pages/admin/permission';
 import DiningTablePage from './pages/admin/dining-table';
 import ViewUpsertProduct from './pages/admin/product/container';
 
-import HomePage from './pages/client/home';
-import OrderPage from './pages/admin/order';
-import ClientPage from './pages/admin/client';
 import SaleClient from './pages/client/sales';
-
 import KitchenClient from './pages/client/kitchen';
 import ReceptionClient from './pages/client/reception';
 import ViewUpsertReceipt from './pages/admin/receipt/container';
@@ -60,7 +56,7 @@ export default function App() {
   const isLoading = useAppSelector(state => state.account.isLoading);
 
   useEffect(() => {
-    if (window.location.pathname === '/login' || window.location.pathname === '/register') {
+    if (window.location.pathname === '/') {
       return;
     }
 
@@ -222,15 +218,7 @@ export default function App() {
           element: <ProtectedRoute> <PermissionPage /> </ProtectedRoute>
         }
       ]
-    },
-    {
-      path: "/login",
-      element: <LoginPage />,
-    },
-    {
-      path: "/register",
-      element: <RegisterPage />,
-    },
+    }
   ]);
 
   return (

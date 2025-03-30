@@ -16,8 +16,16 @@ export const authApi = {
         return axios.post<IBackendRes<IUser>>('/api/v1/auth/register', { name, email, password, restaurant })
     },
 
+    callVerifyCode(email: string, verificationCode: string) {
+        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/verify', { email, verificationCode });
+    },
+
     callLogin(username: string, password: string) {
         return axios.post<IBackendRes<IAccount>>('/api/v1/auth/login', { username, password })
+    },
+
+    callForgotPassword(email: string) {
+        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/forgot', { email });
     },
 
     callFetchAccount() {

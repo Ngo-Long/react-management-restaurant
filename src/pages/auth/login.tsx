@@ -1,14 +1,13 @@
 import { authApi } from '@/config/api';
 import { useDispatch } from 'react-redux';
-import { useState, useEffect } from 'react';
-import styles from 'styles/auth.module.scss';
+import { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import Loading from '@/components/share/loading';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { setUserLoginInfo } from '@/redux/slice/accountSlide';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Divider, Form, Input, message, notification } from 'antd';
+import { Button, Form, Input, message, notification } from 'antd';
 
-const LoginPage = () => {
+const LoginModal = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -71,63 +70,53 @@ const LoginPage = () => {
 
     return (
         <>
-            {isLoading ? (
-                <Loading />
-            ) : (
-                <div className={styles["login-page"]}>
-                    <main className={styles.main}>
-                        <div className={styles.container}>
-                            <section className={styles.wrapper}>
-                                <div className={styles.heading}>
-                                    <h2 className={`${styles.text} ${styles["text-large"]}`}>Đăng Nhập</h2>
-                                    <Divider />
-                                </div>
+            {/* {isLoading && <Loading />} */}
 
-                                <Form
-                                    name="basic"
-                                    // style={{ maxWidth: 600, margin: '0 auto' }}
-                                    onFinish={onFinish}
-                                    autoComplete="off"
-                                >
-                                    <Form.Item
-                                        labelCol={{ span: 24 }}
-                                        label="Email"
-                                        name="username"
-                                        rules={[{ required: true, message: 'Email không được để trống!' }]}
-                                    >
-                                        <Input />
-                                    </Form.Item>
+            <Form
+                name="basic"
+                autoComplete="off"
+                onFinish={onFinish}
+            >
+                <Form.Item
+                    label="Email"
+                    name="username"
+                    labelCol={{ span: 24 }}
+                    rules={[{ required: true, message: 'Email không được để trống!' }]}
+                >
+                    <Input placeholder="Nhập email" />
+                </Form.Item>
 
-                                    <Form.Item
-                                        labelCol={{ span: 24 }}
-                                        label="Mật khẩu"
-                                        name="password"
-                                        rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}
-                                    >
-                                        <Input.Password />
-                                    </Form.Item>
+                <Form.Item
+                    label="Mật khẩu"
+                    name="password"
+                    labelCol={{ span: 24 }}
+                    rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}
+                >
+                    <Input.Password placeholder="Nhập mật khẩu" />
+                </Form.Item>
 
-                                    <Form.Item
-                                    // wrapperCol={{ offset: 6, span: 16 }}
-                                    >
-                                        <Button type="primary" htmlType="submit" loading={isSubmit}>
-                                            Đăng nhập
-                                        </Button>
-                                    </Form.Item>
-                                    <Divider>Or</Divider>
-                                    <p className="text text-normal">Chưa có tài khoản ?
-                                        <span>
-                                            <Link to='/register' > Đăng Ký </Link>
-                                        </span>
-                                    </p>
-                                </Form>
-                            </section>
-                        </div>
-                    </main>
-                </div>
-            )}
+                <Form.Item>
+                    <Button
+                        block
+                        size="large"
+                        htmlType="submit"
+                        loading={isSubmit}
+                        style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            borderRadius: 20,
+                            margin: '10px 0',
+                            border: "1px solid #ddd",
+                            color: "white",
+                            background: "linear-gradient(70.06deg, #2cccff -5%, #22dfbf 106%)",
+                        }}
+                    >
+                        Đăng nhập
+                    </Button>
+                </Form.Item>
+            </Form>
         </>
     )
 }
 
-export default LoginPage;
+export default LoginModal;
