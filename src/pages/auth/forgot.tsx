@@ -32,20 +32,22 @@ const ForgotPasswordModal = () => {
 
   const sendVerificationCode = async () => {
     if (!formValues.email) {
-      message.error("Vui lòng điền đầy đủ thông tin trước khi gửi mã!");
+      message.error("Vui lòng nhập email trước khi gửi mã!");
       return;
     }
 
-    setIsSendingCode(true);
-    const resForgot = await authApi.callForgotPassword(formValues.email);
-    setIsSendingCode(false);
-
-    if (resForgot?.data) {
-      setIsCodeSent(true);
-      setCountdown(120);
-      message.success("Mã xác nhận đã được gửi đến email của bạn!");
-    } else {
-      notification.error({ message: "Có lỗi xảy ra", description: resForgot.message, duration: 5 });
+    try {
+      setIsSendingCode(true);
+      const res = await authApi.callForgotPassword(formValues.email);
+      if (res?.data) {
+        setIsCodeSent(true);
+        setCountdown(120);
+        message.success("Mã xác nhận đã được gửi đến email của bạn!");
+      }
+    } catch (error) {
+      notification.error({ message: "Có lỗi xảy ra", duration: 5 });
+    } finally {
+      setIsSendingCode(false);
     }
   };
 
@@ -54,14 +56,19 @@ const ForgotPasswordModal = () => {
       message.error("Vui lòng nhập mã xác nhận!");
       return;
     }
-    setIsSubmit(true);
-    const resVerifyCode = await authApi.callVerifyCode(formValues.email, verificationCode);
-    setIsSubmit(false);
-    if (resVerifyCode?.data) {
-      setIsCodeConfirmed(true);
-      message.success("Xác nhận mã thành công!");
-    } else {
+
+    try {
+      setIsSubmit(true);
+      const res = await authApi.callVerifyCode(formValues.email, verificationCode);
+      if (res?.data) {
+        setFormValues(prev => ({ ...prev, email: formValues.email }));
+        setIsCodeConfirmed(true);
+        message.success("Xác nhận mã thành công!");
+      }
+    } catch (error) {
       notification.error({ message: "Mã xác nhận không chính xác!", duration: 5 });
+    } finally {
+      setIsSubmit(false);
     }
   };
 
@@ -70,10 +77,11 @@ const ForgotPasswordModal = () => {
     setIsSubmit(true);
 
     try {
-      const resLogin = await authApi.callLogin(email, password);
-      if (resLogin?.data) {
-        localStorage.setItem("access_token", resLogin.data.access_token);
-        dispatch(setUserLoginInfo(resLogin.data.user));
+      await authApi.callChangePassword(email, password);
+      const res = await authApi.callLogin(email, password);
+      if (res?.data) {
+        localStorage.setItem("access_token", res.data.access_token);
+        dispatch(setUserLoginInfo(res.data.user));
         message.success("Đặt lại mật khẩu thành công!");
         navigate(callback || `/sales`, { replace: true });
       }
@@ -85,39 +93,118 @@ const ForgotPasswordModal = () => {
   };
 
   return (
-    <Form name="basic" onFinish={onFinish} autoComplete="off" onValuesChange={(changedValues, allValues) => setFormValues(allValues)}>
+    <Form
+      name="basic"
+      autoComplete="off"
+      onFinish={onFinish}
+      onValuesChange={(changedValues, allValues) => {
+        setFormValues(prev => ({ ...prev, ...allValues }));
+      }}
+    >
       {!isCodeConfirmed && (
         <>
-          <Form.Item labelCol={{ span: 24 }} label="Email" name="email" rules={[{ required: true, message: 'Email không được để trống!' }]}>
+          <Form.Item
+            name="email"
+            label="Email"
+            labelCol={{ span: 24 }}
+            rules={[{ required: true, message: 'Email không được để trống!' }]}
+          >
             <Input type='email' placeholder="Nhập email" />
           </Form.Item>
+
           <Form.Item required>
             <Flex gap={10}>
               <Input
-                placeholder="Nhập mã xác nhận"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
                 disabled={!isCodeSent}
+                value={verificationCode}
+                placeholder="Nhập mã xác nhận"
+                onChange={(e) => setVerificationCode(e.target.value)}
               />
-              <Button type="primary" loading={isSendingCode} onClick={sendVerificationCode} disabled={countdown > 0 || !formValues.email}>{countdown > 0 ? `Gửi lại mã (${countdown}s)` : "Gửi mã"}</Button>
+              <Button
+                type="primary"
+                loading={isSendingCode}
+                onClick={sendVerificationCode}
+                disabled={countdown > 0 || !formValues.email}
+              >
+                {countdown > 0 ? `Gửi lại mã (${countdown}s)` : "Gửi mã"}
+              </Button>
             </Flex>
           </Form.Item>
+
           <Form.Item>
-            <Button block size="large" type="primary" onClick={confirmVerificationCode} loading={isSubmit}>Xác nhận mã</Button>
+            <Button
+              block
+              size="large"
+              loading={isSubmit}
+              onClick={confirmVerificationCode}
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                borderRadius: 20,
+                color: "white",
+                margin: '10px 0',
+                border: "1px solid #ddd",
+                background: "linear-gradient(70.06deg, #2cccff -5%, #22dfbf 106%)"
+              }}
+            >
+              Xác nhận mã
+            </Button>
           </Form.Item>
         </>
       )}
 
       {isCodeConfirmed && (
         <>
-          <Form.Item name="password" label="Mật khẩu mới" labelCol={{ span: 24 }} rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}>
+          <Form.Item
+            name="password"
+            label="Mật khẩu mới"
+            labelCol={{ span: 24 }}
+            rules={[
+              { required: true, message: 'Mật khẩu không được để trống!' },
+              { min: 4, message: 'Mật khẩu phải có ít nhất 4 ký tự!' }
+            ]}
+          >
             <Input.Password placeholder="Nhập mật khẩu" />
           </Form.Item>
-          <Form.Item name="confirmPassword" label="Nhập lại mật khẩu mới" labelCol={{ span: 24 }} rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}>
+
+          <Form.Item
+            name="confirmPassword"
+            label="Nhập lại mật khẩu mới"
+            dependencies={['password']}
+            labelCol={{ span: 24 }}
+            rules={[
+              { required: true, message: 'Mật khẩu không được để trống!' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Mật khẩu nhập lại không khớp!'));
+                },
+              }),
+            ]}
+          >
             <Input.Password placeholder="Nhập lại mật khẩu" />
           </Form.Item>
+
           <Form.Item>
-            <Button block size="large" htmlType="submit" loading={isSubmit} style={{ fontSize: 14, fontWeight: 600, borderRadius: 20, margin: '10px 0', border: "1px solid #ddd", color: "white", background: "linear-gradient(70.06deg, #2cccff -5%, #22dfbf 106%)" }}>Đặt lại mật khẩu</Button>
+            <Button
+              block
+              size="large"
+              htmlType="submit"
+              loading={isSubmit}
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                borderRadius: 20,
+                color: "white",
+                margin: '10px 0',
+                border: "1px solid #ddd",
+                background: "linear-gradient(70.06deg, #2cccff -5%, #22dfbf 106%)"
+              }}
+            >
+              Đặt lại mật khẩu
+            </Button>
           </Form.Item>
         </>
       )}

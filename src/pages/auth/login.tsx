@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { authApi } from '@/config/api';
 import { useDispatch } from 'react-redux';
-import { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import Loading from '@/components/share/loading';
 import { useLocation, useNavigate } from 'react-router-dom';

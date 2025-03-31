@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
 import { authApi } from '@/config/api';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Flex, Form, Input, message, notification } from 'antd';
 import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { setUserLoginInfo } from '@/redux/slice/accountSlide';
+import { Button, Flex, Form, Input, message, notification } from 'antd';
 
 const RegisterModal = () => {
     const dispatch = useDispatch();
@@ -109,35 +109,52 @@ const RegisterModal = () => {
             onValuesChange={(changedValues, allValues) => setFormValues(allValues)}
         >
             <Form.Item
-                labelCol={{ span: 24 }}
                 label="Thông tin của bạn"
                 name={['restaurant', 'name']}
+                labelCol={{ span: 24 }}
                 rules={[{ required: true, message: 'Tên nhà hàng không được để trống!' }]}
             >
                 <Input placeholder="Tên nhà hàng" />
             </Form.Item>
 
             <Form.Item
-                labelCol={{ span: 24 }}
                 name="name"
-                rules={[{ required: true, message: 'Họ tên không được để trống!' }]}
+                labelCol={{ span: 24 }}
+                rules={[
+                    { required: true, message: 'Họ tên không được để trống!' },
+                    {
+                        validator(_, value) {
+                            if (!value) return Promise.resolve();
+                            const words = value.trim().split(/\s+/);
+                            if (words.length < 2) return Promise.reject(new Error('Họ tên phải có ít nhất 2 từ!'));
+                            if (!/^[a-zA-ZÀ-ỹ\s]+$/.test(value)) return Promise.reject(new Error('Họ tên không được chứa ký tự đặc biệt!'));
+                            return Promise.resolve();
+                        },
+                    },
+                ]}
             >
                 <Input placeholder="Họ tên" />
             </Form.Item>
 
             <Form.Item
-                labelCol={{ span: 24 }}
-                label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Email không được để trống!' }]}
+                label="Email"
+                labelCol={{ span: 24 }}
+                rules={[
+                    { required: true, message: 'Email không được để trống!' },
+                    { type: 'email', message: 'Email không hợp lệ!' }
+                ]}
             >
                 <Input type='email' placeholder="Nhập email" />
             </Form.Item>
 
             <Form.Item
-                labelCol={{ span: 24 }}
                 name="password"
-                rules={[{ required: true, message: 'Mật khẩu không được để trống!' }]}
+                labelCol={{ span: 24 }}
+                rules={[
+                    { required: true, message: 'Mật khẩu không được để trống!' },
+                    { min: 4, message: 'Mật khẩu phải có ít nhất 4 ký tự!' }
+                ]}
             >
                 <Input.Password placeholder="Nhập mật khẩu" />
             </Form.Item>
@@ -172,9 +189,9 @@ const RegisterModal = () => {
                         fontSize: 14,
                         fontWeight: 600,
                         borderRadius: 20,
+                        color: "white",
                         margin: '10px 0',
                         border: "1px solid #ddd",
-                        color: "white",
                         background: "linear-gradient(70.06deg, #2cccff -5%, #22dfbf 106%)",
                     }}
                 >

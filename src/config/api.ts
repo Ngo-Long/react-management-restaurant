@@ -20,6 +20,10 @@ export const authApi = {
         return axios.post<IBackendRes<IAccount>>('/api/v1/auth/verify', { email, verificationCode });
     },
 
+    callChangePassword(email: string, password: string) {
+        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/change-password', { email, password });
+    },
+
     callLogin(username: string, password: string) {
         return axios.post<IBackendRes<IAccount>>('/api/v1/auth/login', { username, password })
     },
