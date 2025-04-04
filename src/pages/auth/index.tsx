@@ -1,9 +1,13 @@
-import { useState } from "react";
 import LoginModal from './login';
+import { useState } from "react";
 import RegisterModal from './register';
+import { useDispatch } from 'react-redux';
 import ForgotPasswordModal from './forgot';
+import { useNavigate } from 'react-router-dom';
 import { LeftOutlined } from "@ant-design/icons";
-import { Modal, Button, Typography } from "antd";
+import { Modal, Button, Typography, message } from "antd";
+import { setUserLoginInfo } from '@/redux/slice/accountSlide';
+import { authApi } from '@/config/api';
 
 const { Text, Title } = Typography;
 
@@ -15,10 +19,67 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, isLogin, setIsLogin }) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showRegisterForm, setShowRegisterForm] = useState(false);
     const [showForgotPasswordForm, setShowForgotPasswordForm] = useState(false);
     const isForgotPassword = showForgotPasswordForm;
+
+    const handleGoogleLogin = () => {
+        const width = 500;
+        const height = 600;
+        const left = (window.screen.width - width) / 2;
+        const top = (window.screen.height - height) / 2;
+
+        const popup = window.open(
+            `${import.meta.env.VITE_BACKEND_URL}/oauth2/authorization/google`,
+            'oauth2_popup',
+            `width=${width},height=${height},left=${left},top=${top},scrollbars=no`
+        );
+
+        const checkPopup = setInterval(() => {
+            try {
+                if (!popup || popup.closed) {
+                    clearInterval(checkPopup);
+                    return;
+                }
+
+                // Popup redirect về trang
+                if (popup.location.href.startsWith(window.location.origin)) {
+                    clearInterval(checkPopup);
+
+                    // Xử lý token từ URL (nếu cần)
+                    const popupParams = new URLSearchParams(popup.location.search);
+                    const accessToken = popupParams.get('access_token');
+                    const email = popupParams.get('email');
+
+                    if (!accessToken || !email) {
+                        message.error('Thiếu thông tin xác thực từ Google');
+                        popup.close();
+                        return;
+                    }
+
+                    try {
+                        const user = authApi.callFetchUser(email);
+                        console.log(user);
+                        dispatch(setUserLoginInfo(user));
+                        localStorage.setItem('access_token', accessToken);
+
+                        message.success(`Đăng nhập thành công!`);
+                        navigate('/sales');
+                        popup.close();
+                    } catch (error) {
+                        console.error('Lỗi xử lý thông tin:', error);
+                        message.error('Lỗi xử lý thông tin đăng nhập');
+                        popup.close();
+                    }
+                }
+            } catch (e) {
+                // Bỏ qua lỗi cross-origin khi kiểm tra popup
+            }
+        }, 500);
+    };
 
     return (
         <Modal
@@ -120,12 +181,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, isLogin, setIsLogi
                     <Button
                         block
                         size="large"
+                        onClick={handleGoogleLogin}
                         style={{
+                            position: "relative",
                             fontSize: 14,
                             borderRadius: 20,
                             marginBottom: 10,
                             border: "1px solid #ddd",
-                            position: "relative",
                         }}
                     >
                         <img
@@ -157,17 +219,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, isLogin, setIsLogi
                 </>
             )}
 
-            {showLoginForm && (
-                <LoginModal />
-            )}
-
-            {showRegisterForm && (
-                <RegisterModal />
-            )}
-
-            {showForgotPasswordForm && (
-                <ForgotPasswordModal />
-            )}
+            {/* Show form */}
+            {showLoginForm && (<LoginModal />)}
+            {showRegisterForm && (<RegisterModal />)}
+            {showForgotPasswordForm && (<ForgotPasswordModal />)}
 
             <div style={{ textAlign: "center", margin: '20px 0 10px' }}>
                 {isLogin ? (

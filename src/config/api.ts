@@ -33,15 +33,19 @@ export const authApi = {
     },
 
     callFetchAccount() {
-        return axios.get<IBackendRes<IGetAccount>>('/api/v1/auth/account')
+        return axios.post<IBackendRes<IGetAccount>>('/api/v1/auth/account')
     },
 
     callRefreshToken() {
-        return axios.get<IBackendRes<IAccount>>('/api/v1/auth/refresh')
+        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/refresh')
     },
 
     callLogout() {
         return axios.post<IBackendRes<string>>('/api/v1/auth/logout')
+    },
+
+    callFetchUser(email: string) {
+        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/google/user', { email });
     },
 }
 
