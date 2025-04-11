@@ -15,20 +15,32 @@ import 'dayjs/locale/vi';
 import dayjs, { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { OrderStatus } from '@/utils/statusConfig';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
 declare type IProps = {
     dataOrders: IOrder[];
-    selectedStatuses: string[];
-    onStatusChange: (checkedValues: string[]) => void;
+    selectedStatuses: OrderStatus[];
+    onStatusChange: (checkedValues: OrderStatus[]) => void;
     openModal: boolean;
-    setOpenModal: (value: boolean) => void;
+    setOpenModal: (v: boolean) => void;
+    selectedOrder: IOrder | null;
+    setSelectedOrder: (order: IOrder) => void;
+    loading: boolean;
 }
 
-const CalendarModal = (props: IProps) => {
-    const { dataOrders, selectedStatuses, onStatusChange, openModal, setOpenModal } = props;
+const CalendarModal = ({ 
+    dataOrders, 
+    selectedStatuses, 
+    onStatusChange, 
+    openModal, 
+    setOpenModal,
+    selectedOrder,
+    setSelectedOrder,
+    loading,
+}: IProps) => {
 
     const getListData = (value: Dayjs) => {
         const ordersInDay = dataOrders.filter(order => {
@@ -88,8 +100,8 @@ const CalendarModal = (props: IProps) => {
                     >
                         <div
                             onClick={() => {
+                                setSelectedOrder(item.order);
                                 setOpenModal(true);
-                                console.log('Khách hàng:', item.order.client?.name)
                             }}
                             onMouseEnter={(e) => {
                                 (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
@@ -125,19 +137,19 @@ const CalendarModal = (props: IProps) => {
                         options={[
                             {
                                 label: <span className="status-waiting">Chờ xếp bàn</span>,
-                                value: 'WAITING'
+                                value: OrderStatus.WAITING
                             },
                             {
                                 label: <span className="status-reserved">Đã xếp bàn</span>,
-                                value: 'RESERVED'
+                                value: OrderStatus.RESERVED
                             },
                             {
                                 label: <span className="status-pending">Đã nhận bàn</span>,
-                                value: 'PENDING'
+                                value: OrderStatus.PENDING
                             },
                             {
                                 label: <span className="status-canceled">Đã hủy</span>,
-                                value: 'CANCELED'
+                                value: OrderStatus.CANCELED
                             },
                         ]}
                     />

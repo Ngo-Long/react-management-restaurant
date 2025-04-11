@@ -9,6 +9,8 @@ import {
     DatePicker,
     TimePicker,
     notification,
+    Modal,
+    Descriptions,
 } from "antd";
 import {
     ModalForm,
@@ -21,12 +23,13 @@ import { PlusOutlined } from '@ant-design/icons';
 
 import dayjs, { Dayjs } from 'dayjs';
 import { orderApi } from "@/config/api";
-import { IClient, IOrder } from "@/types/backend";
+import { IOrder } from "@/types/backend";
 import 'react-quill/dist/quill.snow.css';
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import React, { useEffect, useState } from 'react';
+import { OrderStatus } from "@/utils/statusConfig";
 import ModalClient from '@/components/client/modal.client';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchClientsByRestaurant } from "@/redux/slice/clientSlide";
@@ -37,13 +40,20 @@ declare type IProps = {
     setOpenModal: (v: boolean) => void;
     reloadTable: () => void;
     fetchData: () => void;
-    dataInit?: IOrder | null;
-    setDataInit: (v: any) => void;
-    handleUpdateStatus: (order: IOrder, status: "CANCELED" | "PENDING" | 'DELETE') => Promise<void>
+    selectedOrder?: IOrder | null;
+    setSelectedOrder: (v: any) => void;
+    handleUpdateStatus: (order: IOrder, status: OrderStatus) => Promise<void>;
 }
 
-export const ModalOrderScheduled = (props: IProps) => {
-    const { openModal, setOpenModal, reloadTable, fetchData, dataInit, setDataInit, handleUpdateStatus } = props;
+export const ModalOrderScheduled = ({
+    openModal,
+    setOpenModal,
+    reloadTable,
+    fetchData,
+    selectedOrder,
+    setSelectedOrder,
+    handleUpdateStatus
+}: IProps) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const [openClientModal, setOpenClientModal] = useState(false);
@@ -57,23 +67,23 @@ export const ModalOrderScheduled = (props: IProps) => {
 
     useEffect(() => {
         fetchInitialData();
-    }, [dispatch, dataInit]);
+    }, [dispatch, selectedOrder]);
 
     const fetchInitialData = async () => {
         await dispatch(fetchClientsByRestaurant({ query: 'sort=createdDate,desc' }));
         await dispatch(fetchDiningTableByRestaurant({ query: 'page=1&size=100&sort=sequence,asc&filter=active=true' }));
 
-        if (dataInit?.id) {
-            const reservationTime = dayjs(dataInit!.reservationTime);
+        if (selectedOrder?.id) {
+            const reservationTime = dayjs(selectedOrder!.reservationTime);
             setSelectedDate(reservationTime);
             setSelectedTime(reservationTime);
 
             // Tìm client trong danh sách đã load
-            const client = clients.find(c => c.id === dataInit.client?.id) || dataInit.client;
+            const client = clients.find(c => c.id === selectedOrder.client?.id) || selectedOrder.client;
             form.setFieldsValue({
-                ...dataInit,
+                ...selectedOrder,
                 client: client?.id,
-                diningTables: dataInit.diningTables?.map(table => table.id)
+                diningTables: selectedOrder.diningTables?.map(table => table.id)
             });
 
         }
@@ -81,7 +91,7 @@ export const ModalOrderScheduled = (props: IProps) => {
 
     const handleReset = async () => {
         form.resetFields();
-        setDataInit(null);
+        setSelectedOrder(null);
         setOpenModal(false);
         setSelectedDate(dayjs());
         setSelectedTime(dayjs().add(30, 'minute'));
@@ -132,13 +142,14 @@ export const ModalOrderScheduled = (props: IProps) => {
             }
 
             const tables = diningTables === undefined ? [] : diningTables;
+            const status = tables.length > 0 ? OrderStatus.RESERVED : OrderStatus.WAITING;
 
             const orderScheduled: IOrder = {
-                id: dataInit?.id,
+                id: selectedOrder?.id,
                 note,
                 guestCount,
                 option: 'SCHEDULED',
-                status: (tables as string[])?.length <= 0 ? 'WAITING' : 'RESERVED',
+                status,
                 reservationTime: reservationTime.toISOString(),
                 client: {
                     id: clientId
@@ -148,12 +159,12 @@ export const ModalOrderScheduled = (props: IProps) => {
                 }))
             };
 
-            const res = dataInit?.id
+            const res = selectedOrder?.id
                 ? await orderApi.callUpdate(orderScheduled)
                 : await orderApi.callCreate(orderScheduled);
 
             if (res.data) {
-                message.success(dataInit?.id ? "Cập nhật lịch đặt thành công" : "Thêm mới lịch đặt thành công");
+                message.success(selectedOrder?.id ? "Cập nhật lịch đặt thành công" : "Thêm mới lịch đặt thành công");
                 handleReset();
                 fetchData();
                 reloadTable();
@@ -169,12 +180,12 @@ export const ModalOrderScheduled = (props: IProps) => {
     return (
         <>
             <ModalForm
-                title={<>{dataInit?.id ? "Cập nhật lịch đặt" : "Tạo mới lịch đặt"}</>}
+                title={<>{selectedOrder?.id ? "Cập nhật lịch đặt" : "Tạo mới lịch đặt"}</>}
                 form={form}
                 open={openModal}
                 preserve={false}
                 scrollToFirstError={true}
-                initialValues={{ ...dataInit }}
+                initialValues={{ ...selectedOrder }}
                 onFinish={submitOrderScheduled}
                 modalProps={{
                     onCancel: () => handleReset(),
@@ -183,43 +194,78 @@ export const ModalOrderScheduled = (props: IProps) => {
                     width: isMobile ? "100%" : 700,
                     keyboard: false,
                     maskClosable: false,
-                    okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
+                    okText: <>{selectedOrder?.id ? "Cập nhật" : "Tạo mới"}</>,
                     cancelText: 'Hủy'
                 }}
                 submitter={{
                     render: (props, defaultDoms) => {
+                        if (selectedOrder?.status === OrderStatus.CANCELED) return null;
                         const [cancelBtn, submitBtn] = defaultDoms;
                         const buttonStyle = { minWidth: 80 };
+
                         return (
                             <Space size="middle">
-                                {React.cloneElement(cancelBtn, { key: 'cancel', style: buttonStyle })}
-                                {dataInit?.id && (
+                                {React.cloneElement(
+                                    cancelBtn,
+                                    {
+                                        key: 'cancel',
+                                        style: buttonStyle
+                                    }
+                                )}
+
+                                {selectedOrder?.id && selectedOrder.status !== OrderStatus.PENDING && (
                                     <Button
                                         danger
                                         type="primary"
                                         style={buttonStyle}
                                         onClick={() => {
                                             handleReset();
-                                            handleUpdateStatus(dataInit, 'DELETE')
+                                            handleUpdateStatus(selectedOrder!, OrderStatus.DELETE)
                                         }}
                                     >
                                         Xóa
                                     </Button>
                                 )}
-                                {dataInit?.id && (
+
+                                {selectedOrder?.id && (
                                     <Button
                                         danger
                                         type="primary"
                                         style={buttonStyle}
                                         onClick={() => {
                                             handleReset();
-                                            handleUpdateStatus(dataInit, 'CANCELED')
+                                            handleUpdateStatus(selectedOrder, OrderStatus.CANCELED)
                                         }}
                                     >
                                         Hủy đặt
                                     </Button>
                                 )}
-                                {React.cloneElement(submitBtn, { key: 'submit', style: buttonStyle })}
+
+                                {(
+                                    !selectedOrder ||
+                                    (selectedOrder.id && selectedOrder.status !== OrderStatus.PENDING)
+                                ) &&
+                                    React.cloneElement(
+                                        submitBtn,
+                                        {
+                                            key: 'submit',
+                                            style: buttonStyle
+                                        }
+                                    )
+                                }
+
+                                {selectedOrder?.status === OrderStatus.RESERVED && (
+                                    <Button
+                                        type="primary"
+                                        style={buttonStyle}
+                                        onClick={() => {
+                                            handleReset();
+                                            handleUpdateStatus(selectedOrder, OrderStatus.PENDING)
+                                        }}
+                                    >
+                                        Nhận bàn
+                                    </Button>
+                                )}
                             </Space>
                         );
                     }
@@ -334,34 +380,34 @@ export const ModalOrderScheduled = (props: IProps) => {
                             }}
                         />
                     </Col>
-                </Row>
 
-                <Col span={24}>
-                    <ProFormTextArea
-                        label="Ghi chú"
-                        name="note"
-                        placeholder="Nhập ghi chú"
-                        fieldProps={{
-                            maxLength: 200,
-                            showCount: true,
-                            autoSize: { minRows: 2, maxRows: 4 }
-                        }}
-                    />
-                    <Space wrap style={{ marginBottom: 8 }}>
-                        {['Có trẻ em', 'Cần bàn riêng', 'Sinh nhật', 'Kỷ niệm', 'Hội họp', 'Khách VIP'].map(text => (
-                            <Button
-                                key={text}
-                                size="small"
-                                onClick={() => {
-                                    const note = form.getFieldValue('note');
-                                    form.setFieldValue('note', note ? `${note}, ${text}` : text);
-                                }}
-                            >
-                                {text}
-                            </Button>
-                        ))}
-                    </Space>
-                </Col>
+                    <Col span={24} style={{ marginBottom: '14px' }}>
+                        <ProFormTextArea
+                            label="Ghi chú"
+                            name="note"
+                            placeholder="Nhập ghi chú"
+                            fieldProps={{
+                                maxLength: 200,
+                                showCount: true,
+                                autoSize: { minRows: 2, maxRows: 4 }
+                            }}
+                        />
+                        <Space wrap>
+                            {['Có trẻ em', 'Cần bàn riêng', 'Sinh nhật', 'Kỷ niệm', 'Hội họp', 'Khách VIP'].map(text => (
+                                <Button
+                                    key={text}
+                                    size="small"
+                                    onClick={() => {
+                                        const note = form.getFieldValue('note');
+                                        form.setFieldValue('note', note ? `${note}, ${text}` : text);
+                                    }}
+                                >
+                                    {text}
+                                </Button>
+                            ))}
+                        </Space>
+                    </Col>
+                </Row>
             </ModalForm >
 
             <ModalClient

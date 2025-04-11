@@ -18,8 +18,8 @@ import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
 import { IOrderDetail } from '../../../types/backend';
 import { orderApi, orderDetailApi } from "@/config/api";
-import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
+import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
 
 const SaleClient: React.FC = () => {
     const dispatch = useAppDispatch();

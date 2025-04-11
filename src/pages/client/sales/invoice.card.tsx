@@ -24,8 +24,8 @@ import html2canvas from 'html2canvas';
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { invoiceApi } from "@/config/api";
 import { formatPrice } from "@/utils/format";
+import { invoiceApi, orderApi } from "@/config/api";
 import { IOrder, IOrderDetail } from "@/types/backend";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
@@ -63,7 +63,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
         setReturnAmount(Math.max(0, amount - total));
     };
 
-    const handleCreateInvoice = async (currentOrder: IOrder) => {
+    const handlePaymentInvoice = async (currentOrder: IOrder) => {
         if (!currentOrder) return;
 
         if (customerPaid < currentOrder?.totalPrice!) {
@@ -71,8 +71,15 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             return;
         }
 
+        // update order
+        const resOrder = await orderApi.callUpdate({ ...currentOrder, status: "COMPLETED" });
+        if (!resOrder.data) {
+            notification.error({ message: "Có lỗi đơn hàng xảy ra", description: resOrder.message });
+            return;
+        }
+        
         // create invoice
-        const res = await invoiceApi.callCreate({
+        const resInvoice = await invoiceApi.callCreate({
             totalAmount: currentOrder.totalPrice,
             customerPaid,
             returnAmount,
@@ -81,11 +88,11 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             order: { id: currentOrder.id }
         });
 
-        if (res.data) {
+        if (resInvoice.data) {
             // info
             setOpen(false)
             setActiveTabKey('tab1');
-            message.success(`Thanh toán hóa đơn [ ${res.data.id} ] thành công `);
+            message.success(`Thanh toán hóa đơn [ ${resInvoice.data.id} ] thành công `);
 
             // reset data
             setReturnAmount(0);
@@ -94,7 +101,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             dispatch(fetchOrderDetailsByOrderId(''));
             dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100' }));
         } else {
-            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
+            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: resInvoice.message });
         }
     }
 
@@ -366,7 +373,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                         <Button
                             className='invoice-btn__pay btn-green'
                             disabled={!currentOrder}
-                            onClick={() => currentOrder && handleCreateInvoice(currentOrder)}
+                            onClick={() => currentOrder && handlePaymentInvoice(currentOrder)}
                         >
                             THANH TOÁN
                         </Button>

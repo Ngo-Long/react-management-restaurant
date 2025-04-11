@@ -4,11 +4,9 @@ import {
     Space,
     Badge,
     Button,
-    message,
     Tooltip,
     Checkbox,
     Popconfirm,
-    notification,
 } from 'antd';
 import {
     PlusOutlined,
@@ -19,70 +17,42 @@ import {
 } from '@ant-design/icons';
 import { Table } from 'antd/lib';
 import { ColumnType } from 'antd/es/table';
-import { ActionType } from '@ant-design/pro-components';
-
-import { orderApi } from '@/config/api';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { IOrder } from "@/types/backend";
-import { ModalOrderScheduled } from './container';
 import { convertCSV, handleExportAsXlsx } from "@/utils/file";
 
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { OrderStatus, StatusBadgeMap } from '@/utils/statusConfig';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
 declare type IProps = {
     dataOrders: IOrder[];
-    fetchData: () => void;
-    selectedStatuses: string[];
-    onStatusChange: (checkedValues: string[]) => void;
+    selectedStatuses: OrderStatus[];
+    onStatusChange: (checkedValues: OrderStatus[]) => void;
     openModal: boolean;
     setOpenModal: (value: boolean) => void;
+    selectedOrder: IOrder | null;
+    setSelectedOrder: (order: IOrder) => void;
+    handleUpdateStatus: (order: IOrder, status: OrderStatus) => Promise<void>;
+    loading: boolean;
 }
 
-const TableCalendarModal = (props: IProps) => {
-    const { dataOrders, fetchData, selectedStatuses, onStatusChange, openModal, setOpenModal } = props;
-    const tableRef = useRef<ActionType>();
-    const [loading, setLoading] = useState(false);
-    const [dataInit, setDataInit] = useState<IOrder | null>(null);
-
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
-
-    const handleUpdateStatus = async (order: IOrder, status: 'CANCELED' | 'PENDING' | 'DELETE') => {
-        try {
-            if (order.status === 'COMPLETED') {
-                message.error('Phiếu đặt bàn đã được thanh toán. Bạn không thể cập nhật.');
-                return;
-            }
-
-            if (order.status === 'PENDING') {
-                message.error('Khách đang được phục vụ. Bạn phải hủy đơn hàng trước.');
-                return;
-            }
-
-            setLoading(true);
-            if (status === 'DELETE') {
-                await orderApi.callDelete(order?.id || '');
-                message.success(`Xóa phiếu đặt bàn thành công`);
-            } else {
-                await orderApi.callUpdate({ ...order, status });
-                message.success(`Cập nhật trạng thái thành công`);
-            }
-
-            fetchData();
-            reloadTable();
-        } catch (error: any) {
-            notification.error({ message: "Lỗi cập nhật trạng thái", description: error.message });
-        } finally {
-            setLoading(false);
-        }
-    };
+const TableCalendarModal = ({ 
+    dataOrders, 
+    selectedStatuses, 
+    onStatusChange, 
+    openModal, 
+    setOpenModal,
+    selectedOrder,
+    setSelectedOrder,
+    handleUpdateStatus,
+    loading,
+}: IProps) => {
 
     const formatCSV = (data: IOrder[]) => {
         const excludeKeys = [
@@ -101,19 +71,19 @@ const TableCalendarModal = (props: IProps) => {
 
     const columns: ColumnType<IOrder>[] = [
         {
-            title: 'Mã đặt bàn',
+            title: 'Mã phiếu',
             key: 'id',
             dataIndex: 'id',
-            width: 105,
+            width: 80,
             render: (_, record) => {
                 return (<>DB-{record.id}</>);
             }
         },
         {
-            title: 'Thời gian đến',
+            title: 'Giờ đến',
             key: 'reservationTime',
             dataIndex: 'reservationTime',
-            width: 150,
+            width: 135,
             render: (_, record) => {
                 const date = dayjs(record.reservationTime);
                 return (<>{date.format('HH:mm - DD/MM/YYYY')}</>);
@@ -123,7 +93,7 @@ const TableCalendarModal = (props: IProps) => {
             title: 'Khách hàng',
             key: 'client',
             dataIndex: 'client',
-            width: 130,
+            width: 120,
             render: (_, record) => {
                 return (<>{`${record.client?.name} (${record.client?.phoneNumber || 'Không có số'})`}</>);
             }
@@ -132,20 +102,20 @@ const TableCalendarModal = (props: IProps) => {
             title: 'Số khách',
             key: 'guestCount',
             dataIndex: 'guestCount',
-            width: 90,
+            width: 75,
         },
         {
             title: 'Phòng/bàn',
             key: 'order.diningTable',
             dataIndex: ['order', 'diningTable'],
-            width: 160,
+            width: 123,
             render: (_, { diningTables = [] }) => (
-                <Space size="small" wrap>
+                <Flex wrap gap="6px 0" >
                     {diningTables.map((table) => (
                         <Tag
                             key={table.id}
                             style={{
-                                padding: '4px 8px',
+                                padding: '2px 4px',
                                 borderRadius: '4px',
                                 fontSize: '14px'
                             }}
@@ -153,23 +123,16 @@ const TableCalendarModal = (props: IProps) => {
                             {table.name}
                         </Tag>
                     ))}
-                </Space>
+                </Flex>
             ),
         },
         {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
-            width: 125,
+            width: 110,
             render: (status) => {
-                const statusConfig = {
-                    WAITING: { color: '#fa8c16', text: 'Chờ xếp bàn' },
-                    RESERVED: { color: '#52c41a', text: 'Đã xếp bàn' },
-                    CANCELED: { color: '#ff4d4f', text: 'Đã hủy' },
-                    PENDING: { color: '#1677ff', text: 'Đã nhận bàn' }
-                } as const;
-                const config = statusConfig[status as keyof typeof statusConfig] || { color: '#ff4d4f', text: 'Đã hủy' };
-
+                const config = StatusBadgeMap[status as keyof typeof StatusBadgeMap];
                 return (
                     <Space>
                         <Badge color={config.color} />
@@ -181,7 +144,7 @@ const TableCalendarModal = (props: IProps) => {
         {
             title: 'Tác vụ',
             align: "center",
-            width: 85,
+            width: 65,
             render: (_, entity) =>
                 <Space>
                     {(entity.status === 'WAITING') &&
@@ -190,7 +153,7 @@ const TableCalendarModal = (props: IProps) => {
                                 style={{ fontSize: 20, color: '#ff8400' }}
                                 onClick={() => {
                                     setOpenModal(true);
-                                    setDataInit(entity);
+                                    setSelectedOrder(entity);
                                 }}
                             />
                         </Tooltip>
@@ -200,12 +163,12 @@ const TableCalendarModal = (props: IProps) => {
                         <Tooltip title="Nhận bàn" placement="top">
                             <CheckSquareOutlined
                                 style={{ fontSize: 20, color: '#277500' }}
-                                onClick={() => { handleUpdateStatus(entity, 'PENDING') }}
+                                onClick={() => { handleUpdateStatus(entity, OrderStatus.PENDING) }}
                             />
                         </Tooltip>
                     }
 
-                    {(entity.status !== 'CANCELED') &&
+                    {(entity.status !== OrderStatus.CANCELED) &&
                         <Tooltip title="Hủy đặt" placement="top">
                             <Popconfirm
                                 okText="Xác nhận"
@@ -213,7 +176,7 @@ const TableCalendarModal = (props: IProps) => {
                                 placement="leftTop"
                                 title={"Xác nhận hủy"}
                                 description={"Bạn có muốn hủy phiếu đặt bàn này?"}
-                                onConfirm={() => handleUpdateStatus(entity, 'CANCELED')}
+                                onConfirm={() => handleUpdateStatus(entity, OrderStatus.CANCELED)}
                             >
                                 <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                             </Popconfirm>
@@ -233,19 +196,19 @@ const TableCalendarModal = (props: IProps) => {
                         options={[
                             {
                                 label: <span className="status-waiting">Chờ xếp bàn</span>,
-                                value: 'WAITING'
+                                value: OrderStatus.WAITING
                             },
                             {
                                 label: <span className="status-reserved">Đã xếp bàn</span>,
-                                value: 'RESERVED'
+                                value: OrderStatus.RESERVED
                             },
                             {
                                 label: <span className="status-pending">Đã nhận bàn</span>,
-                                value: 'PENDING'
+                                value: OrderStatus.PENDING
                             },
                             {
                                 label: <span className="status-canceled">Đã hủy</span>,
-                                value: 'CANCELED'
+                                value: OrderStatus.CANCELED
                             },
                         ]}
                     />
@@ -264,25 +227,15 @@ const TableCalendarModal = (props: IProps) => {
                 key={dataOrders.length}
                 loading={loading}
                 columns={columns}
-                dataSource={dataOrders}
                 pagination={false}
-                size='large'
+                dataSource={dataOrders}
+                size='small'
                 tableLayout="fixed"
                 className="order-table"
                 rowClassName="order-table-row"
                 rowKey={(record) => record.id || ''}
                 scroll={{ y: 'calc(100vh - 200px)' }}
                 style={{ height: 'calc(100vh - 154px)' }}
-            />
-
-            <ModalOrderScheduled
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                reloadTable={reloadTable}
-                fetchData={fetchData}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
-                handleUpdateStatus={handleUpdateStatus}
             />
         </>
     );

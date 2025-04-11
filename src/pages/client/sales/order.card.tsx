@@ -137,15 +137,8 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
         }
     };
 
-    const handleUpdateCompletedOrder = async (currentOrder: IOrder) => {
+    const handleNotificationKitchen = async (currentOrder: IOrder) => {
         try {
-            // update order
-            const resOrder = await orderApi.callUpdate({ ...currentOrder, note, status: "COMPLETED" });
-            if (!resOrder.data) {
-                notification.error({ message: "Có lỗi đơn hàng xảy ra", description: resOrder.message });
-                return;
-            }
-
             // update order details
             const awaitingDetails = orderDetails.filter(item => item.status === "AWAITING");
             await Promise.all(
@@ -154,8 +147,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 })
             );
 
-            setCurrentOrder(resOrder.data);
-            dispatch(fetchOrderDetailsByOrderId(resOrder.data?.id!));
+            dispatch(fetchOrderDetailsByOrderId(currentOrder?.id!));
             dispatch(fetchDiningTableByRestaurant({ query: "?page=1&size=100" }));
             message.success("Bếp đã được nhận thông báo");
         } catch (error: any) {
@@ -329,7 +321,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                             danger
                             className='order-btn__alert'
                             disabled={!orderDetails?.some(item => item.status === 'AWAITING')}
-                            onClick={() => currentOrder && handleUpdateCompletedOrder(currentOrder)}
+                            onClick={() => currentOrder && handleNotificationKitchen(currentOrder)}
                         >
                             <AlertOutlined style={{ fontSize: '18px' }} />  THÔNG BÁO
                         </Button>
