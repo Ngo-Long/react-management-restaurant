@@ -215,7 +215,7 @@ const ReviewPage = () => {
     }
 
     return (
-        <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
+        <Access permission={ALL_PERMISSIONS.REVIEWS.GET_PAGINATE}>
             <DataTable<IReview>
                 rowKey="id"
                 actionRef={tableRef}
@@ -233,9 +233,11 @@ const ReviewPage = () => {
                         <DownloadOutlined /> Export
                     </Button>,
 
-                    <Button type="primary" onClick={() => setOpenModal(true)} >
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                    <Access permission={ALL_PERMISSIONS.REVIEWS.CREATE}>
+                        <Button type="primary" onClick={() => setOpenModal(true)} >
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>
                 ]}
             />
 

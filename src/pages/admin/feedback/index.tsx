@@ -22,7 +22,6 @@ import DataTable from '@/components/client/data.table';
 import { ALL_PERMISSIONS } from "@/config/permissions";
 import { paginationConfigure } from '@/utils/paginator';
 import { fetchFeedback } from "@/redux/slice/feedbackSlide";
-import { convertCSV, handleExportAsXlsx } from '@/utils/file';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { ActionType, ProColumns } from '@ant-design/pro-components';
 
@@ -45,21 +44,6 @@ const FeedbackPage = () => {
             message.success('Xóa thành công');
             reloadTable();
         }
-    }
-
-    const formatCSV = (data: IFeedback[]) => {
-        const excludeKeys = [
-            'id', 'status', 'active', 'createdBy',
-            'createdDate', 'lastModifiedDate', 'lastModifiedBy', 'restaurant'
-        ];
-        return data.map((row) => {
-            return (Object.keys(row) as Array<keyof IFeedback>)
-                .filter((key) => !excludeKeys.includes(key as string))
-                .reduce((newRow, key) => {
-                    newRow[key] = convertCSV(row[key]);
-                    return newRow;
-                }, {} as Record<keyof IFeedback, any>)
-        })
     }
 
     const columns: ProColumns<IFeedback>[] = [
@@ -118,7 +102,7 @@ const FeedbackPage = () => {
             align: "center",
             render: (_, entity) => (
                 <Space>
-                    <Access permission={ALL_PERMISSIONS.DININGTABLES.UPDATE} hideChildren>
+                    <Access permission={ALL_PERMISSIONS.FEEDBACKS.UPDATE} hideChildren>
                         <EditOutlined
                             style={{ fontSize: 20, color: '#ffa500' }}
                             onClick={() => {
@@ -128,7 +112,7 @@ const FeedbackPage = () => {
                         />
                     </Access >
 
-                    <Access permission={ALL_PERMISSIONS.DININGTABLES.DELETE} hideChildren >
+                    <Access permission={ALL_PERMISSIONS.FEEDBACKS.DELETE} hideChildren >
                         <Popconfirm
                             placement="leftTop"
                             title={"Xác nhận xóa đánh giá"}
@@ -181,7 +165,7 @@ const FeedbackPage = () => {
     }
 
     return (
-        <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
+        <Access permission={ALL_PERMISSIONS.FEEDBACKS.GET_PAGINATE}>
             <DataTable<IFeedback>
                 rowKey="id"
                 actionRef={tableRef}
@@ -195,9 +179,11 @@ const FeedbackPage = () => {
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
-                    <Button type="primary" onClick={() => setOpenModal(true)} >
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                    <Access permission={ALL_PERMISSIONS.FEEDBACKS.CREATE} hideChildren>
+                        <Button type="primary" onClick={() => setOpenModal(true)}>
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>
                 ]}
             />
 

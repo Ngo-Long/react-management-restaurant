@@ -1,5 +1,5 @@
-import { userApi } from '@/config/api';
-import { IUser } from '@/types/backend';
+import { clientApi } from '@/config/api';
+import { IClient } from '@/types/backend';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 interface IState {
@@ -10,21 +10,21 @@ interface IState {
         pages: number;
         total: number;
     },
-    result: IUser[]
+    result: IClient[]
 }
 // First, create the thunk
-export const fetchAllUser = createAsyncThunk(
-    'user/fetchAllUser',
+export const fetchClients = createAsyncThunk(
+    'client/fetchClients',
     async ({ query }: { query: string }) => {
-        const response = await userApi.callFetchAll(query);
+        const response = await clientApi.callFetchAll(query);
         return response;
     }
 )
 
-export const fetchUserByRestaurant = createAsyncThunk(
-    'user/fetchUserByRestaurant',
+export const fetchClientsByRestaurant = createAsyncThunk(
+    'client/fetchClientsByRestaurant',
     async ({ query }: { query: string }) => {
-        const response = await userApi.callFetchByRestaurant(query);
+        const response = await clientApi.callFetchByRestaurant(query);
         return response;
     }
 )
@@ -40,8 +40,8 @@ const initialState: IState = {
     result: []
 };
 
-export const userSlide = createSlice({
-    name: 'user',
+export const clientSlide = createSlice({
+    name: 'client',
     initialState,
     reducers: {
         setActiveMenu: (state, action) => {
@@ -49,15 +49,15 @@ export const userSlide = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(fetchAllUser.pending, (state, action) => {
+        builder.addCase(fetchClients.pending, (state, action) => {
             state.isFetching = true;
         })
 
-        builder.addCase(fetchAllUser.rejected, (state, action) => {
+        builder.addCase(fetchClients.rejected, (state, action) => {
             state.isFetching = false;
         })
 
-        builder.addCase(fetchAllUser.fulfilled, (state, action) => {
+        builder.addCase(fetchClients.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;
@@ -65,15 +65,15 @@ export const userSlide = createSlice({
             }
         })
 
-        builder.addCase(fetchUserByRestaurant.pending, (state, action) => {
+        builder.addCase(fetchClientsByRestaurant.pending, (state, action) => {
             state.isFetching = true;
         })
 
-        builder.addCase(fetchUserByRestaurant.rejected, (state, action) => {
+        builder.addCase(fetchClientsByRestaurant.rejected, (state, action) => {
             state.isFetching = false;
         })
 
-        builder.addCase(fetchUserByRestaurant.fulfilled, (state, action) => {
+        builder.addCase(fetchClientsByRestaurant.fulfilled, (state, action) => {
             if (action.payload && action.payload.data) {
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;
@@ -84,6 +84,6 @@ export const userSlide = createSlice({
 
 });
 
-export const { setActiveMenu } = userSlide.actions;
+export const { setActiveMenu } = clientSlide.actions;
 
-export default userSlide.reducer;
+export default clientSlide.reducer;

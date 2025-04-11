@@ -5,6 +5,12 @@ export const ALL_PERMISSIONS = {
         UPDATE: { method: "PUT", apiPath: '/api/v1/restaurants', module: "RESTAURANTS" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/restaurants/{id}', module: "RESTAURANTS" },
     },
+    CLIENTS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/clients', module: "CLIENTS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/clients', module: "CLIENTS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/clients', module: "CLIENTS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/clients/{id}', module: "CLIENTS" },
+    },
     USERS: {
         GET_PAGINATE: { method: "GET", apiPath: '/api/v1/users', module: "USERS" },
         CREATE: { method: "POST", apiPath: '/api/v1/users', module: "USERS" },
@@ -65,19 +71,41 @@ export const ALL_PERMISSIONS = {
         UPDATE: { method: "PUT", apiPath: '/api/v1/receipts', module: "RECEIPTS" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/receipts/{id}', module: "RECEIPTS" },
     },
+    REVIEWS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/reviews', module: "REVIEWS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/reviews', module: "REVIEWS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/reviews', module: "REVIEWS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/reviews/{id}', module: "REVIEWS" },
+    },
+    SHIFTS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/shifts', module: "SHIFTS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/shifts', module: "SHIFTS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/shifts', module: "SHIFTS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/shifts/{id}', module: "SHIFTS" },
+    },
+    FEEDBACKS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/feedbacks', module: "FEEDBACKS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/feedbacks', module: "FEEDBACKS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/feedbacks', module: "FEEDBACKS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/feedbacks/{id}', module: "FEEDBACKS" },
+    },
 }
 
 export const ALL_MODULES = {
-    FILES: 'FILES',
-    RESTAURANTS: 'RESTAURANTS',
     USERS: 'USERS',
+    FILES: 'FILES',
     ROLES: 'ROLES',
-    PERMISSIONS: 'PERMISSIONS',
-    DININGTABLES: 'DININGTABLES',
-    SUPPLIERS: 'SUPPLIERS',
+    SHIFTS: 'SHIFTS',
     ORDERS: 'ORDERS',
-    PRODUCTS: 'PRODUCTS',
-    INGREDIENTS: 'INGREDIENTS',
+    CLIENTS: 'CLIENTS',
+    REVIEWS: 'REVIEWS',
     INVOICES: 'INVOICES',
-    RECEIPTS: 'RECEIPTS'
+    RECEIPTS: 'RECEIPTS',
+    PRODUCTS: 'PRODUCTS',
+    SUPPLIERS: 'SUPPLIERS',
+    FEEDBACKS: 'FEEDBACKS',
+    RESTAURANTS: 'RESTAURANTS',
+    PERMISSIONS: 'PERMISSIONS',
+    INGREDIENTS: 'INGREDIENTS',
+    DININGTABLES: 'DININGTABLES',
 }

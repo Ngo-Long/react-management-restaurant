@@ -19,11 +19,9 @@ import { IOrderDetail } from '../../../types/backend';
 import DropdownMenu from '@/components/share/dropdown.menu';
 import { fetchOrderDetailsByRestaurant } from '@/redux/slice/orderDetailSlide';
 
-import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { fetchProductsByRestaurant } from '@/redux/slice/productSlide';
-dayjs.locale('vi');
 dayjs.extend(relativeTime);
 
 const KitchenClient: React.FC = () => {

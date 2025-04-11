@@ -89,10 +89,10 @@ const OrderPage = () => {
         },
         {
             title: 'Khách hàng',
-            dataIndex: "user",
+            dataIndex: "client",
             hideInSearch: false,
             render(_, entity) {
-                return <>{entity.user?.name}</>
+                return <>{entity.client?.name}</>
             },
         },
         {

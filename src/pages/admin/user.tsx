@@ -241,9 +241,11 @@ const UserPage = () => {
                 pagination={paginationConfigure(meta)}
                 rowSelection={false}
                 toolBarRender={(_action, _rows): any => [
-                    <Button type="primary" onClick={() => setOpenModal(true)}>
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                    <Access permission={ALL_PERMISSIONS.USERS.CREATE}>
+                        <Button type="primary" onClick={() => setOpenModal(true)}>
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>
                 ]}
             />
 

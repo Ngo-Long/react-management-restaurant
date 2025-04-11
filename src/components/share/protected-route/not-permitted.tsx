@@ -8,9 +8,14 @@ const NotPermitted = () => {
             status="403"
             title="403"
             subTitle="Xin lỗi, bạn không được phép truy cập trang này!"
-            extra={<Button type="primary"
-                onClick={() => navigate('/')}
-            >Back Home</Button>}
+            extra={
+                <Button
+                    type="primary"
+                    onClick={() => navigate('/')}
+                >
+                    Quay về trang chủ
+                </Button>
+            }
         />
     )
 };

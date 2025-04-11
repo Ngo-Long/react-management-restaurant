@@ -1,21 +1,26 @@
-import HomePage from './pages/client/home';
-import OrderPage from './pages/admin/order';
-import ClientPage from './pages/admin/client';
 import RolePage from './pages/admin/role';
 import UserPage from './pages/admin/user';
+import ShiftPage from './pages/admin/shift';
+import OrderPage from './pages/admin/order';
+import ReviewPage from './pages/admin/review';
+import ClientPage from './pages/admin/client';
+import ProductPage from './pages/admin/product';
+import ReceiptPage from './pages/admin/receipt';
 import InvoicePage from './pages/admin/invoice';
+import FeedbackPage from './pages/admin/feedback';
 import SupplierPage from './pages/admin/supplier';
 import DashboardPage from './pages/admin/dashboard';
 import IngredientPage from './pages/admin/ingredient';
 import RestaurantPage from './pages/admin/restaurant';
 import PermissionPage from './pages/admin/permission';
 import DiningTablePage from './pages/admin/dining-table';
+import ViewUpsertReceipt from './pages/admin/receipt/container';
 import ViewUpsertProduct from './pages/admin/product/container';
 
+import HomePage from './pages/client/home';
 import SaleClient from './pages/client/sales';
 import KitchenClient from './pages/client/kitchen';
 import ReceptionClient from './pages/client/reception';
-import ViewUpsertReceipt from './pages/admin/receipt/container';
 
 import NotFound from './components/share/not.found';
 import LayoutApp from './components/share/layout.app';
@@ -23,16 +28,13 @@ import LayoutAdmin from './components/admin/layout.admin';
 import ProtectedRoute from './components/share/protected-route';
 
 import './styles/reset.scss';
+import viVN from 'antd/locale/vi_VN';
+import { ConfigProvider } from 'antd';
 import { useEffect, useRef } from 'react';
+import Loading from './components/share/loading';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom";
-
-import ProductPage from './pages/admin/product';
-import ReceiptPage from './pages/admin/receipt';
-import FeedbackPage from './pages/admin/feedback';
-import ReviewPage from './pages/admin/review';
-import ShiftPage from './pages/admin/shift';
+import { createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation } from "react-router-dom";
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -53,7 +55,7 @@ const LayoutClient = () => {
 
 export default function App() {
   const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(state => state.account.isLoading);
+  const { isAuthenticated, isLoading } = useAppSelector(state => state.account);
 
   useEffect(() => {
     if (window.location.pathname === '/') {
@@ -61,7 +63,7 @@ export default function App() {
     }
 
     dispatch(fetchAccount());
-  }, [])
+  }, [dispatch])
 
   const router = createBrowserRouter([
     {
@@ -222,8 +224,8 @@ export default function App() {
   ]);
 
   return (
-    <>
+    <ConfigProvider locale={viVN}>
       <RouterProvider router={router} />
-    </>
+    </ConfigProvider>
   )
 }

@@ -39,7 +39,9 @@ const ForgotPasswordModal = () => {
     try {
       setIsSendingCode(true);
       const res = await authApi.callForgotPassword(formValues.email);
-      if (res?.data) {
+      if (+res?.statusCode == 400) {
+        notification.error({ message: "Email không tồn tại", duration: 5 });
+      } else {
         setIsCodeSent(true);
         setCountdown(120);
         message.success("Mã xác nhận đã được gửi đến email của bạn!");

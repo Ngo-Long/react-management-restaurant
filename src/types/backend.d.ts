@@ -55,6 +55,27 @@ export interface IRestaurant {
     lastModifiedDate?: string;
 }
 
+export interface IClient {
+    id?: string;
+    name: string;
+    email?: string;
+    avatar: string | null;
+    gender?: string;
+    address?: string;
+    birthDate?: string;
+    phoneNumber?: string;
+    description?: string;
+    restaurant?: {
+        id?: string;
+        name?: string;
+    }
+    createdBy?: string;
+    isDeleted?: boolean;
+    deletedAt?: boolean | null;
+    createdDate?: string;
+    lastModifiedDate?: string;
+}
+
 export interface IUser {
     id?: string;
     name: string;
@@ -137,7 +158,7 @@ export interface IOrder {
     reservationTime?: string;
     option?: string;
     status?: string;
-    user?: {
+    client?: {
         id?: string;
         name?: string;
         phoneNumber?: string;

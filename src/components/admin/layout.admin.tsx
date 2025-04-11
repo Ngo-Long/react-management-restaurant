@@ -39,7 +39,6 @@ const LayoutAdmin: React.FC = () => {
     const [menuItems, setMenuItems] = useState<MenuProps['items']>([]);
     const [activeMenu, setActiveMenu] = useState('');
 
-
     useEffect(() => {
         setActiveMenu(location.pathname)
     }, [location])
@@ -119,7 +118,7 @@ const LayoutAdmin: React.FC = () => {
                     icon: <UserOutlined />,
                     children: [
                         {
-                            label: 'Nhân viên',
+                            label: 'Người dùng',
                             key: '/admin/user',
                             onClick: () => navigate('/admin/user')
                         },

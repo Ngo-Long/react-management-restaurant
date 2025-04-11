@@ -3,7 +3,6 @@ import {
     Col,
     Card,
     message,
-    Checkbox,
     notification
 } from 'antd';
 import {
@@ -19,26 +18,34 @@ import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
 import { IOrderDetail } from '../../../types/backend';
 import { orderApi, orderDetailApi } from "@/config/api";
-import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
+import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
 
 const SaleClient: React.FC = () => {
     const dispatch = useAppDispatch();
     const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
-    const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(true);
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
     const [currentTable, setCurrentTable] = useState({ id: '', name: 'Chọn bàn' });
+    const [lastClickTime, setLastClickTime] = useState<number>(0);
 
     const handleSelectedTable = (id: string, name: string) => {
         setCurrentTable({ id, name });
 
-        // move tab and fetch order
-        if (isCheckboxChecked) setActiveTabKey('tab2');
+        const now = Date.now();
+        const isDoubleClick = now - lastClickTime < 300;
+
+        setCurrentTable({ id, name });
+        setLastClickTime(now);
+
+        // move tab to menu if double clicked
+        if (isDoubleClick) {
+            setActiveTabKey('tab2');
+        }
+
         if (id) {
-            dispatch(fetchLatestUnpaidOrderByTableId(id))
+            dispatch(fetchLatestPendingOrderByTableId(id))
                 .unwrap()
                 .then((data) => setCurrentOrder(data || null))
-                .catch(() => message.error('Không thể lấy đơn hàng cho bàn này!'));
         }
     };
 
@@ -53,7 +60,8 @@ const SaleClient: React.FC = () => {
 
     const createPendingOrder = async () => {
         const order = {
-            status: "PENDING",
+            status: 'PENDING',
+            option: 'DINE_IN',
             diningTables: [{
                 id: currentTable.id
             }]
@@ -110,15 +118,6 @@ const SaleClient: React.FC = () => {
                     bordered={true}
                     activeTabKey={activeTabKey}
                     onTabChange={(key) => setActiveTabKey(key)}
-                    tabBarExtraContent={
-                        <Checkbox
-                            style={{ fontWeight: 500 }}
-                            checked={isCheckboxChecked}
-                            onChange={(e) => setIsCheckboxChecked(e.target.checked)}
-                        >
-                            Mở thực đơn khi chọn bàn
-                        </Checkbox>
-                    }
                 >
                     {contentList[activeTabKey]}
                 </Card>

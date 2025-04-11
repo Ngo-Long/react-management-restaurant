@@ -164,18 +164,18 @@ const ProductPage = () => {
                 return <>{formatPrice(selectedUnit.price)} ₫</>
             },
         },
-        {
-            title: 'Phân loại',
-            dataIndex: 'type',
-            align: "center",
-            hideInSearch: true,
-        },
-        {
-            title: 'Khu chế biến',
-            dataIndex: 'station',
-            align: "center",
-            hideInSearch: true,
-        },
+        // {
+        //     title: 'Phân loại',
+        //     dataIndex: 'type',
+        //     align: "center",
+        //     hideInSearch: true,
+        // },
+        // {
+        //     title: 'Khu chế biến',
+        //     dataIndex: 'station',
+        //     align: "center",
+        //     hideInSearch: true,
+        // },
         {
             title: 'Hoạt động',
             align: "center",
@@ -307,9 +307,11 @@ const ProductPage = () => {
                         <DownloadOutlined /> Export
                     </Button>,
 
-                    <Button type="primary" onClick={() => navigate('upsert')}>
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                    <Access permission={ALL_PERMISSIONS.PRODUCTS.CREATE}>
+                        <Button type="primary" onClick={() => navigate('upsert')}>
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>,
                 ]}
             />
         </Access>

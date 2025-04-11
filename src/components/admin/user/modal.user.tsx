@@ -31,7 +31,6 @@ import { useState, useEffect } from "react";
 import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
 import { DebounceSelect } from "./debouce.select";
-import viVN from 'antd/es/date-picker/locale/vi_VN';
 import { userApi, roleApi, restaurantApi } from "@/config/api";
 import { CheckSquareOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
@@ -139,7 +138,7 @@ const ModalUser = (props: IProps) => {
                 name: restaurantValue?.label
             }
         };
-        console.log(user);
+
         const res = dataInit?.id
             ? await userApi.callUpdate(user)
             : await userApi.callCreate(user);
@@ -343,7 +342,7 @@ const ModalUser = (props: IProps) => {
                                 name="birthDate"
                                 label="Ngày sinh"
                                 placeholder="Chọn ngày sinh"
-                                fieldProps={{ format: 'DD/MM/YYYY', locale: viVN }}
+                                fieldProps={{ format: 'DD/MM/YYYY' }}
                                 rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                             />
                         </Col>

@@ -2,38 +2,39 @@ import {
     Row,
     Col,
     Form,
+    Upload,
     message,
     notification,
     ConfigProvider,
-    Upload
 } from "antd";
 import {
+    ModalForm,
     ProFormText,
     ProFormSelect,
     ProFormDatePicker,
-    ModalForm,
 } from "@ant-design/pro-components";
+import {
+    PlusOutlined,
+    LoadingOutlined,
+} from '@ant-design/icons';
+import enUS from 'antd/lib/locale/en_US';
+
 import {
     beforeUpload, getBase64, handleChange,
     handleRemoveFile, handleUploadFileLogo
 } from "@/utils/image";
 import moment from "moment";
 import { v4 as uuidv4 } from 'uuid';
-import ReactQuill from "react-quill";
-import { IUser } from "@/types/backend";
-import enUS from 'antd/lib/locale/en_US';
+import { clientApi } from "@/config/api";
+import { IClient } from "@/types/backend";
 import { useState, useEffect } from "react";
 import { isMobile } from 'react-device-detect';
 import { useAppSelector } from "@/redux/hooks";
-import viVN from 'antd/es/date-picker/locale/vi_VN';
-import { userApi, roleApi, restaurantApi } from "@/config/api";
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { DebounceSelect } from "../admin/user/debouce.select";
 
 interface IProps {
     openModal: boolean;
     setOpenModal: (v: boolean) => void;
-    dataInit?: IUser | null;
+    dataInit?: IClient | null;
     setDataInit: (v: any) => void;
     reloadTable: () => void;
 }
@@ -44,7 +45,7 @@ export interface IRestaurantSelect {
     key?: string;
 }
 
-interface IUserAvatar {
+interface IClientAvatar {
     name: string | null;
     uid: string;
 }
@@ -53,15 +54,13 @@ const ModalClient = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
     const [form] = Form.useForm();
     const [desc, setDesc] = useState<string>("");
-    const [animation, setAnimation] = useState<string>('open');
-    const currentUser = useAppSelector(state => state.account?.user);
     const currentRestaurant = useAppSelector(state => state.account?.user?.restaurant);
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
-    const [dataAvatar, setDataAvatar] = useState<IUserAvatar[]>([
+    const [dataAvatar, setDataAvatar] = useState<IClientAvatar[]>([
         { name: "", uid: "" }
     ]);
 
@@ -72,18 +71,17 @@ const ModalClient = (props: IProps) => {
         }
     }, [dataInit]);
 
-    const submitUser = async (valuesForm: any) => {
+    const submitClient = async (valuesForm: any) => {
         const { name, email, gender, address, password, birthDate, phoneNumber } = valuesForm;
         const formattedBirthDate = birthDate ? moment(birthDate, "DD/MM/YYYY").format("YYYY-MM-DD") : null;
 
-        const user = {
+        const client = {
             id: dataInit?.id,
             name,
             email,
             avatar: dataAvatar[0].name || null,
             gender,
             address,
-            password,
             birthDate: formattedBirthDate ?? undefined,
             phoneNumber,
             active: true,
@@ -95,11 +93,12 @@ const ModalClient = (props: IProps) => {
         };
 
         const res = dataInit?.id
-            ? await userApi.callUpdate(user)
-            : await userApi.callCreateClient(user);
+            ? await clientApi.callUpdate(client)
+            : await clientApi.callCreate(client);
 
         if (res.data) {
             message.success(dataInit?.id ? "Cập nhật khách hàng thành công" : "Thêm mới khách hàng thành công");
+            setDataInit(res.data);
             reloadTable();
             setOpenModal(false);
         } else {
@@ -115,7 +114,7 @@ const ModalClient = (props: IProps) => {
             form={form}
             open={openModal}
             preserve={false}
-            onFinish={submitUser}
+            onFinish={submitClient}
             scrollToFirstError={true}
             title={<>{dataInit?.id ? "Cập nhật khách hàng" : "Tạo mới khách hàng"}</>}
             initialValues={{ dataInit }}
@@ -221,7 +220,7 @@ const ModalClient = (props: IProps) => {
                                 name="birthDate"
                                 label="Ngày sinh"
                                 placeholder="Chọn ngày sinh"
-                                fieldProps={{ format: 'DD/MM/YYYY', locale: viVN }}
+                                fieldProps={{ format: 'DD/MM/YYYY' }}
                             />
                         </Col>
 

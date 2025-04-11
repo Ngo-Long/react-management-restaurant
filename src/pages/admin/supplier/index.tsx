@@ -290,55 +290,55 @@ const SupplierPage = () => {
     }
 
     return (
-        <div>
-            <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}>
-                <DataTable<ISupplier>
-                    rowKey="id"
-                    actionRef={tableRef}
-                    headerTitle="Danh sách nhà cung cấp"
-                    loading={isFetching}
-                    columns={columns}
-                    dataSource={suppliers}
-                    request={async (params, sort, filter): Promise<any> => {
-                        const query = buildQuery(params, sort, filter);
-                        dispatch(fetchSupplierByRestaurant({ query }))
-                    }}
-                    pagination={paginationConfigure(meta)}
-                    toolBarRender={(): any => [
-                        <Button onClick={() => setOpenUpload(true)}>
-                            <UploadOutlined /> Import
-                        </Button>,
+        <Access permission={ALL_PERMISSIONS.SUPPLIERS.GET_PAGINATE}>
+            <DataTable<ISupplier>
+                rowKey="id"
+                actionRef={tableRef}
+                headerTitle="Danh sách nhà cung cấp"
+                loading={isFetching}
+                columns={columns}
+                dataSource={suppliers}
+                request={async (params, sort, filter): Promise<any> => {
+                    const query = buildQuery(params, sort, filter);
+                    dispatch(fetchSupplierByRestaurant({ query }))
+                }}
+                pagination={paginationConfigure(meta)}
+                toolBarRender={(): any => [
+                    <Button onClick={() => setOpenUpload(true)}>
+                        <UploadOutlined /> Import
+                    </Button>,
 
-                        <Button onClick={handleExportAsXlsx(suppliers, formatCSV)}>
-                            <DownloadOutlined /> Export
-                        </Button>,
+                    <Button onClick={handleExportAsXlsx(suppliers, formatCSV)}>
+                        <DownloadOutlined /> Export
+                    </Button>,
 
+                    <Access permission={ALL_PERMISSIONS.SUPPLIERS.CREATE}>
                         <Button type="primary" onClick={() => setOpenModal(true)}>
                             <PlusOutlined />  Thêm mới
                         </Button>
-                    ]}
-                />
+                    </Access>
+                ]}
+            />
 
-                <ModalSupplier
-                    openModal={openModal}
-                    setOpenModal={setOpenModal}
-                    reloadTable={reloadTable}
-                    dataInit={dataInit}
-                    setDataInit={setDataInit}
-                />
+            <ModalSupplier
+                openModal={openModal}
+                setOpenModal={setOpenModal}
+                reloadTable={reloadTable}
+                dataInit={dataInit}
+                setDataInit={setDataInit}
+            />
 
-                <ModalBatchImport
-                    open={openUpload}
-                    onOpen={setOpenUpload}
-                    loading={loading}
-                    onLoading={setLoading}
-                    reloadTable={reloadTable}
-                    onSubmit={(values) => {
-                        batchImportConfigHandler(values);
-                    }}
-                />
-            </Access>
-        </div>
+            <ModalBatchImport
+                open={openUpload}
+                onOpen={setOpenUpload}
+                loading={loading}
+                onLoading={setLoading}
+                reloadTable={reloadTable}
+                onSubmit={(values) => {
+                    batchImportConfigHandler(values);
+                }}
+            />
+        </Access>
     )
 }
 

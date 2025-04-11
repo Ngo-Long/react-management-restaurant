@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useAppDispatch } from '@/redux/hooks';
 import React, { useEffect, useState } from 'react';
-import { fetchLatestUnpaidOrderByTableId } from '@/redux/slice/orderSlide';
+import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 
 interface DiningTableCardProps {
@@ -32,7 +32,7 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleS
 
             // fetch the latest order
             for (const table of occupiedTables) {
-                const order = await dispatch(fetchLatestUnpaidOrderByTableId(table.id!)).unwrap();
+                const order = await dispatch(fetchLatestPendingOrderByTableId(table.id!)).unwrap();
                 if (order) ordersMap[table.id!] = order;
             }
 

@@ -162,7 +162,7 @@ const ShiftPage = () => {
     ];
 
     return (
-        <Access permission={ALL_PERMISSIONS.DININGTABLES.GET_PAGINATE}>
+        <Access permission={ALL_PERMISSIONS.SHIFTS.GET_PAGINATE}>
             <DataTable<IShift>
                 rowKey="id"
                 actionRef={tableRef}
@@ -175,9 +175,11 @@ const ShiftPage = () => {
                 }}
                 pagination={paginationConfigure(meta)}
                 toolBarRender={(): any => [
-                    <Button type="primary" onClick={() => setOpenModal(true)} >
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                    <Access permission={ALL_PERMISSIONS.SHIFTS.CREATE}>
+                        <Button type="primary" onClick={() => setOpenModal(true)} >
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>
                 ]}
             />
 

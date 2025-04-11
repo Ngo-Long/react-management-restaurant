@@ -223,13 +223,13 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                         <div className="invoice-content">
                             <div className="invoice-content__left">
                                 <p className="invoice-content__title">Mã hóa đơn: {currentOrder?.id}</p>
-                                <p className="invoice-content__title">Phục vụ: {currentOrder?.user?.name}</p>
+                                <p className="invoice-content__title">Phục vụ: {currentOrder?.createdBy}</p>
                                 <p className="invoice-content__title">Giờ vào: {dayjs().format(' HH:mm:ss DD/MM/YYYY')}</p>
                             </div>
 
                             <div className="invoice-content__right">
                                 <p className="invoice-content__title">Bàn ăn: {currentTable.name}</p>
-                                <p className="invoice-content__title">Thu ngân: {currentOrder?.user?.name}</p>
+                                <p className="invoice-content__title">Thu ngân: {currentOrder?.createdBy}</p>
                                 <p className="invoice-content__title">Giờ ra: {dayjs().format('HH:mm:ss DD/MM/YYYY')}</p>
                             </div>
                         </div>

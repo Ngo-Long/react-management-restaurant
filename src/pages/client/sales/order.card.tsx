@@ -210,8 +210,6 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
         }
     ];
 
-    console.log(orderDetail?.status)
-
     return (
         <Card
             type="inner"

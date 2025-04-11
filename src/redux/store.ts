@@ -5,40 +5,42 @@ import {
 } from '@reduxjs/toolkit';
 import roleReducer from './slice/roleSlide';
 import userReducer from './slice/userSlide';
+import shiftReducer from './slice/shiftSlide';
+import orderReducer from './slice/orderSlide';
+import clientReducer from './slice/clientSlide';
+import reviewReducer from './slice/reviewSlide';
 import receiptReducer from './slice/receiptSlide';
 import invoiceReducer from './slice/invoiceSlide';
 import accountReducer from './slice/accountSlide';
 import productReducer from './slice/productSlide';
+import feedbackReducer from './slice/feedbackSlide';
 import supplierReducer from './slice/supplierSlide';
 import restaurantReducer from './slice/restaurantSlide';
 import permissionReducer from './slice/permissionSlide';
 import ingredientReducer from './slice/ingredientSlide';
 import orderDetailReducer from './slice/orderDetailSlide';
 import diningTableReducer from './slice/diningTableSlide';
-import reviewReducer from './slice/reviewSlide';
-import feedbackReducer from './slice/feedbackSlide';
-import shiftReducer from './slice/shiftSlide';
-import orderReducer from './slice/orderSlide';
 
 // Configure the Redux store with various slice reducers
 export const store = configureStore({
   reducer: {
     role: roleReducer,
     user: userReducer,
+    shift: shiftReducer,
+    order: orderReducer,
+    review: reviewReducer,
+    client: clientReducer,
     account: accountReducer,
     invoice: invoiceReducer,
     product: productReducer,
     receipt: receiptReducer,
+    feedback: feedbackReducer,
     supplier: supplierReducer,
     ingredient: ingredientReducer,
     permission: permissionReducer,
     restaurant: restaurantReducer,
     diningTable: diningTableReducer,
     orderDetail: orderDetailReducer,
-    review: reviewReducer,
-    feedback: feedbackReducer,
-    shift: shiftReducer,
-    order: orderReducer,
   },
 });
 

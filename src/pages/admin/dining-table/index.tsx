@@ -225,7 +225,7 @@ const DiningTablePage = () => {
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
                     </Access>
-                </Space >
+                </Space>
             ),
         },
     ];
@@ -294,9 +294,11 @@ const DiningTablePage = () => {
                         <DownloadOutlined /> Export
                     </Button>,
 
-                    <Button type="primary" onClick={() => setOpenModal(true)}>
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                    <Access permission={ALL_PERMISSIONS.FEEDBACKS.CREATE} hideChildren>
+                        <Button type="primary" onClick={() => setOpenModal(true)}>
+                            <PlusOutlined /> Thêm mới
+                        </Button>
+                    </Access>,
                 ]}
             />
 

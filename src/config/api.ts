@@ -4,7 +4,8 @@ import {
     IRole, IDiningTable, IOrder, IProduct, IOrderDetail, IInvoice,
     IIngredient, IReceipt, IRestaurant, ISupplier, IPermission, IUnit,
     IFeedback, IReview,
-    IShift
+    IShift,
+    IClient
 } from '../types/backend';
 
 /**
@@ -28,6 +29,10 @@ export const authApi = {
         return axios.post<IBackendRes<IAccount>>('/api/v1/auth/login', { username, password })
     },
 
+    callFetchUser(email: string) {
+        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/google/user', { email })
+    },
+
     callForgotPassword(email: string) {
         return axios.post<IBackendRes<IAccount>>('/api/v1/auth/forgot', { email });
     },
@@ -42,10 +47,6 @@ export const authApi = {
 
     callLogout() {
         return axios.post<IBackendRes<string>>('/api/v1/auth/logout')
-    },
-
-    callFetchUser(email: string) {
-        return axios.post<IBackendRes<IAccount>>('/api/v1/auth/google/user', { email });
     },
 }
 
@@ -93,15 +94,38 @@ export const restaurantApi = {
     },
 }
 
+
+/**
+ *
+Module Client
+ */
+export const clientApi = {
+    callCreate(client: IClient) {
+        return axios.post<IBackendRes<IClient>>('/api/v1/clients', { ...client });
+    },
+
+    callUpdate(client: IClient) {
+        return axios.put<IBackendRes<IClient>>(`/api/v1/clients`, { ...client });
+    },
+
+    callDelete(id: string) {
+        return axios.delete<IBackendRes<IClient>>(`/api/v1/clients/${id}`);
+    },
+
+    callFetchAll(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IClient>>>(`/api/v1/clients?${query}`);
+    },
+
+    callFetchByRestaurant(query: string) {
+        return axios.get<IBackendRes<IModelPaginate<IClient>>>(`/api/v1/clients/by-restaurant?${query}`);
+    },
+}
+
 /**
  *
 Module User
  */
 export const userApi = {
-    callCreateClient(user: IUser) {
-        return axios.post<IBackendRes<IUser>>('/api/v1/users/clients', { ...user });
-    },
-
     callCreate(user: IUser) {
         return axios.post<IBackendRes<IUser>>('/api/v1/users', { ...user });
     },
