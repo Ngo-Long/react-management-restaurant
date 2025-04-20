@@ -181,7 +181,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             )
         },
         {
-            title: 'Số lượng',
+            title: 'SL',
             dataIndex: 'quantity',
             key: 'quantity',
             align: 'center',
