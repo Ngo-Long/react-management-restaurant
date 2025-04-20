@@ -282,6 +282,12 @@
             color: #393939;
             font-weight: 600;
 
+            &__tooltip {
+                cursor: pointer;
+                background: #F5F5F5;
+                border: 1px solid #ebebeb;
+            }
+
             &__desc {
                 font-size: 15px;
             }

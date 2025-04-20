@@ -50,7 +50,6 @@ const TableCalendarModal = ({
     handleUpdateStatus,
     loading,
 }: IProps) => {
-
     const formatCSV = (data: IOrder[]) => {
         const excludeKeys = [
             'createdBy', 'createdDate',

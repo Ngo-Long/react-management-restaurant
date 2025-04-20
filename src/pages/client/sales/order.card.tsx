@@ -12,6 +12,8 @@ import {
     message,
     InputNumber,
     notification,
+    Tooltip,
+    Radio,
 } from 'antd';
 import {
     EditOutlined,
@@ -58,6 +60,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     const [open, setOpen] = useState(false);
     const [note, setNote] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalMergeTable, setIsModalMergeTable] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [quantityItem, setQuantityItem] = useState<number>(1);
     const [totalPriceItem, setTotalPriceItem] = useState<number>(0);
@@ -221,6 +224,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 </div>
             }
         >
+            {/* hiện danh sách món đặt */}
             <div className="container container-order">
                 <div style={{ height: '70%' }}>
                     {orderDetails.length === 0 ? (
@@ -266,40 +270,49 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                     </div> */}
 
                     <div className='order-total'>
-                        <Flex gap="middle" wrap justify="space-between" align="center">
-                            <Avatar
-                                shape="square"
-                                size="default"
-                                icon={<SplitCellsOutlined style={{ color: '#111' }} />}
-                                style={{ backgroundColor: '#F5F5F5', border: '1px solid #ebebeb' }}
-                            />
-
-                            <Badge count={orderSchedules.length}>
+                        <Flex gap="middle" justify="space-between" align="center">
+                            <Tooltip title="Chia bàn" placement="top" mouseEnterDelay={0.3}>
                                 <Avatar
                                     shape="square"
                                     size="default"
-                                    icon={<ScheduleOutlined style={{ color: '#111' }} />}
-                                    style={{ backgroundColor: '#F5F5F5', border: '1px solid #ebebeb' }}
+                                    className='order-total__tooltip'
+                                    icon={<SplitCellsOutlined style={{ color: '#111' }} />}
+                                    onClick={() => setIsModalMergeTable(true)}
                                 />
-                            </Badge>
+                            </Tooltip>
 
-                            <Avatar
-                                shape="square"
-                                size="default"
-                                icon={<HistoryOutlined style={{ color: '#111' }} />}
-                                style={{ backgroundColor: '#F5F5F5', border: '1px solid #ebebeb' }}
-                            />
+                            <Tooltip title="Lịch đặt bàn" placement="top" mouseEnterDelay={0.3}>
+                                <Badge count={orderSchedules.length}>
+                                    <Avatar
+                                        shape="square"
+                                        size="default"
+                                        className='order-total__tooltip'
+                                        icon={<ScheduleOutlined style={{ color: '#111' }} />}
+                                    />
+                                </Badge>
+                            </Tooltip>
 
-                            <Avatar
-                                shape="square"
-                                size="default"
-                                icon={<FormOutlined style={{ color: '#111' }} />}
-                                style={{ backgroundColor: '#F5F5F5', border: '1px solid #ebebeb' }}
-                            />
+                            <Tooltip title="Lịch sử" placement="top" mouseEnterDelay={0.3}>
+                                <Avatar
+                                    shape="square"
+                                    size="default"
+                                    className='order-total__tooltip'
+                                    icon={<HistoryOutlined style={{ color: '#111' }} />}
+                                />
+                            </Tooltip>
+
+                            <Tooltip title="Ghi chú" placement="top" mouseEnterDelay={0.3}>
+                                <Avatar
+                                    shape="square"
+                                    size="default"
+                                    className='order-total__tooltip'
+                                    icon={<FormOutlined style={{ color: '#111' }} />}
+                                />
+                            </Tooltip>
                         </Flex>
 
-                        <Flex gap="middle" wrap justify="space-between" align="center">
-                            <Flex gap="small" wrap justify="space-between" align="center" className='order-total__desc'>
+                        <Flex gap="middle" justify="space-between" align="center">
+                            <Flex gap="small" justify="space-between" align="center" className='order-total__desc'>
                                 Tổng tiền
                                 <Badge
                                     showZero
@@ -316,14 +329,16 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                     </div>
 
                     <div className='order-btn'>
-                        <Button
-                            danger
-                            className='order-btn__alert'
-                            disabled={!orderDetails?.some(item => item.status === 'AWAITING')}
-                            onClick={() => currentOrder && handleNotificationKitchen(currentOrder)}
-                        >
-                            <AlertOutlined style={{ fontSize: '18px' }} />  THÔNG BÁO
-                        </Button>
+                        <Tooltip title="Chuyển món ăn tới bếp" placement="top" mouseEnterDelay={0.5}>
+                            <Button
+                                danger
+                                className='order-btn__alert'
+                                disabled={!orderDetails?.some(item => item.status === 'AWAITING')}
+                                onClick={() => currentOrder && handleNotificationKitchen(currentOrder)}
+                            >
+                                <AlertOutlined style={{ fontSize: '18px' }} />  THÔNG BÁO
+                            </Button>
+                        </Tooltip>
 
                         <Button
                             className='order-btn__pay btn-green'
@@ -336,6 +351,17 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 </div>
             </div>
 
+            {/* mở modal thanh toán */}
+            <InvoiceCard
+                open={open}
+                setOpen={setOpen}
+                currentOrder={currentOrder}
+                setCurrentOrder={setCurrentOrder}
+                currentTable={currentTable}
+                setActiveTabKey={setActiveTabKey}
+            />
+
+            {/* modal đặt món ăn cho đơn hàng */}
             <Modal
                 title={`
                     ${orderDetail?.product?.name} (${orderDetail?.unit?.name}) -
@@ -347,7 +373,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 onCancel={() => setIsModalOpen(false)}
                 footer={[
                     orderDetail?.status === 'AWAITING' && (
-                        <Flex gap="middle" wrap justify="space-between">
+                        <Flex gap="middle" justify="space-between">
                             <Button
                                 style={{ flex: 1 }}
                                 onClick={() => setIsModalOpen(false)}
@@ -459,14 +485,53 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 </div>
             </Modal>
 
-            <InvoiceCard
-                open={open}
-                setOpen={setOpen}
-                currentOrder={currentOrder}
-                setCurrentOrder={setCurrentOrder}
-                currentTable={currentTable}
-                setActiveTabKey={setActiveTabKey}
-            />
+            {/* modal tách gộp bàn */}
+            <Modal
+                title={`Bàn 1 - Tầng 1`}
+                width={550}
+                open={isModalMergeTable}
+                className='container-modal'
+                onCancel={() => setIsModalMergeTable(false)}
+                footer={[
+                    orderDetail?.status === 'AWAITING' && (
+                        <Flex gap="middle" justify="space-between">
+                            <Button
+                                style={{ flex: 1 }}
+                                onClick={() => setIsModalMergeTable(false)}
+                            >
+                                Hủy
+                            </Button>
+                            <Button
+                                danger type="primary" style={{ flex: 1 }}
+                                onClick={() => handleRemoveItem(orderDetail?.id!)}
+                            >
+                                Xóa
+                            </Button>
+                            <Button
+                                className="btn-green" style={{ flex: 1 }}
+                                onClick={handleUpdateItem} disabled={confirmLoading}
+                            >
+                                Cập nhật
+                            </Button>
+                        </Flex>
+                    )
+                ]}
+            >
+                <div className='modal-content'>
+                    <Radio.Group
+                        name="radiogroup"
+                        defaultValue={1}
+                        options={[
+                            { value: 1, label: 'Ghép bàn' },
+                            { value: 2, label: 'Tách bàn' },
+                        ]}
+                    />
+
+                    <Flex>
+                        <div className='modal-card__title'>Ghép đến:</div>
+                    </Flex>
+                </div>
+            </Modal>
         </Card>
     );
 };

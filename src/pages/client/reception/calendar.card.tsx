@@ -39,7 +39,6 @@ const CalendarModal = ({
     setSelectedOrder,
     loading,
 }: IProps) => {
-
     const getListData = (value: Dayjs) => {
         const ordersInDay = dataOrders.filter(order => {
             const orderDate = dayjs(order.reservationTime);
@@ -90,11 +89,13 @@ const CalendarModal = ({
         const listData = getListData(value);
         return (
             <div
-                className="events"
-                onClick={() => {
-                    setOpenModal(true);
-                }}
                 style={{ height: '100%' }}
+                onClick={() => {
+                    setSelectedOrder({
+                        reservationTime: value.toISOString()
+                    });
+                    setOpenModal(true)
+                }}
             >
                 {listData.map((item) => (
                     <Tooltip
@@ -103,7 +104,8 @@ const CalendarModal = ({
                         title={`${item.time} - ${item.order.client?.name} (${item.order.client?.phoneNumber})`}
                     >
                         <div
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation(); 
                                 setSelectedOrder(item.order);
                                 setOpenModal(true);
                             }}
