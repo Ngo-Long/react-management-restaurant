@@ -16,9 +16,8 @@ import {
     CheckSquareOutlined,
 } from '@ant-design/icons';
 import { Table } from 'antd/lib';
-import { ColumnType } from 'antd/es/table';
-import { useState } from 'react';
 import { IOrder } from "@/types/backend";
+import { ColumnType } from 'antd/es/table';
 import { convertCSV, handleExportAsXlsx } from "@/utils/file";
 
 import 'dayjs/locale/vi';
@@ -34,7 +33,6 @@ declare type IProps = {
     dataOrders: IOrder[];
     selectedStatuses: OrderStatus[];
     onStatusChange: (checkedValues: OrderStatus[]) => void;
-    openModal: boolean;
     setOpenModal: (value: boolean) => void;
     selectedOrder: IOrder | null;
     setSelectedOrder: (order: IOrder) => void;
@@ -46,7 +44,6 @@ const TableCalendarModal = ({
     dataOrders, 
     selectedStatuses, 
     onStatusChange, 
-    openModal, 
     setOpenModal,
     selectedOrder,
     setSelectedOrder,

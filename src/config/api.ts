@@ -1,3 +1,4 @@
+import { OrderStatus } from '@/utils/statusConfig';
 import axios from '../config/axios-customize';
 import {
     IBackendRes, IAccount, IUser, IModelPaginate, IGetAccount,
@@ -372,6 +373,10 @@ export const orderDetailApi = {
 
     callUpdate(orderDetail: IOrderDetail) {
         return axios.put<IBackendRes<IOrderDetail>>('/api/v1/order-details', { ...orderDetail });
+    },
+
+    callBatchUpdateStatus(orderDetails: IOrderDetail[]) {
+        return axios.put<IBackendRes<number>>('/api/v1/order-details/batch-update', orderDetails);
     },
 
     callDelete(id: string) {

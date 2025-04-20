@@ -66,6 +66,8 @@ const ForgotPasswordModal = () => {
         setFormValues(prev => ({ ...prev, email: formValues.email }));
         setIsCodeConfirmed(true);
         message.success("Xác nhận mã thành công!");
+      } else {
+        message.error(`${res?.message}`)
       }
     } catch (error) {
       notification.error({ message: "Mã xác nhận không chính xác!", duration: 5 });

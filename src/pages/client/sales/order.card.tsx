@@ -140,13 +140,12 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     const handleNotificationKitchen = async (currentOrder: IOrder) => {
         try {
             // update order details
-            const awaitingDetails = orderDetails.filter(item => item.status === "AWAITING");
-            await Promise.all(
-                awaitingDetails.map(async (item) => {
-                    await orderDetailApi.callUpdate({ ...item, status: "PENDING" });
-                })
-            );
+            const updateDetails = orderDetails
+                .filter(item => item.status === "AWAITING")
+                .map(item => ({ ...item, status: "PENDING" }));
+            await orderDetailApi.callBatchUpdateStatus(updateDetails);
 
+            // fetch data
             dispatch(fetchOrderDetailsByOrderId(currentOrder?.id!));
             dispatch(fetchDiningTableByRestaurant({ query: "?page=1&size=100" }));
             message.success("Bếp đã được nhận thông báo");

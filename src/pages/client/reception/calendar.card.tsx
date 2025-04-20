@@ -2,20 +2,20 @@ import {
     Flex,
     Badge,
     Select,
+    Tooltip,
     Checkbox,
     Calendar,
     DatePicker,
     BadgeProps,
     CalendarProps,
-    Tooltip,
 } from 'antd';
 import { IOrder } from "@/types/backend";
+import { OrderStatus } from '@/utils/statusConfig';
 
 import 'dayjs/locale/vi';
 import dayjs, { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { OrderStatus } from '@/utils/statusConfig';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -24,18 +24,16 @@ declare type IProps = {
     dataOrders: IOrder[];
     selectedStatuses: OrderStatus[];
     onStatusChange: (checkedValues: OrderStatus[]) => void;
-    openModal: boolean;
     setOpenModal: (v: boolean) => void;
     selectedOrder: IOrder | null;
     setSelectedOrder: (order: IOrder) => void;
     loading: boolean;
 }
 
-const CalendarModal = ({ 
-    dataOrders, 
-    selectedStatuses, 
-    onStatusChange, 
-    openModal, 
+const CalendarModal = ({
+    dataOrders,
+    selectedStatuses,
+    onStatusChange,
     setOpenModal,
     selectedOrder,
     setSelectedOrder,
@@ -91,7 +89,13 @@ const CalendarModal = ({
     const dateCellRender = (value: Dayjs) => {
         const listData = getListData(value);
         return (
-            <div className="events">
+            <div
+                className="events"
+                onClick={() => {
+                    setOpenModal(true);
+                }}
+                style={{ height: '100%' }}
+            >
                 {listData.map((item) => (
                     <Tooltip
                         key={item.content}
@@ -105,7 +109,7 @@ const CalendarModal = ({
                             }}
                             onMouseEnter={(e) => {
                                 (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
-                                (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5';
+                                (e.currentTarget as HTMLDivElement).style.backgroundColor = '#fff';
                             }}
                             onMouseLeave={(e) => {
                                 (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
@@ -168,6 +172,7 @@ const CalendarModal = ({
                         picker={type}
                         value={value}
                         onChange={(date) => onChange(date as Dayjs)}
+                        format={type === 'month' ? 'MM-YYYY' : 'YYYY'}
                         style={{ marginLeft: 8 }}
                     />
                 </Flex>

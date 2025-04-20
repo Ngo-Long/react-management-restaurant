@@ -12,9 +12,9 @@ const HomePage = () => {
     const primaryColor = '#ff4d4f';
     const secondaryColor = '#40a9ff';
     const textColor = '#333333';
-    const lightTextColor = '#ffffff';
-    const backgroundColor = '#ffffff'; // Nền ngoài cùng màu trắng
-    const cardBackgroundColor = '#ffffff';
+    const lightTextColor = '#fff';
+    const backgroundColor = '#fff'; // Nền ngoài cùng màu trắng
+    const cardBackgroundColor = '#555';
     const sectionBackgroundColor = '#e6f7ff';
 
     const cardStyle = {
@@ -35,7 +35,7 @@ const HomePage = () => {
                 <header className="fixed-header">
                     <nav className="nav" style={{ padding: '4px 48px' }}>
                         <a href="#" className="nav__logo">
-                            <div style={{ color: primaryColor, fontSize: '16px', fontWeight: 600 }}>
+                            <div style={{ color: primaryColor, fontSize: '30px', fontWeight: 600 }}>
                                 Rservice
                             </div>
                         </a>
@@ -170,6 +170,7 @@ const HomePage = () => {
                                     />
                                 </div>
                             </Col>
+
                             <Col xs={24} md={12}>
                                 <Typography.Title level={4} style={{ color: textColor }}>
                                     Quản lý quy trình Phục vụ - Thu ngân - Bếp chuẩn xác, thuận lợi
@@ -222,317 +223,12 @@ const HomePage = () => {
                     </Card>
                 </section>
 
-                <section style={{ padding: '20px', marginTop: '20px', backgroundColor: '#ffebee' }}>
-                    <Flex align="center" justify="space-around">
-                        <img
-                            src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/cld-sample-3.jpg"
-                            alt="Thanh toán nhanh"
-                            style={{ width: '40%' }}
-                        />
-                        <div style={{ width: '50%', textAlign: 'left' }}>
-                            <Typography.Title level={4} style={{ color: textColor }}>
-                                Thanh toán nhanh, giảm thiểu thất thoát
-                            </Typography.Title>
-                            <Typography.Paragraph style={{ color: textColor }}>
-                                Hỗ trợ thu ngân thanh toán nhanh trong giờ cao điểm, giảm thiểu nhầm lẫn. Tất cả thao tác của nhân viên đều được lưu trữ rõ ràng, dễ dàng tra cứu khi cần thiết.
-                            </Typography.Paragraph>
-                        </div>
-                    </Flex>
-                </section>
-
-                <section style={{ padding: '20px', marginTop: '20px', backgroundColor: cardBackgroundColor }}>
-                    <Flex align="center" justify="space-around" style={{ flexDirection: 'row-reverse' }}>
-                        <img
-                            src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/cld-sample-2.jpg"
-                            alt="Điều phối chế biến"
-                            style={{ width: '40%' }}
-                        />
-                        <div style={{ width: '50%', textAlign: 'left' }}>
-                            <Typography.Title level={4} style={{ color: textColor }}>
-                                Hỗ trợ quầy Bar/bếp điều phối chế biến
-                            </Typography.Title>
-                            <Typography.Paragraph style={{ color: textColor }}>
-                                Tích hợp máy in bếp thông báo gọi món. Màn hình bếp hiển thị trực tiếp tất cả món ăn được yêu cầu chế biến từ bồi bàn hoặc khách hàng.
-                            </Typography.Paragraph>
-                        </div>
-                    </Flex>
-                </section>
-
-                <section style={{ padding: '20px', marginTop: '20px', backgroundColor: '#e8f5e9' }}>
-                    <Flex align="center" justify="space-around">
-                        <img
-                            src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/cld-sample.jpg"
-                            alt="Đặt bàn dễ dàng"
-                            style={{ width: '40%' }}
-                        />
-                        <div style={{ width: '50%', textAlign: 'left' }}>
-                            <Typography.Title level={4} style={{ color: textColor }}>
-                                Đặt bàn, đặt chỗ từ xa một cách dễ dàng
-                            </Typography.Title>
-                            <Typography.Paragraph style={{ color: textColor }}>
-                                Phần mềm hỗ trợ quản lý phòng bàn chuyên nghiệp, kiểm tra nhanh bàn nào còn trống, bàn nào đã có khách... hoặc đặt bàn sẵn theo nhu cầu của khách.
-                            </Typography.Paragraph>
-                        </div>
-                    </Flex>
-                </section>
-
-                <section style={{ padding: '20px', marginTop: '20px', backgroundColor: cardBackgroundColor }}>
-                    <Flex align="center" justify="space-around" style={{ flexDirection: 'row-reverse' }}>
-                        <img
-                            src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/samples/people/kitchen.jpg"
-                            alt="Quản lý nhân viên"
-                            style={{ width: '40%' }}
-                        />
-                        <div style={{ width: '50%', textAlign: 'left' }}>
-                            <Typography.Title level={4} style={{ color: textColor }}>
-                                Quản lý chấm công và tính lương nhân viên
-                            </Typography.Title>
-                            <Typography.Paragraph style={{ color: textColor }}>
-                                Rservice kết nối và đồng bộ tự động với máy chấm công, lưu trữ toàn bộ dữ liệu như giờ đến, giờ về, ngày nghỉ... và tự động tính lương, thưởng cho từng nhân viên.
-                            </Typography.Paragraph>
-                        </div>
-                    </Flex>
-                </section>
-
-                <section style={{ padding: '20px', marginTop: '20px', textAlign: 'center', backgroundColor: backgroundColor }}>
-                    <Typography.Title level={3} style={{ color: textColor }}>Khách hàng của chúng tôi</Typography.Title>
-                    <Row gutter={[16, 16]} justify="center">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card cover={<img alt="3 Gỏi Quán" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712616224/200.jpg" />} style={{ marginBottom: '20px', backgroundColor: cardBackgroundColor }}>
-                                <Typography.Paragraph style={{ color: textColor }}>3 Gỏi Quán - Thành công từ phần mềm đến món ăn. Q5, St32 Vũ Văn Kiệt, P. Cầu Kho, Quận 1, Thành phố Hồ Chí Minh.</Typography.Paragraph>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card cover={<img alt="QUÁN BIA CONTAINER NO.15" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712616224/15.jpg" />} style={{ marginBottom: '20px', backgroundColor: cardBackgroundColor }}>
-                                <Typography.Paragraph style={{ color: textColor }}>QUÁN BIA CONTAINER NO.15 - Tươi rói dịp hội hè ở Việt Trì. 15 Trần Khánh Dư, Nông Trang, Việt Trì, Phú Thọ.</Typography.Paragraph>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card cover={<img alt="Nhà sàn Tây Bắc" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712616224/Tay_Bac.jpg" />} style={{ marginBottom: '20px', backgroundColor: cardBackgroundColor }}>
-                                <Typography.Paragraph style={{ color: textColor }}>Nhà sàn Tây Bắc - Không gian ẩm thực mang đậm bản sắc vùng cao (tầng 1&2). 56 Trần Quý Cáp, Tam Kỳ, Quảng Nam.</Typography.Paragraph>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card cover={<img alt="Gấc Thông" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712616224/Gac_Thong.png" />} style={{ marginBottom: '20px', backgroundColor: cardBackgroundColor }}>
-                                <Typography.Paragraph style={{ color: textColor }}>Gấc Thông - Cafe & Beer - Nơi chốn phủ phê giữa lòng Đà Lạt. 26/1 Nguyễn Khuyến, Đà Lạt, Lâm Đồng.</Typography.Paragraph>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card cover={<img alt="NANNKABAN" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712616224/NANNKABAN.jpg" />} style={{ marginBottom: '20px', backgroundColor: cardBackgroundColor }}>
-                                <Typography.Paragraph style={{ color: textColor }}>NANNKABAN - Nhà hàng ẩm thực Trung Đông độc đáo. Số 4 Khu Biệt Thự, Mỹ Đình, Hà Nội.</Typography.Paragraph>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card cover={<img alt="Kumbo Singapore Food" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712616224/Kumbo.jpg" />} style={{ marginBottom: '20px', backgroundColor: cardBackgroundColor }}>
-                                <Typography.Paragraph style={{ color: textColor }}>Kumbo Singapore Food. 60 Lê Văn Thiêm, Thanh Xuân, Hà Nội.</Typography.Paragraph>
-                            </Card>
-                        </Col>
-                    </Row>
-                    <Button type="primary" style={{ backgroundColor: primaryColor, borderColor: primaryColor, color: lightTextColor }}>Tất cả khách hàng</Button>
-                </section>
-
-                <section style={{ padding: '20px', marginTop: '20px', textAlign: 'center', backgroundColor: backgroundColor }}>
-                    <Typography.Title level={3} style={{ color: textColor }}>Hãy để Rservice đồng hành kinh doanh cùng bạn</Typography.Title>
-                    <Button type="primary" danger style={{ marginBottom: '20px', backgroundColor: primaryColor, borderColor: primaryColor, color: lightTextColor }}>Dùng thử miễn phí</Button>
-                    <Row gutter={[16, 16]} justify="center">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card style={{ marginBottom: '20px', border: 'none', textAlign: 'left', backgroundColor: backgroundColor }}>
-                                <Flex align="center" gap="small">
-                                    <img alt="Hotline" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712617089/hotline_z8l0c9.png" style={{ width: '30px' }} />
-                                    <div>
-                                        <Typography.Text strong style={{ color: textColor }}>Hotline</Typography.Text><br />
-                                        <Typography.Text style={{ fontSize: '12px', color: textColor }}>1800 6162<br />
-                                            (Miễn phí cước gọi)<br />
-                                            Thời gian làm việc 365 ngày<br />
-                                            8:00 - 22:00
-                                        </Typography.Text>
-                                    </div>
-                                </Flex>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card style={{ marginBottom: '20px', border: 'none', textAlign: 'left', backgroundColor: backgroundColor }}>
-                                <Flex align="center" gap="small">
-                                    <img alt="Rservice Fanpage" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712617089/fange_t0j26i.png" style={{ width: '30px' }} />
-                                    <div>
-                                        <Typography.Text strong style={{ color: textColor }}>Rservice Fanpage</Typography.Text><br />
-                                        <Typography.Text style={{ fontSize: '12px', color: textColor }}>Cập nhật thông tin sản phẩm, các phần mềm hữu ích <br /> Facebook.</Typography.Text>
-                                    </div>
-                                </Flex>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card style={{ marginBottom: '20px', border: 'none', textAlign: 'left', backgroundColor: backgroundColor }}>
-                                <Flex align="center" gap="small">
-                                    <img alt="Kênh hỗ trợ Youtube" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712617089/youtube_vpgwlu.png" style={{ width: '30px' }} />
-                                    <div>
-                                        <Typography.Text strong style={{ color: textColor }}>Kênh hỗ trợ Youtube</Typography.Text><br />
-                                        <Typography.Text style={{ fontSize: '12px', color: textColor }}>Video hướng dẫn sử dụng, chia sẻ kinh nghiệm <br /> Xem ngay để dùng tốt hơn. <br /> Đăng ký kênh.</Typography.Text>
-                                    </div>
-                                </Flex>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Card style={{ marginBottom: '20px', border: 'none', textAlign: 'left', backgroundColor: backgroundColor }}>
-                                <Flex align="center" gap="small">
-                                    <img alt="Chat trên web & mobile" src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712617089/chat_w3t3i0.png" style={{ width: '30px' }} />
-                                    <div>
-                                        <Typography.Text strong style={{ color: textColor }}>Chat trên web & mobile</Typography.Text><br />
-                                        <Typography.Text style={{ fontSize: '12px', color: textColor }}>Gửi yêu cầu hỗ trợ ngay qua phần mềm Rservice. <br /> Luôn có nhân viên hỗ trợ 365 ngày.</Typography.Text>
-                                    </div>
-                                </Flex>
-                            </Card>
-                        </Col>
-                    </Row>
-                </section>
-
-                <section style={{ padding: '20px', marginTop: '20px', backgroundColor: '#001529', color: '#fff' }}>
-                    <Row gutter={[16, 16]} justify="space-around">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Rservice</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>Công ty Cổ phần Phần mềm Citigo</Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Hotline: 1800 6162 <br />
-                                Email: hotro@rservice.com
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Trụ sở: Tầng 6, Toà nhà FPT Tower, số 10 Phạm Văn Bạch, Phường Dịch Vọng, Quận Cầu Giấy, Thành phố Hà Nội, Việt Nam
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Doanh nghiệp</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Giới thiệu
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Điều khoản & chính sách sử dụng
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Quyền riêng tư
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Tuyển dụng Rservice
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Hỗ trợ</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Câu hỏi thường gặp
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Wiki Rservice
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Blog
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Thông tin cập nhật Covid
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>1800 6162</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                1800 65 22
-                            </Typography.Paragraph>
-                        </Col>
-                    </Row>
-                    <Row gutter={[16, 16]} justify="space-around">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Ngành hàng</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Bán lẻ
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Siêu thị & tạp hóa
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Thiết bị điện tử & điện máy
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Vật liệu xây dựng
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Mẹ & Bé
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Thời trang & phụ kiện
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Sách & văn phòng phẩm
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Sản xuất
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Ẩm thực</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Mỳ cay
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Nhà hàng & quán ăn
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Cafe, Trà sữa
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Bún, Phở & đồ ăn sáng
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Cơm
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Lẩu, Nướng
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Dịch vụ</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Spa & Massage
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Nail & Mi
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Khách sạn & nhà nghỉ
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Karaoke
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Bida
-                            </Typography.Paragraph>
-                        </Col>
-                    </Row>
-                    <Row gutter={[16, 16]} justify="space-around">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Địa chỉ miền Bắc</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Số 10, ngõ Quan Thổ 1, phố Tôn Đức Thắng, phường Hàng Bột, quận Đống Đa, Hà Nội <br />
-                                Hotline: 02473050616
-                            </Typography.Paragraph>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Địa chỉ miền Trung</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Số 386 Điện Biên Phủ, phường Thanh Khê Đông, quận Thanh Khê, Đà Nẵng <br />
-                                Hotline: 02367305616
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Địa chỉ miền Nam</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Tầng 6, toà nhà Lottery Tower, số 77 Trần Nhân Tôn, Phường 9, Quận 5, TP. Hồ Chí Minh <br />
-                                Hotline: 02873050616
-                            </Typography.Paragraph>
-                        </Col>
-                    </Row>
-                </section>
-
                 <Footer style={{ textAlign: 'center', backgroundColor: '#001529', color: lightTextColor }}>
                     Rservice ©{new Date().getFullYear()} Created by NKL
                 </Footer>
             </Layout >
 
-            < AuthModal
+            <AuthModal
                 open={isAuthOpen}
                 onClose={() => setIsAuthOpen(false)}
                 isLogin={isLogin}

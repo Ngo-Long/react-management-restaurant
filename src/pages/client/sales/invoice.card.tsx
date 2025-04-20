@@ -25,9 +25,9 @@ import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { formatPrice } from "@/utils/format";
-import { invoiceApi, orderApi } from "@/config/api";
 import { IOrder, IOrderDetail } from "@/types/backend";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { invoiceApi, orderApi, orderDetailApi } from "@/config/api";
 import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
 import { fetchDiningTableByRestaurant } from "@/redux/slice/diningTableSlide";
 
@@ -71,13 +71,19 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             return;
         }
 
+        // update order details
+        const updateDetails = orderDetails
+            .filter(item => item.status === "AWAITING")
+            .map(item => ({ ...item, status: "PENDING" }));
+        await orderDetailApi.callBatchUpdateStatus(updateDetails);
+
         // update order
-        const resOrder = await orderApi.callUpdate({ ...currentOrder, status: "COMPLETED" });
+        const resOrder = await orderApi.callUpdate({ ...currentOrder, status: "PAID" });
         if (!resOrder.data) {
             notification.error({ message: "Có lỗi đơn hàng xảy ra", description: resOrder.message });
             return;
         }
-        
+
         // create invoice
         const resInvoice = await invoiceApi.callCreate({
             totalAmount: currentOrder.totalPrice,
