@@ -2,7 +2,6 @@ import {
     Row,
     Col,
     Card,
-    message,
     notification
 } from 'antd';
 import {
@@ -10,9 +9,9 @@ import {
     GatewayOutlined
 } from '@ant-design/icons';
 import '@/styles/client.table.scss';
-import OrderCard from './order.card';
+import OrderCard from './order';
 import React, { useState } from 'react';
-import { IOrder } from '@/types/backend';
+import { IDiningTable, IOrder } from '@/types/backend';
 import ProductCard from './product.card';
 import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
@@ -25,16 +24,19 @@ const SaleClient: React.FC = () => {
     const dispatch = useAppDispatch();
     const [activeTabKey, setActiveTabKey] = useState<string>('tab1');
     const [currentOrder, setCurrentOrder] = useState<IOrder | null>(null);
-    const [currentTable, setCurrentTable] = useState({ id: '', name: 'Chọn bàn' });
     const [lastClickTime, setLastClickTime] = useState<number>(0);
+    const [currentTable, setCurrentTable] = useState<IDiningTable>({
+        id: '',
+        name: 'Chọn bàn',
+        location: '',
+        active: false,
+    });
 
-    const handleSelectedTable = (id: string, name: string) => {
-        setCurrentTable({ id, name });
-
+    const handleSelectedTable = (dataTable: IDiningTable) => {
         const now = Date.now();
         const isDoubleClick = now - lastClickTime < 300;
 
-        setCurrentTable({ id, name });
+        setCurrentTable(dataTable);
         setLastClickTime(now);
 
         // move tab to menu if double clicked
@@ -42,8 +44,8 @@ const SaleClient: React.FC = () => {
             setActiveTabKey('tab2');
         }
 
-        if (id) {
-            dispatch(fetchLatestPendingOrderByTableId(id))
+        if (dataTable.id) {
+            dispatch(fetchLatestPendingOrderByTableId(dataTable.id))
                 .unwrap()
                 .then((data) => setCurrentOrder(data || null))
         }
@@ -101,7 +103,7 @@ const SaleClient: React.FC = () => {
     const contentList: Record<string, React.ReactNode> = {
         tab1: <DiningTableCard
             currentTable={currentTable}
-            handleSelectedTable={(id, name) => handleSelectedTable(id, name)}
+            handleSelectedTable={handleSelectedTable}
         />,
         tab2: <ProductCard handleItemSelect={handleItemSelect} />
     };

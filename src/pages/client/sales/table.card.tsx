@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { Col, Row } from 'antd';
-import { IOrder } from '@/types/backend';
+import { IDiningTable, IOrder } from '@/types/backend';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useAppDispatch } from '@/redux/hooks';
@@ -9,8 +9,8 @@ import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 
 interface DiningTableCardProps {
-    currentTable: { id?: string | null; name: string };
-    handleSelectedTable: (id: string, name: string) => void;
+    currentTable: IDiningTable;
+    handleSelectedTable: (dataTable: IDiningTable) => void;
 }
 
 const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleSelectedTable }) => {
@@ -59,7 +59,7 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleS
                             <Col span={6} key={table.id}>
                                 <div
                                     className={`table-item ${currentTable.id === table.id ? 'active' : ''}`}
-                                    onClick={() => handleSelectedTable(table.id || '', table.name || '')}
+                                    onClick={() => handleSelectedTable(table)}
                                 >
                                     <div className="item-card">
                                         <p className="item-card__title">{table.name}</p>

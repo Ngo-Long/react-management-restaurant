@@ -14,6 +14,7 @@ import {
     notification,
     Tooltip,
     Radio,
+    Select,
 } from 'antd';
 import {
     EditOutlined,
@@ -29,27 +30,29 @@ import {
     HourglassOutlined,
     SplitCellsOutlined,
     ShoppingCartOutlined,
+    ArrowRightOutlined,
 } from '@ant-design/icons';
 import { ColumnType } from 'antd/es/table';
 import TextArea from 'antd/es/input/TextArea';
 
-import InvoiceCard from './invoice.card';
+import InvoiceCard from '../invoice.card';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { formatPrice } from '@/utils/format';
 import React, { useEffect, useState } from 'react';
-import { IOrder, IOrderDetail } from '@/types/backend';
+import { IDiningTable, IOrder, IOrderDetail } from '@/types/backend';
 import { orderApi, orderDetailApi } from '@/config/api';
 import DropdownMenu from '@/components/share/dropdown.menu';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchOrderByRestaurant } from '@/redux/slice/orderSlide';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { fetchOrderDetailsByOrderId, resetOrderDetails } from '@/redux/slice/orderDetailSlide';
+import ModalMergeOrder from './container';
 
 interface OrderCardProps {
     currentOrder: IOrder | null;
     setCurrentOrder: (order: IOrder | null) => void;
-    currentTable: { id: string | null; name: string | null };
+    currentTable: IDiningTable | null;
     setActiveTabKey: (tab: string) => void;
 }
 
@@ -60,11 +63,12 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     const [open, setOpen] = useState(false);
     const [note, setNote] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isModalMergeTable, setIsModalMergeTable] = useState(false);
+    const [isModalMerge, setIsModalMerge] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [quantityItem, setQuantityItem] = useState<number>(1);
     const [totalPriceItem, setTotalPriceItem] = useState<number>(0);
     const [orderDetail, setOrderDetail] = useState<IOrderDetail | null>(null);
+
     const meta = useAppSelector(state => state.orderDetail.meta);
     const orderDetails = useSelector((state: RootState) => state.orderDetail?.result);
     const orderSchedules = useSelector((state: RootState) => state.order?.result);
@@ -162,6 +166,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             title: 'Tên món ăn',
             key: 'name',
             dataIndex: 'unit',
+            width: 160,
             render: (_, record) => (
                 <Space>
                     {{
@@ -184,11 +189,11 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             )
         },
         {
-            title: 'Số lượng',
+            title: 'SL',
             dataIndex: 'quantity',
             key: 'quantity',
             align: 'center',
-            width: 90
+            width: 50
         },
         {
             title: 'T.Tiền',
@@ -224,7 +229,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 </div>
             }
         >
-            {/* hiện danh sách món đặt */}
+            {/* hiện danh sách đơn hàng */}
             <div className="container container-order">
                 <div style={{ height: '70%' }}>
                     {orderDetails.length === 0 ? (
@@ -270,19 +275,27 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                     </div> */}
 
                     <div className='order-total'>
-                        <Flex gap="middle" justify="space-between" align="center">
-                            <Tooltip title="Chia bàn" placement="top" mouseEnterDelay={0.3}>
+                        <Flex gap="small" justify="space-between" align="center">
+                            <Tooltip title="Tách/gộp đơn" placement="top" mouseEnterDelay={0.3}>
                                 <Avatar
                                     shape="square"
                                     size="default"
                                     className='order-total__tooltip'
                                     icon={<SplitCellsOutlined style={{ color: '#111' }} />}
-                                    onClick={() => setIsModalMergeTable(true)}
+                                    onClick={() => {
+                                        if (sortedOrderDetails.length > 0) {
+                                          setIsModalMerge(true);
+                                        }
+                                      }}
+                                    style={{
+                                        cursor: sortedOrderDetails.length > 0 ? 'pointer' : 'not-allowed',
+                                        opacity: sortedOrderDetails.length > 0 ? 1 : 0.5,
+                                    }}
                                 />
                             </Tooltip>
 
-                            <Tooltip title="Lịch đặt bàn" placement="top" mouseEnterDelay={0.3}>
-                                <Badge count={orderSchedules.length}>
+                            <Tooltip title="Phiếu đặt bàn" placement="top" mouseEnterDelay={0.3}>
+                                <Badge count={orderSchedules.length} size='small'>
                                     <Avatar
                                         shape="square"
                                         size="default"
@@ -292,7 +305,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                                 </Badge>
                             </Tooltip>
 
-                            <Tooltip title="Lịch sử" placement="top" mouseEnterDelay={0.3}>
+                            <Tooltip title="Lịch sử báo bếp" placement="top" mouseEnterDelay={0.3}>
                                 <Avatar
                                     shape="square"
                                     size="default"
@@ -359,6 +372,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                 setCurrentOrder={setCurrentOrder}
                 currentTable={currentTable}
                 setActiveTabKey={setActiveTabKey}
+            />
+
+            {/* modal tách gộp bàn */}
+            <ModalMergeOrder
+                isModalMerge={isModalMerge}
+                setIsModalMerge={setIsModalMerge}
+                currentOrder={currentOrder}
+                sortedOrderDetails={sortedOrderDetails}
             />
 
             {/* modal đặt món ăn cho đơn hàng */}
@@ -482,54 +503,6 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                             />
                         </Col>
                     </Row>
-                </div>
-            </Modal>
-
-            {/* modal tách gộp bàn */}
-            <Modal
-                title={`Bàn 1 - Tầng 1`}
-                width={550}
-                open={isModalMergeTable}
-                className='container-modal'
-                onCancel={() => setIsModalMergeTable(false)}
-                footer={[
-                    orderDetail?.status === 'AWAITING' && (
-                        <Flex gap="middle" justify="space-between">
-                            <Button
-                                style={{ flex: 1 }}
-                                onClick={() => setIsModalMergeTable(false)}
-                            >
-                                Hủy
-                            </Button>
-                            <Button
-                                danger type="primary" style={{ flex: 1 }}
-                                onClick={() => handleRemoveItem(orderDetail?.id!)}
-                            >
-                                Xóa
-                            </Button>
-                            <Button
-                                className="btn-green" style={{ flex: 1 }}
-                                onClick={handleUpdateItem} disabled={confirmLoading}
-                            >
-                                Cập nhật
-                            </Button>
-                        </Flex>
-                    )
-                ]}
-            >
-                <div className='modal-content'>
-                    <Radio.Group
-                        name="radiogroup"
-                        defaultValue={1}
-                        options={[
-                            { value: 1, label: 'Ghép bàn' },
-                            { value: 2, label: 'Tách bàn' },
-                        ]}
-                    />
-
-                    <Flex>
-                        <div className='modal-card__title'>Ghép đến:</div>
-                    </Flex>
                 </div>
             </Modal>
         </Card>
