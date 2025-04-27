@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-dayjs.locale('vi'); 
+dayjs.locale('vi');
 import { ConfigProvider } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 

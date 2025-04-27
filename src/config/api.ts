@@ -251,6 +251,10 @@ export const orderApi = {
         return axios.put<IBackendRes<IOrder>>('/api/v1/orders', { ...order });
     },
 
+    callMergeTable(order: IOrder) {
+        return axios.put<IBackendRes<IOrder>>('/api/v1/orders/merge-table', { ...order });
+    },
+
     callDelete(id: string) {
         return axios.delete<IBackendRes<IOrder>>(`/api/v1/orders/${id}`);
     },

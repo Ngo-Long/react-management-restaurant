@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 import { Col, Row } from 'antd';
-import { IDiningTable, IOrder } from '@/types/backend';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { formatPrice } from '@/utils/format';
 import { useAppDispatch } from '@/redux/hooks';
+import { IDiningTable } from '@/types/backend';
 import React, { useEffect, useState } from 'react';
-import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 
 interface DiningTableCardProps {
@@ -17,43 +17,23 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleS
     const dispatch = useAppDispatch();
     const diningTables = useSelector((state: RootState) => state.diningTable.result);
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-    const [currentOrders, setCurrentOrders] = useState<{ [key: string]: IOrder }>({});
 
     useEffect(() => {
         dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100&sort=sequence,asc&filter=active=true' }));
     }, [dispatch]);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            const ordersMap: { [key: string]: IOrder } = {};
-
-            // filter table status "OCCUPIED"
-            const occupiedTables = diningTables.filter((table) => table.status === 'OCCUPIED');
-
-            // fetch the latest order
-            for (const table of occupiedTables) {
-                const order = await dispatch(fetchLatestPendingOrderByTableId(table.id!)).unwrap();
-                if (order) ordersMap[table.id!] = order;
-            }
-
-            // update state
-            setCurrentOrders(ordersMap);
-        };
-        fetchOrders();
-    }, [dispatch, diningTables]);
-
     const uniqueLocations = Array.from(new Set(diningTables.map(table => table?.location)));
 
-    const filteredTables = diningTables
-        .filter((table) => !selectedLocation || table.location === selectedLocation)
-        .map((table) => ({ ...table, currentOrder: currentOrders[table.id!] }));
+    const filteredTables = diningTables.filter((table) => {
+        return !selectedLocation || table.location === selectedLocation;
+    });
 
     return (
         <div className="container">
             <div className="container-content">
                 <Row gutter={[20, 22]}>
                     {filteredTables.map((table) => {
-                        const currentOrder = currentOrders[table.id || ''];
+                        const currentOrder = (table?.orders || []).find(order => order?.id != null);
 
                         return (
                             <Col span={6} key={table.id}>
@@ -73,7 +53,8 @@ const DiningTableCard: React.FC<DiningTableCardProps> = ({ currentTable, handleS
                                             </div>
 
                                             <div className="item-info__price">
-                                                {(currentOrder.totalPrice + "")?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                {formatPrice(currentOrder.totalPrice)}
+                                                {/* {(currentOrder.totalPrice + "")?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} */}
                                             </div>
                                         </div>
                                     )}

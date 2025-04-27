@@ -196,7 +196,7 @@ export const ModalOrderScheduled = ({
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{selectedOrder?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: 'Hủy'
+                    cancelText: 'Đóng'
                 }}
                 submitter={{
                     render: (props, defaultDoms) => {

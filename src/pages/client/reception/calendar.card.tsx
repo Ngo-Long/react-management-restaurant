@@ -105,7 +105,7 @@ const CalendarModal = ({
                     >
                         <div
                             onClick={(e) => {
-                                e.stopPropagation(); 
+                                e.stopPropagation();
                                 setSelectedOrder(item.order);
                                 setOpenModal(true);
                             }}

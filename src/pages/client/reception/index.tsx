@@ -154,7 +154,7 @@ const ReceptionClient: React.FC = () => {
                         onChange(newDate);
                     }}
                     options={months}
-                    style={{ width: 100 }}
+                    style={{ width: '100%' }}
                 />
 
                 <Select
@@ -164,7 +164,7 @@ const ReceptionClient: React.FC = () => {
                         onChange(newDate);
                     }}
                     options={years}
-                    style={{ width: 75, marginLeft: 4 }}
+                    style={{ width: 75, marginLeft: 10 }}
                 />
             </Flex>
         );
@@ -201,11 +201,11 @@ const ReceptionClient: React.FC = () => {
             <Row>
                 <Col span={5}>
                     <Card title="Lịch đặt bàn" style={{ height: '100%', padding: 0 }} >
-                            <Calendar
-                                fullscreen={false}
-                                onPanelChange={onPanelChange}
-                                headerRender={customHeaderRender}
-                            />
+                        <Calendar
+                            fullscreen={false}
+                            onPanelChange={onPanelChange}
+                            headerRender={customHeaderRender}
+                        />
                     </Card>
                 </Col>
 

@@ -11,11 +11,11 @@ import {
 import '@/styles/client.table.scss';
 import OrderCard from './order';
 import React, { useState } from 'react';
-import { IDiningTable, IOrder } from '@/types/backend';
 import ProductCard from './product.card';
 import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
 import { IOrderDetail } from '../../../types/backend';
+import { IDiningTable, IOrder } from '@/types/backend';
 import { orderApi, orderDetailApi } from "@/config/api";
 import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
 import { fetchLatestPendingOrderByTableId } from '@/redux/slice/orderSlide';

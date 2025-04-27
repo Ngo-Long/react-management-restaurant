@@ -153,7 +153,7 @@ const OrderPage = () => {
                     <Access permission={ALL_PERMISSIONS.ORDERS.DELETE} hideChildren>
                         <Popconfirm
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                             placement="leftTop"
                             title={"Xác nhận xóa bàn ăn"}
                             description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}

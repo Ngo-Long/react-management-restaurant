@@ -238,7 +238,7 @@ const SupplierPage = () => {
                             description={"Bạn có chắc chắn muốn xóa nhà cung cấp này ?"}
                             onConfirm={() => handleDeleteSupplier(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

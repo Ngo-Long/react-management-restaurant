@@ -139,6 +139,12 @@ export interface IDiningTable {
     description?: string;
     status?: string;
     active: boolean;
+    orders?: {
+        id?: string | null;
+        totalPrice?: number;
+        createdDate?: string;
+        lastModifiedDate?: string;
+    }[];
     restaurant?: {
         id: string;
         name: string;

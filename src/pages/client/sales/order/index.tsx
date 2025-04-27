@@ -10,11 +10,9 @@ import {
     Avatar,
     Button,
     message,
+    Tooltip,
     InputNumber,
     notification,
-    Tooltip,
-    Radio,
-    Select,
 } from 'antd';
 import {
     EditOutlined,
@@ -30,24 +28,23 @@ import {
     HourglassOutlined,
     SplitCellsOutlined,
     ShoppingCartOutlined,
-    ArrowRightOutlined,
 } from '@ant-design/icons';
 import { ColumnType } from 'antd/es/table';
-import TextArea from 'antd/es/input/TextArea';
 
 import InvoiceCard from '../invoice.card';
 import { RootState } from '@/redux/store';
+import ModalMergeOrder from './container';
 import { useSelector } from 'react-redux';
 import { formatPrice } from '@/utils/format';
+import TextArea from 'antd/es/input/TextArea';
 import React, { useEffect, useState } from 'react';
-import { IDiningTable, IOrder, IOrderDetail } from '@/types/backend';
 import { orderApi, orderDetailApi } from '@/config/api';
 import DropdownMenu from '@/components/share/dropdown.menu';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchOrderByRestaurant } from '@/redux/slice/orderSlide';
+import { IDiningTable, IOrder, IOrderDetail } from '@/types/backend';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { fetchOrderDetailsByOrderId, resetOrderDetails } from '@/redux/slice/orderDetailSlide';
-import ModalMergeOrder from './container';
 
 interface OrderCardProps {
     currentOrder: IOrder | null;
@@ -219,12 +216,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             title={
                 <div style={{ display: "flex", fontSize: '15px' }}>
                     <ShoppingCartOutlined style={{ fontSize: '20px', marginRight: '6px' }} />
-                    {currentOrder
-                        ? `Đơn hàng ${currentOrder.id} /
-                            ${currentOrder?.diningTables!
-                            .map(table => table.name)
-                            .join(' - ')}`
-                        : `Đơn hàng / ${currentTable?.name}`
+                    {
+                        currentOrder
+                            ? `Đơn hàng ${currentOrder.id} - ${[...(currentOrder.diningTables || [])]
+                                .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                                .map(table => table.name)
+                                .join(', ')
+                            }`
+                            : `Đơn hàng / ${currentTable?.name}`
                     }
                 </div>
             }
@@ -276,25 +275,25 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
 
                     <div className='order-total'>
                         <Flex gap="small" justify="space-between" align="center">
-                            <Tooltip title="Tách/gộp đơn" placement="top" mouseEnterDelay={0.3}>
+                            <Tooltip title="Tách/ghép bàn" placement="top" mouseEnterDelay={0.2}>
                                 <Avatar
                                     shape="square"
                                     size="default"
                                     className='order-total__tooltip'
                                     icon={<SplitCellsOutlined style={{ color: '#111' }} />}
                                     onClick={() => {
-                                        if (sortedOrderDetails.length > 0) {
-                                          setIsModalMerge(true);
+                                        if (currentOrder != null) {
+                                            setIsModalMerge(true);
                                         }
-                                      }}
+                                    }}
                                     style={{
-                                        cursor: sortedOrderDetails.length > 0 ? 'pointer' : 'not-allowed',
-                                        opacity: sortedOrderDetails.length > 0 ? 1 : 0.5,
+                                        cursor: currentOrder != null ? 'pointer' : 'not-allowed',
+                                        opacity: currentOrder != null ? 1 : 0.5,
                                     }}
                                 />
                             </Tooltip>
 
-                            <Tooltip title="Phiếu đặt bàn" placement="top" mouseEnterDelay={0.3}>
+                            <Tooltip title="Phiếu đặt bàn" placement="top" mouseEnterDelay={0.2}>
                                 <Badge count={orderSchedules.length} size='small'>
                                     <Avatar
                                         shape="square"
@@ -305,7 +304,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                                 </Badge>
                             </Tooltip>
 
-                            <Tooltip title="Lịch sử báo bếp" placement="top" mouseEnterDelay={0.3}>
+                            <Tooltip title="Lịch sử báo bếp" placement="top" mouseEnterDelay={0.2}>
                                 <Avatar
                                     shape="square"
                                     size="default"
@@ -314,7 +313,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                                 />
                             </Tooltip>
 
-                            <Tooltip title="Ghi chú" placement="top" mouseEnterDelay={0.3}>
+                            <Tooltip title="Ghi chú" placement="top" mouseEnterDelay={0.2}>
                                 <Avatar
                                     shape="square"
                                     size="default"
@@ -399,7 +398,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
                                 style={{ flex: 1 }}
                                 onClick={() => setIsModalOpen(false)}
                             >
-                                Hủy
+                                Đóng
                             </Button>
                             <Button
                                 danger type="primary" style={{ flex: 1 }}
