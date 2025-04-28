@@ -71,7 +71,7 @@ const ModalMergeOrder = ({
 
         // Validate số lượng tách
         for (const itemId of selectedItemsToSplit) {
-            const originalItem = sortedOrderDetails.find((item: any)=> item.id === itemId);
+            const originalItem = sortedOrderDetails.find((item: any) => item.id === itemId);
             const splitQty = splitQuantities[itemId] || 0;
 
             if (!originalItem || splitQty <= 0 || splitQty > originalItem.quantity!) {
@@ -82,12 +82,12 @@ const ModalMergeOrder = ({
 
         try {
             setLoading(true);
-            
+
             // Gọi API tách bàn
             await orderApi.callMergeOrder({
                 orderId: currentOrder?.id,
                 diningTables: selectedTables.map(table => ({
-                    id: table.split(' - ')[0] 
+                    id: table.split(' - ')[0]
                 })),
                 orderDetails: selectedItemsToSplit.map(id => ({
                     id,
@@ -238,7 +238,7 @@ const ModalMergeOrder = ({
                 return (
                     <Flex align="center" gap="small">
                         <Button
-                            style={{height: '22px', width: '22px'}}
+                            style={{ height: '22px', width: '22px' }}
                             size="small" color="danger" variant="outlined"
                             onClick={() => handleQuantityChange(record.id!, Math.max(0, currentValue - 1))}
                         >
@@ -261,7 +261,7 @@ const ModalMergeOrder = ({
                         </Space>
 
                         <Button
-                            style={{height: '22px', width: '22px'}}
+                            style={{ height: '22px', width: '22px' }}
                             size="small" color="danger" variant="outlined"
                             onClick={() => handleQuantityChange(record.id!, Math.min(maxQuantity, currentValue + 1))}
                         >
