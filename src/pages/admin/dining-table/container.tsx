@@ -129,7 +129,7 @@ export const ModalDiningTable = (props: IProps) => {
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: "Hủy"
+                    cancelText: "Đóng"
                 }}
                 scrollToFirstError={true}
                 preserve={false}
@@ -275,7 +275,7 @@ export const ModalBatchImport = (props: IBatchImportBatchImport) => {
                 keyboard: false,
                 maskClosable: false,
                 okText: 'Xác nhận',
-                cancelText: "Hủy"
+                cancelText: "Đóng"
             }}
             onFinish={onFinish}
         >

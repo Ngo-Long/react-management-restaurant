@@ -214,7 +214,7 @@ const ViewUpsertReceipt = () => {
                     onFinish={submitReceipt}
                     submitter={{
                         searchConfig: {
-                            resetText: "Hủy",
+                            resetText: "Đóng",
                             submitText: "Tạo biên lai"
                         },
                         onReset: () => navigate('/admin/receipt'),

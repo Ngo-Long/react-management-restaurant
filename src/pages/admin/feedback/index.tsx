@@ -119,7 +119,7 @@ const FeedbackPage = () => {
                             description={"Bạn có chắc chắn muốn xóa đánh giá này ?"}
                             onConfirm={() => handleDeleteFeedback(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

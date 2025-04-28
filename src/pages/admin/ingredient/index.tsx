@@ -241,7 +241,7 @@ const IngredientPage = () => {
                             description={"Bạn có chắc chắn muốn xóa hàng hóa này ?"}
                             onConfirm={() => handleDeleteIngredient(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

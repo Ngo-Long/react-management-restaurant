@@ -149,7 +149,7 @@ const ModalRestaurant = (props: IProps) => {
                                 icon: <CheckSquareOutlined />
                             },
                             searchConfig: {
-                                resetText: "Hủy",
+                                resetText: "Đóng",
                                 submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
                             }
                         }}

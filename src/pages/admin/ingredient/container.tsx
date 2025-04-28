@@ -217,7 +217,7 @@ export const ModalIngredient = (props: IProps) => {
                 render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
                 submitButtonProps: { icon: <CheckSquareOutlined /> },
                 searchConfig: {
-                    resetText: "Hủy",
+                    resetText: "Đóng",
                     submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
                 }
             }}
@@ -454,7 +454,7 @@ export const ModalBatchImport = (props: IBatchImportBatchImport) => {
                 keyboard: false,
                 maskClosable: false,
                 okText: 'Xác nhận',
-                cancelText: "Hủy"
+                cancelText: "Đóng"
             }}
             onFinish={onFinish}
         >

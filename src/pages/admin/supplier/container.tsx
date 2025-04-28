@@ -100,7 +100,7 @@ export const ModalSupplier = (props: IProps) => {
                 keyboard: false,
                 maskClosable: false,
                 okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                cancelText: "Hủy"
+                cancelText: "Đóng"
             }}
         >
             <Row gutter={[30, 4]}>
@@ -193,7 +193,7 @@ export const ModalBatchImport = (props: IBatchImportBatchImport) => {
                 keyboard: false,
                 maskClosable: false,
                 okText: 'Xác nhận',
-                cancelText: "Hủy"
+                cancelText: "Đóng"
             }}
             onFinish={onFinish}
         >

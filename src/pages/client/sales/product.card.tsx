@@ -184,7 +184,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                             style={{ flex: 1 }}
                             onClick={() => setIsModalOpen(false)}
                         >
-                            Hủy
+                            Đóng
                         </Button>
                         <Button
                             style={{ flex: 1 }}

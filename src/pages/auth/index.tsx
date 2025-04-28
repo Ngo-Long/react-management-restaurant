@@ -196,7 +196,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, isLogin, setIsLogi
         overflowY: "auto" as const,
         textAlign: "center" as const,
         scrollbarWidth: "none" as const,
-        background: "linear-gradient(to bottom, #ffffff, #f8f9fa)",
+        background: "fff"
     };
 
     return (

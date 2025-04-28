@@ -219,7 +219,7 @@ const ModalUser = (props: IProps) => {
                 render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
                 submitButtonProps: { icon: <CheckSquareOutlined /> },
                 searchConfig: {
-                    resetText: "Hủy",
+                    resetText: "Đóng",
                     submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
                 }
             }}

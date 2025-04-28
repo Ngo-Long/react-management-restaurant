@@ -151,7 +151,7 @@ const ShiftPage = () => {
                             description={"Bạn có chắc chắn muốn xóa ca làm này ?"}
                             onConfirm={() => handleDeleteShift(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

@@ -86,7 +86,7 @@ export const ModalShift = (props: IProps) => {
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: "Hủy"
+                    cancelText: "Đóng"
                 }}
                 scrollToFirstError={true}
                 preserve={false}

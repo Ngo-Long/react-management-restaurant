@@ -220,7 +220,7 @@ const DiningTablePage = () => {
                             description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
                             onConfirm={() => handleDeleteDiningTable(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

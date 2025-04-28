@@ -278,7 +278,7 @@ const ViewUpsertProduct = () => {
                     onFinish={submitProduct}
                     submitter={{
                         searchConfig: {
-                            resetText: "Hủy",
+                            resetText: "Đóng",
                             submitText: <>{dataProduct?.id ? "Cập nhật món ăn" : "Thêm món ăn"}</>
                         },
                         onReset: () => navigate('/admin/product'),

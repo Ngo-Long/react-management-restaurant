@@ -25,7 +25,7 @@ import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { formatPrice } from "@/utils/format";
-import { IOrder, IOrderDetail } from "@/types/backend";
+import { IDiningTable, IOrder, IOrderDetail } from "@/types/backend";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { invoiceApi, orderApi, orderDetailApi } from "@/config/api";
 import { fetchOrderDetailsByOrderId } from "@/redux/slice/orderDetailSlide";
@@ -36,7 +36,7 @@ interface InvoiceCardProps {
     setOpen: (is: boolean) => void;
     currentOrder: IOrder | null;
     setCurrentOrder: (order: IOrder | null) => void;
-    currentTable: { id: string | null; name: string | null };
+    currentTable: IDiningTable | null;
     setActiveTabKey: (tab: string) => void;
 }
 
@@ -189,7 +189,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
             width='950'
             className='container-invoice'
             onClose={() => setOpen(false)}
-            title={`Thanh toán - ${currentTable.name} `}
+            title={`Thanh toán - ${currentTable?.name} `}
         >
             <Row gutter={40}>
                 <Col span={14}>
@@ -241,7 +241,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
                             </div>
 
                             <div className="invoice-content__right">
-                                <p className="invoice-content__title">Bàn ăn: {currentTable.name}</p>
+                                <p className="invoice-content__title">Bàn ăn: {currentTable?.name}</p>
                                 <p className="invoice-content__title">Thu ngân: {currentOrder?.createdBy}</p>
                                 <p className="invoice-content__title">Giờ ra: {dayjs().format('HH:mm:ss DD/MM/YYYY')}</p>
                             </div>

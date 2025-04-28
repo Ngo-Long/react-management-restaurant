@@ -83,7 +83,10 @@ export const ModalOrderScheduled = ({
                 client: client?.id,
                 diningTables: selectedOrder.diningTables?.map(table => table.id)
             });
-
+        } else {
+            const reservationTime = dayjs(selectedOrder!.reservationTime);
+            setSelectedDate(reservationTime);
+            setSelectedTime(reservationTime);
         }
     }
 
@@ -193,7 +196,7 @@ export const ModalOrderScheduled = ({
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{selectedOrder?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: 'Hủy'
+                    cancelText: 'Đóng'
                 }}
                 submitter={{
                     render: (props, defaultDoms) => {
@@ -243,6 +246,17 @@ export const ModalOrderScheduled = ({
                                     !selectedOrder ||
                                     (selectedOrder.id && selectedOrder.status !== OrderStatus.PENDING)
                                 ) &&
+                                    React.cloneElement(
+                                        submitBtn,
+                                        {
+                                            key: 'submit',
+                                            style: buttonStyle
+                                        }
+                                    )
+                                }
+
+                                {/* nếu có thời gian mà ko có id thì tạo mới */}
+                                {(!selectedOrder?.id && selectedOrder?.reservationTime) &&
                                     React.cloneElement(
                                         submitBtn,
                                         {

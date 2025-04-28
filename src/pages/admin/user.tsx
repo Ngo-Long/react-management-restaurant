@@ -170,7 +170,7 @@ const UserPage = () => {
                             description={"Bạn có chắc chắn muốn xóa người dùng này ?"}
                             onConfirm={() => handleDeleteUser(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
