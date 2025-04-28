@@ -8,6 +8,7 @@ import {
     IShift,
     IClient
 } from '../types/backend';
+import { SplitOrderRequest } from '@/pages/client/sales/order/data';
 
 /**
  *
@@ -253,6 +254,10 @@ export const orderApi = {
 
     callMergeTable(order: IOrder) {
         return axios.put<IBackendRes<IOrder>>('/api/v1/orders/merge-table', { ...order });
+    },
+
+    callMergeOrder(request: SplitOrderRequest) {
+        return axios.put<IBackendRes<IOrder>>('/api/v1/orders/split-order', { ...request });
     },
 
     callDelete(id: string) {

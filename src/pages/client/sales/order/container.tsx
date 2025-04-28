@@ -7,7 +7,12 @@ import {
     Button,
     Select,
     message,
+    InputNumber,
 } from 'antd';
+import {
+    PlusOutlined,
+    MinusOutlined,
+} from '@ant-design/icons';
 import { ColumnType } from 'antd/es/table';
 
 import { useState } from 'react';
@@ -23,7 +28,7 @@ declare type IProps = {
     isModalMerge: boolean;
     setIsModalMerge: (v: boolean) => void;
     currentOrder: IOrder | null;
-    sortedOrderDetails: any;
+    sortedOrderDetails: IOrderDetail[];
 }
 
 const ModalMergeOrder = ({
@@ -34,46 +39,67 @@ const ModalMergeOrder = ({
 }: IProps) => {
     const dispatch = useAppDispatch();
     const meta = useAppSelector(state => state.orderDetail.meta);
+    const diningTables = useSelector((state: RootState) => state.diningTable.result);
 
     const [loading, setLoading] = useState(false);
     const [selectedAction, setSelectedAction] = useState<number>(1);
     const [selectedTables, setSelectedTables] = useState<string[]>([]);
     const [selectedItemsToSplit, setSelectedItemsToSplit] = useState<string[]>([]);
-    const diningTables = useSelector((state: RootState) => state.diningTable.result);
+    const [splitQuantities, setSplitQuantities] = useState<Record<string, number>>({});
 
-    // Tạo options cho select tách bàn
-    const splitTableOptions = currentOrder?.diningTables?.map(table => ({
-        value: table.id,
-        label: table.name
-    })) || [];
+    const handleQuantityChange = (id: string, value: number | null) => {
+        if (value !== null) {
+            setSplitQuantities(prev => ({
+                ...prev,
+                [id]: value
+            }));
 
-    // Tạo options cho select món ăn cần tách
-    const itemOptions = sortedOrderDetails?.map((item: IOrderDetail) => ({
-        value: item.id,
-        label: `${item.product?.name} (${item.quantity}x)`
-    })) || [];
+            // Tự động chọn món nếu số lượng > 0
+            if (value > 0 && !selectedItemsToSplit.includes(id)) {
+                setSelectedItemsToSplit(prev => [...prev, id]);
+            } else if (value <= 0 && selectedItemsToSplit.includes(id)) {
+                setSelectedItemsToSplit(prev => prev.filter(itemId => itemId !== id));
+            }
+        }
+    };
 
     const handleSplitTable = async () => {
-        if (!currentOrder || selectedItemsToSplit.length === 0 || !selectedTables[0]) {
+        if (selectedItemsToSplit.length === 0 || !selectedTables[0]) {
             message.info('Vui lòng chọn bàn và món ăn cần tách');
             return;
         }
 
+        // Validate số lượng tách
+        for (const itemId of selectedItemsToSplit) {
+            const originalItem = sortedOrderDetails.find((item: any)=> item.id === itemId);
+            const splitQty = splitQuantities[itemId] || 0;
+
+            if (!originalItem || splitQty <= 0 || splitQty > originalItem.quantity!) {
+                message.error(`Số lượng tách không hợp lệ cho món ${originalItem?.product?.name}`);
+                return;
+            }
+        }
+
         try {
             setLoading(true);
-            const [tableId] = selectedTables[0].split(' - ');
-
+            
             // Gọi API tách bàn
-            // await orderApi.callSplitTable({
-            //     originalOrderId: currentOrder.id,
-            //     newTableId: tableId,
-            //     orderDetailIds: selectedItemsToSplit
-            // });
+            await orderApi.callMergeOrder({
+                orderId: currentOrder?.id,
+                diningTables: selectedTables.map(table => ({
+                    id: table.split(' - ')[0] 
+                })),
+                orderDetails: selectedItemsToSplit.map(id => ({
+                    id,
+                    quantity: splitQuantities[id] || 1
+                }))
+            });
 
             dispatch(fetchDiningTableByRestaurant({ query: '?page=1&size=100&sort=sequence,asc&filter=active=true' }));
             message.success('Tách bàn thành công');
             setIsModalMerge(false);
             setSelectedTables([]);
+            setSplitQuantities({});
             setSelectedItemsToSplit([]);
         } catch (error) {
             message.error('Tách bàn thất bại');
@@ -144,7 +170,10 @@ const ModalMergeOrder = ({
             width: 160,
             render: (_, record) => (
                 <Space>
-                    {(`${record.client?.name} (${record.client?.phoneNumber})`) || 'Khách vãng lai'}
+                    {record.client ?
+                        (`${record.client?.name} (${record.client?.phoneNumber})`) :
+                        'Khách vãng lai'
+                    }
                 </Space>
             )
         },
@@ -197,21 +226,60 @@ const ModalMergeOrder = ({
             )
         },
         {
-            title: 'SL',
+            title: 'Số lượng',
             dataIndex: 'quantity',
             key: 'quantity',
             align: 'center',
-            width: 50
+            width: 81,
+            render: (_, record) => {
+                const maxQuantity = record.quantity || 1;
+                const currentValue = splitQuantities[record.id!] || 0;
+
+                return (
+                    <Flex align="center" gap="small">
+                        <Button
+                            style={{height: '22px', width: '22px'}}
+                            size="small" color="danger" variant="outlined"
+                            onClick={() => handleQuantityChange(record.id!, Math.max(0, currentValue - 1))}
+                        >
+                            <MinusOutlined style={{ width: 10 }} />
+                        </Button>
+
+                        <InputNumber
+                            key={`input-${record.id}`}
+                            min={0}
+                            max={record.quantity}
+                            size="small"
+                            controls={false}
+                            style={{ width: '52px' }}
+                            value={currentValue}
+                            onChange={(value) => handleQuantityChange(record.id!, value)}
+                        />
+
+                        <Space>
+                            / {record.quantity}
+                        </Space>
+
+                        <Button
+                            style={{height: '22px', width: '22px'}}
+                            size="small" color="danger" variant="outlined"
+                            onClick={() => handleQuantityChange(record.id!, Math.min(maxQuantity, currentValue + 1))}
+                        >
+                            <PlusOutlined style={{ width: 10 }} />
+                        </Button>
+                    </Flex>
+                )
+            }
         },
         {
             title: 'T.Tiền',
             dataIndex: 'price',
             key: 'price',
-            width: 90,
+            width: 50,
             align: 'center',
             render: (_, record) => (
                 <Space>
-                    {formatPrice(record.quantity! * record.unit?.price!)}
+                    {formatPrice((splitQuantities[record.id!] || 0) * (record.unit?.price || 0))}
                 </Space>
             ),
         }
@@ -226,12 +294,19 @@ const ModalMergeOrder = ({
                         .map(table => table.name)
                         .join(', ')}`
                     }`}
-                width={550}
+                width={600}
                 open={isModalMerge}
                 className='container-modal'
                 onCancel={() => setIsModalMerge(false)}
                 footer={[
-                    <Button onClick={() => setIsModalMerge(false)}>
+                    <Button
+                        onClick={() => {
+                            setIsModalMerge(false)
+                            setSelectedTables([]);
+                            setSplitQuantities({});
+                            setSelectedItemsToSplit([]);
+                        }}
+                    >
                         Đóng
                     </Button>,
                     <Button

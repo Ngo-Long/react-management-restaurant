@@ -6,6 +6,7 @@ import {
     Radio,
     Button,
     InputNumber,
+    message,
 } from 'antd';
 import {
     PlusOutlined,
@@ -68,6 +69,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
     };
 
     const handleSelectedProduct = () => {
+        if (typeof quantity !== 'number' || isNaN(quantity) || !Number.isInteger(quantity) || quantity <= 0 || quantity >= 100) {
+            message.warning("Vui lòng nhập số lượng hợp lệ (0 < số lượng < 100).");
+            return;
+        }
         if (!selectedProduct) return;
         const item = {
             note,
@@ -229,6 +234,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                         <Col span={18}>
                             <Flex align="center" gap="small">
                                 <Button
+                                    style={{height: '30px'}}
                                     size="small" color="danger" variant="outlined"
                                     onClick={() => handleQuantityChange(quantity - 1)}
                                 >
@@ -236,13 +242,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ handleItemSelect }) => {
                                 </Button>
 
                                 <InputNumber
+                                    min={1} 
+                                    max={99} 
+                                    controls={false} 
+                                    defaultValue={1}
+                                    size="middle" 
                                     style={{ width: '60px' }}
-                                    min={1} max={99} defaultValue={1}
-                                    size="middle" value={quantity}
+                                    value={quantity}
                                     onChange={handleQuantityChange}
                                 />
 
                                 <Button
+                                    style={{height: '30px'}}
                                     size="small" color="danger" variant="outlined"
                                     onClick={() => handleQuantityChange(quantity + 1)}
                                 >

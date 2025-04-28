@@ -120,7 +120,6 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
     };
 
     const handleRemoveItem = async (itemId: string) => {
-        // update order detail
         await orderDetailApi.callDelete(itemId);
         setIsModalOpen(false);
 
