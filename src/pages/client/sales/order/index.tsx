@@ -214,7 +214,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             extra={<DropdownMenu />}
             title={
                 <div style={{ display: "flex", fontSize: '14px' }}>
-                    <ShoppingCartOutlined style={{ fontSize: '20px', marginRight: '6px' }} />
+                    <ShoppingCartOutlined style={{ fontSize: '18px', marginRight: '6px' }} />
                     {
                         currentOrder
                             ? `Đơn hàng ${currentOrder.id} - ${[...(currentOrder.diningTables || [])]
