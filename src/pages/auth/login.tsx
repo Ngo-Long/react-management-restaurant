@@ -83,7 +83,10 @@ const LoginModal = () => {
                     label="Email"
                     name="username"
                     labelCol={{ span: 24 }}
-                    rules={[{ required: true, message: 'Email không được để trống!' }]}
+                    rules={[
+                        { required: true, message: 'Email không được để trống!' },
+                        { type: 'email', message: 'Email không hợp lệ!' }
+                    ]}
                 >
                     <Input placeholder="Nhập email" />
                 </Form.Item>
