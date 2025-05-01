@@ -256,7 +256,7 @@ export const orderApi = {
         return axios.put<IBackendRes<IOrder>>('/api/v1/orders/merge-table', { ...order });
     },
 
-    callMergeOrder(request: SplitOrderRequest) {
+    callSplitOrder(request: SplitOrderRequest) {
         return axios.put<IBackendRes<IOrder>>('/api/v1/orders/split-order', { ...request });
     },
 

@@ -198,10 +198,7 @@ export interface IOrderDetail {
         name?: string;
         station?: string;
     }
-    diningTables?: {
-        id?: string | null;
-        name?: string | null;
-    }[];
+    diningTables?: string[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

@@ -70,7 +70,8 @@ const TableCalendarModal = ({
             title: 'Mã phiếu',
             key: 'id',
             dataIndex: 'id',
-            width: 80,
+            width: 60,
+            align: 'center',
             render: (_, record) => (
                 <a
                     onClick={(e) => {
@@ -108,6 +109,7 @@ const TableCalendarModal = ({
             key: 'guestCount',
             dataIndex: 'guestCount',
             width: 75,
+            align: 'center',
         },
         {
             title: 'Phòng/bàn',
@@ -120,7 +122,7 @@ const TableCalendarModal = ({
                         <Tag
                             key={table.id}
                             style={{
-                                padding: '2px 4px',
+                                padding: '2px 6px',
                                 borderRadius: '4px',
                                 fontSize: '14px'
                             }}

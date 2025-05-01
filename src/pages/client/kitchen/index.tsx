@@ -5,6 +5,7 @@ import {
     Button,
     message,
     notification,
+    Tag,
 } from 'antd';
 import { Table } from 'antd/lib';
 import { ColumnType } from 'antd/es/table';
@@ -22,19 +23,22 @@ import { fetchOrderDetailsByRestaurant } from '@/redux/slice/orderDetailSlide';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { fetchProductsByRestaurant } from '@/redux/slice/productSlide';
+import { ModalReasonCancel } from './container';
 dayjs.extend(relativeTime);
 
 const KitchenClient: React.FC = () => {
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTabKey, setActiveTabKey] = useState<string>('');
+    const [currentData, setCurrentData] = useState<IOrderDetail | null>(null);
     const products = useSelector((state: RootState) => state.product.result);
     const orderDetails = useSelector((state: RootState) => state.orderDetail.result);
     const stations = [...new Set(products.map(product => product.station))].filter(Boolean);
 
     useEffect(() => {
         fetchData();
-    }, [dispatch]);
+    }, [dispatch, isModalOpen]);
 
     useEffect(() => {
         if (stations.length > 0 && !activeTabKey) {
@@ -57,10 +61,10 @@ const KitchenClient: React.FC = () => {
     const handleUpdateStatus = async (orderDetail: IOrderDetail, status: 'CANCELED' | 'CONFIRMED') => {
         try {
             orderDetailApi.callUpdate({ ...orderDetail, status });
-            message.success(`Cập nhật trạng thái thành công: ${status}`);
+            message.success(`Xác nhận thành công.`);
             fetchData();
         } catch (error: any) {
-            notification.error({ message: "Lỗi cập nhật trạng thái", description: error.message });
+            notification.error({ message: "Lỗi cập nhật trạng thái.", description: error.message });
         }
     };
 
@@ -85,17 +89,34 @@ const KitchenClient: React.FC = () => {
             key: 'quantity',
             dataIndex: 'quantity',
             align: 'center',
+            width: 100
         },
         {
             title: 'Phòng/bàn',
             key: 'diningTables',
-            dataIndex: 'diningTables',
-            align: 'center',
+            width: 200,
+            render: (_, record) => (
+                <Flex wrap gap="6px 0" >
+                    {(record.diningTables as string[]).map((table, index) => (
+                        <Tag
+                            key={index}
+                            style={{
+                                fontSize: '14px',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                            }}
+                        >
+                            {table}
+                        </Tag>
+                    ))}
+                </Flex>
+            ),
         },
         {
             title: 'Thời gian',
             dataIndex: 'lastModifiedDate',
             align: 'center',
+            width: 200,
             render: (_, record) => {
                 return (
                     <>
@@ -108,12 +129,16 @@ const KitchenClient: React.FC = () => {
         {
             title: 'Tác vụ',
             align: "center",
+            width: 200,
             render: (_, record) => (
                 <Flex wrap gap="small">
-                    <Button danger onClick={() => handleUpdateStatus(record, 'CANCELED')}>
+                    <Button danger onClick={() => {
+                        setCurrentData(record);
+                        setIsModalOpen(true);
+                    }}>
                         Xóa
                     </Button>
-                    <Button danger type="primary" onClick={() => handleUpdateStatus(record, 'CONFIRMED')}>
+                    <Button className="btn-green" onClick={() => handleUpdateStatus(record, 'CONFIRMED')}>
                         Hoàn thành
                     </Button>
                 </Flex>
@@ -140,34 +165,43 @@ const KitchenClient: React.FC = () => {
     }, {} as Record<string, React.ReactNode>);
 
     return (
-        <Card
-            tabList={stations.map(station => ({ key: station, tab: station }))}
-            bordered={true}
-            className={'no-select'}
-            activeTabKey={activeTabKey}
-            tabBarExtraContent={
-                <Space>
-                    <Button type='primary' onClick={() => fetchData()}>
-                        Lịch sử
-                    </Button>
-                    <Button type='primary' onClick={() => fetchData()}>
-                        Nguyên liệu
-                    </Button>
-                    <DropdownMenu />
-                </Space>
-            }
-            onTabChange={(key) => setActiveTabKey(key)}
-            style={{
-                height: '100vh',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-            bodyStyle={{
-                overflow: 'hidden'
-            }}
-        >
-            {contentList[activeTabKey]}
-        </Card>
+        <>
+            <Card
+                tabList={stations.map(station => ({ key: station, tab: station }))}
+                bordered={true}
+                className={'no-select'}
+                activeTabKey={activeTabKey}
+                tabBarExtraContent={
+                    <Space>
+                        <Button type='primary' onClick={() => fetchData()}>
+                            Lịch sử
+                        </Button>
+                        <Button type='primary' onClick={() => fetchData()}>
+                            Nguyên liệu
+                        </Button>
+                        <DropdownMenu />
+                    </Space>
+                }
+                onTabChange={(key) => setActiveTabKey(key)}
+                style={{
+                    height: '100vh',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}
+                bodyStyle={{
+                    overflow: 'hidden'
+                }}
+            >
+                {contentList[activeTabKey]}
+            </Card>
+
+            <ModalReasonCancel
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                currentData={currentData}
+                setCurrentData={setCurrentData}
+            />
+        </>
     );
 };
 
