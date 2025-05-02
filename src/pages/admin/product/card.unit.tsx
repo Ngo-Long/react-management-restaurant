@@ -135,7 +135,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             return;
         }
 
-        const newQuantity = Math.max(1, Math.min(99, value));
+        const newQuantity = Math.max(0.01, Math.min(99, value));
         setUnitList(prevUnitList =>
             prevUnitList.map(unit => {
                 if (unit.id === unitCurrent?.id) {
@@ -210,9 +210,14 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
                         </Button>
 
                         <InputNumber
-                            style={{ width: '70px', margin: '0 6px' }}
-                            type="number" min={1} max={99} value={quantity}
+                            type="number" 
+                            min={0.01}
+                            max={99} 
+                            value={quantity}
+                            step={0.1}
+                            precision={2}
                             onChange={(value) => handleQuantityChange(record.id!, value || 1)}
+                            style={{ width: '70px', margin: '0 6px' }}
                         />
 
                         <Button
@@ -247,8 +252,10 @@ const UnitCard: React.FC<UnitCardProps> = ({ unitList, setUnitList }) => {
             dataIndex: 'price',
             render(_, record) {
                 const quantity = unitCurrent?.unitDetails?.find(detail => detail.ingredient?.id === record.id)?.quantity || 1;
-                const totalPrice = ((quantity) * (record?.price || 1)) + "";
-                return <>{totalPrice?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ₫</>;
+                const totalPrice = quantity * (record?.price || 1);
+                // return <>{totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₫</>;
+                const formattedPrice = totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                return <>{formattedPrice} ₫</>;
             },
         },
 

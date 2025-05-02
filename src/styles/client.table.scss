@@ -147,15 +147,22 @@
 
                 &__title {
                     color: #333;
-                    font-size: 16px;
-                    margin: 2px 0 0px;
+                    font-size: 14px;
+                    margin-top: 0px;
+                    text-align: center;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 &__price {
                     color: #f82222;
                     font-size: 16px;
                     font-weight: 600;
-                    margin: 0 0 4px;
+                    margin: 0 0 6px;
+                    line-height: 1;
                 }
             }
         }

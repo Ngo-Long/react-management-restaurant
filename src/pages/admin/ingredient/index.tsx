@@ -123,7 +123,7 @@ const IngredientPage = () => {
 
     const columns: ProColumns<IIngredient>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
             width: 50,
             align: "center",

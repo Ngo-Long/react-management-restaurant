@@ -63,7 +63,7 @@ const UserPage = () => {
 
     const columns: ProColumns<IUser>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
             width: 50,
             align: "center",
@@ -148,9 +148,9 @@ const UserPage = () => {
         },
         {
             title: 'Tác vụ',
-            hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
+            hideInSearch: true,
             render: (_value, entity, _index, _action) => (
                 <Space>
                     < Access permission={ALL_PERMISSIONS.USERS.UPDATE} hideChildren>

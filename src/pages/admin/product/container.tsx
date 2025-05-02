@@ -307,7 +307,7 @@ const ViewUpsertProduct = () => {
                                         maxCount={1}
                                         multiple={false}
                                         customRequest={({ file, onSuccess, onError }) => {
-                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo, "product");
                                         }}
                                         beforeUpload={beforeUpload}
                                         onChange={(info) => handleChange(info, setLoadingUpload)}
@@ -326,12 +326,16 @@ const ViewUpsertProduct = () => {
                                                 setPreviewTitle(file.name || fileUrl.substring(fileUrl.lastIndexOf('/') + 1));
                                             });
                                         }}
-                                        fileList={dataLogo.map(logo => ({
-                                            uid: logo.uid,
-                                            name: logo.name || '',
-                                            status: 'done',
-                                            url: logo.name ? `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${logo.name}` : '',
-                                        }))}
+                                        fileList={
+                                            dataProduct?.id && dataProduct?.image
+                                                ? [{
+                                                    uid: uuidv4(),
+                                                    name: dataProduct?.image,
+                                                    status: "done",
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/product/${dataProduct?.image}`,
+                                                }]
+                                                : []
+                                        }
                                     >
                                         <div>
                                             {loadingUpload ? <LoadingOutlined /> : <PlusOutlined />}

@@ -104,31 +104,27 @@ const ProductPage = () => {
 
     const columns: ProColumns<IProduct>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
             width: 50,
             align: "center",
+            hideInSearch: true,
             render: (_, record, index) => {
                 return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
             },
-            hideInSearch: true,
         },
         {
             title: 'Tên hàng',
             dataIndex: 'name',
             sorter: true,
+            width: 300,
         },
         {
             title: 'Danh mục',
             dataIndex: 'category',
             align: "center",
             hideInSearch: false,
-            valueEnum: {
-                'FOOD': { text: 'Món ăn' },
-                'DRINK': { text: 'Đồ uống' },
-                'DESSERT': { text: 'Tráng miệng' },
-                'OTHER': { text: 'Khác' }
-            }
+            width: 150,
         },
         {
             title: 'Đơn vị tính',
@@ -158,6 +154,7 @@ const ProductPage = () => {
             align: "center",
             dataIndex: 'price',
             hideInSearch: true,
+            width: 120,
             render(_, record) {
                 const units = record?.units || [];
                 const selectedUnit = units.find(c => c.id === selectedUnits[Number(record.id)]) || units.find(c => c.isDefault) || units[0];
@@ -181,6 +178,7 @@ const ProductPage = () => {
             align: "center",
             dataIndex: 'active',
             hideInSearch: true,
+            width: 90,
             render: (_, record, index) => [
                 <Switch
                     key={`switch-${index + 1}`}
@@ -217,7 +215,7 @@ const ProductPage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 90,
+            width: 80,
             align: "center",
             render: (value, entity) => (
                 <Space>

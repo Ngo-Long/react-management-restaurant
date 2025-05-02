@@ -185,7 +185,7 @@ const ModalRestaurant = (props: IProps) => {
                                             maxCount={1}
                                             multiple={false}
                                             customRequest={({ file, onSuccess, onError }) => {
-                                                handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
+                                                handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo, 'restaurant');
                                             }}
                                             beforeUpload={beforeUpload}
                                             onChange={(info) => handleChange(info, setLoadingUpload)}
@@ -205,10 +205,10 @@ const ModalRestaurant = (props: IProps) => {
                                                 });
                                             }}
                                             defaultFileList={
-                                                dataInit?.id ?
-                                                    [{
+                                                dataInit?.id && dataInit?.logo
+                                                    ? [{
                                                         uid: uuidv4(),
-                                                        name: dataInit?.logo ?? "",
+                                                        name: dataInit?.logo,
                                                         status: 'done',
                                                         url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.logo}`,
                                                     }]

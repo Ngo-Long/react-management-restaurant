@@ -77,7 +77,7 @@ const ReviewPage = () => {
 
     const columns: ProColumns<IReview>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
             width: 50,
             align: "center",
@@ -148,7 +148,7 @@ const ReviewPage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_, entity) => (
                 <Space>

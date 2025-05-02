@@ -67,7 +67,7 @@ const RolePage = () => {
 
     const columns: ProColumns<IRole>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
             width: 50,
             align: "center",

@@ -228,16 +228,8 @@ export const ModalIngredient = (props: IProps) => {
                         <Col span={24}>
                             <Form.Item
                                 labelCol={{ span: 24 }}
-                                label="Ảnh hàng hóa"
+                                label="Chọn ảnh"
                                 name="image"
-                                rules={[{
-                                    required: true,
-                                    message: 'Vui lòng không bỏ trống',
-                                    validator: () => {
-                                        if (dataLogo.length > 0) return Promise.resolve();
-                                        else return Promise.reject(false);
-                                    }
-                                }]}
                             >
                                 <ConfigProvider locale={enUS}>
                                     <Upload
@@ -247,7 +239,7 @@ export const ModalIngredient = (props: IProps) => {
                                         maxCount={1}
                                         multiple={false}
                                         customRequest={({ file, onSuccess, onError }) => {
-                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo);
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataLogo, 'ingredient');
                                         }}
                                         beforeUpload={beforeUpload}
                                         onChange={(info) => handleChange(info, setLoadingUpload)}
@@ -267,12 +259,12 @@ export const ModalIngredient = (props: IProps) => {
                                             });
                                         }}
                                         defaultFileList={
-                                            dataInit?.id
+                                            dataInit?.id && dataInit?.image
                                                 ? [{
                                                     uid: uuidv4(),
-                                                    name: dataInit?.image ?? "",
+                                                    name: dataInit?.image,
                                                     status: "done",
-                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.image}`,
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/ingredient/${dataInit?.image}`,
                                                 }]
                                                 : []
                                         }

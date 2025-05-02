@@ -161,7 +161,7 @@ const InvoicePage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>

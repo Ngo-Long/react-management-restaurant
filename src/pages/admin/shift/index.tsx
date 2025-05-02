@@ -65,7 +65,7 @@ const ShiftPage = () => {
     const columns: ProColumns<IShift>[] = [
         {
             width: 50,
-            title: 'STT',
+            title: '#',
             key: 'index',
             align: "center",
             hideInSearch: true,
@@ -130,7 +130,7 @@ const ShiftPage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_, entity) => (
                 <Space>

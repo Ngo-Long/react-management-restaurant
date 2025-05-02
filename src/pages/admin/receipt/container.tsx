@@ -116,7 +116,7 @@ const ViewUpsertReceipt = () => {
         {
             key: "id",
             title: "Chọn",
-            width: 50,
+            width: 60,
             align: "center",
             render: (_, record) => <Checkbox />
         },
@@ -124,12 +124,13 @@ const ViewUpsertReceipt = () => {
             key: "name",
             dataIndex: "name",
             title: "Tên nguyên liệu",
+            width: 300,
         },
         {
             key: "quantity",
             dataIndex: "initialQuantity",
             title: "Số lượng",
-            width: 160,
+            width: 168,
             align: "center",
             render: (_, record) => {
                 return (
@@ -190,10 +191,6 @@ const ViewUpsertReceipt = () => {
             render(_, record) {
                 return <>{formatPrice(record.price)}</>
             },
-        },
-        {
-            title: 'Tác vụ',
-            align: "center",
         },
     ];
 

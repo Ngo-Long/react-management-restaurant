@@ -129,7 +129,7 @@ const DiningTablePage = () => {
 
     const columns: ProColumns<IDiningTable>[] = [
         {
-            title: 'STT',
+            title: '#',
             align: "center",
             dataIndex: 'sequence',
             width: 70,
@@ -199,7 +199,7 @@ const DiningTablePage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_, entity) => (
                 <Space>

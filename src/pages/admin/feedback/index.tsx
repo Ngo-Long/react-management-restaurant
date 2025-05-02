@@ -49,7 +49,7 @@ const FeedbackPage = () => {
     const columns: ProColumns<IFeedback>[] = [
         {
             width: 50,
-            title: 'STT',
+            title: '#',
             key: 'index',
             align: "center",
             hideInSearch: true,
@@ -98,7 +98,7 @@ const FeedbackPage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_, entity) => (
                 <Space>

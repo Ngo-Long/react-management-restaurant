@@ -27,31 +27,34 @@ export const beforeUpload = (file: any) => {
 export const handleChange = (info: any, setLoadingUpload: React.Dispatch<React.SetStateAction<boolean>>) => {
     if (info.file.status === 'uploading') {
         setLoadingUpload(true);
+        return;
     }
-    if (info.file.status === 'done') {
+    
+    if (info.file.status === 'done' || info.file.status === 'error' || info.file.status === 'removed') {
         setLoadingUpload(false);
     }
+    
     if (info.file.status === 'error') {
-        setLoadingUpload(false);
         message.error(info?.file?.error?.event?.message ?? "Đã có lỗi xảy ra khi tải ảnh!");
     }
 };
 
 // Hàm upload file logo
-export const handleUploadFileLogo = async ({ file, onSuccess, onError }: any, setDataLogo: React.Dispatch<React.SetStateAction<any[]>>) => {
-    const res = await callUploadSingleFile(file, "restaurant");
-    if (res && res.data) {
-        setDataLogo([{
-            name: res.data.fileName,
-            uid: uuidv4()
-        }]);
-        if (onSuccess) onSuccess('ok');
-    } else {
-        if (onError) {
-            setDataLogo([]);
-            const error = new Error(res.message);
-            onError({ event: error });
+export const handleUploadFileLogo = async ({ file, onSuccess, onError }: any, setDataLogo: React.Dispatch<React.SetStateAction<any[]>>, urlTarget: string) => {
+    try {
+        const res = await callUploadSingleFile(file, urlTarget);
+        if (res && res.data) {
+            setDataLogo([{
+                name: res.data.fileName,
+                uid: uuidv4()
+            }]);
+            onSuccess?.('ok'); 
+        } else {
+            throw new Error(res.message || "Upload failed");
         }
+    } catch (error) {
+        setDataLogo([]);
+        onError?.({ event: error });
     }
 };
 
