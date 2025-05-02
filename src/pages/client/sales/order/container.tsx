@@ -658,28 +658,7 @@ export const ModalHistoryOrder = ({
             key: 'quantity',
             dataIndex: 'quantity',
             align: 'center',
-            width: 80
-        },
-        {
-            title: 'Phòng/bàn',
-            key: 'diningTables',
-            width: 130,
-            render: (_, record) => (
-                <Flex wrap gap="6px 0" >
-                    {(record.diningTables as string[]).map((table, index) => (
-                        <Tag
-                            key={index}
-                            style={{
-                                padding: '2px 6px',
-                                borderRadius: '4px',
-                                fontSize: '14px'
-                            }}
-                        >
-                            {table}
-                        </Tag>
-                    ))}
-                </Flex>
-            ),
+            width: 100
         },
         {
             title: 'Thời gian',
@@ -734,7 +713,7 @@ export const ModalHistoryOrder = ({
                     className="order-table"
                     rowClassName="order-table-row"
                     rowKey={(record) => record.id || ''}
-                    scroll={{ y: '30vh' }}
+                    scroll={{ y: '35vh' }}
                 />
             </div>
         </Modal>

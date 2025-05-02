@@ -32,18 +32,16 @@ export const ModalReasonCancel = ({
     };
 
     const handleReasonCancel = async () => {
-        if (!currentData || selectedReasons.length === 0) {
+        const noteReason = note.length !== 0 && selectedReasons.length > 0 
+                                ? `${note}, ${selectedReasons.join(', ')}` 
+                                : note.length !== 0 
+                                ? note 
+                                : selectedReasons.join(', ');
+
+        if (!currentData || noteReason.length == 0) {
             message.warning('Vui lòng chọn lí do.');
             return;
         }
-    
-        console.log(selectedReasons);
-        console.log({
-            ...currentData,
-            status: 'CANCELED',
-            quantity: quantity,
-            note: `${note}, ${selectedReasons.join(', ')}`
-        });
 
         try {
             if (currentData.quantity === quantity) {
@@ -52,7 +50,7 @@ export const ModalReasonCancel = ({
                     ...currentData,
                     status: 'CANCELED',
                     quantity: currentData.quantity,
-                    note: `${note}, ${selectedReasons.join(', ')}`
+                    note: noteReason
                 };
                 await orderDetailApi.callUpdate(updateData);
             } else {
@@ -62,7 +60,7 @@ export const ModalReasonCancel = ({
                     id: undefined,
                     status: 'CANCELED',
                     quantity: quantity,
-                    note: `${note}, ${selectedReasons.join(', ')}`
+                    note: noteReason
                 };
                 
                 const updateOriginalItem = {
