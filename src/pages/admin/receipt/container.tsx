@@ -42,7 +42,7 @@ import { formatPrice } from "@/utils/format";
 import styles from 'styles/admin.module.scss';
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IIngredient, IReceipt } from "@/types/backend";
+import { IIngredient, IReceipt, IReceiptDetail } from "@/types/backend";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
 import { fetchSupplierByRestaurant } from "@/redux/slice/supplierSlide";
@@ -53,16 +53,13 @@ const ViewUpsertReceipt = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const invoiceRef = useRef<HTMLDivElement | null>(null);
-
-    const [customerPaid, setCustomerPaid] = useState(0);
-    const [returnAmount, setReturnAmount] = useState(0);
-    const [ingredientList, setIngredientList] = useState<IIngredient[]>([]);
+        const [searchText, setSearchText] = useState('');
+    const [selectedIngredients, setSelectedIngredients] = useState<IReceiptDetail[]>([]);
 
     const users = useAppSelector(state => state.user.result);
     const currentUser = useAppSelector(state => state.account.user);
     const suppliers = useAppSelector(state => state.supplier.result);
     const ingredients = useAppSelector(state => state.ingredient.result);
-    const currentRestaurant = useAppSelector(state => state.account.user.restaurant);
 
     useEffect(() => {
         fetch();
@@ -74,24 +71,59 @@ const ViewUpsertReceipt = () => {
         dispatch(fetchIngredientByRestaurant({ query: '?page=1&size=100' }));
     };
 
-    const handleSetCustomerPaid = (amount: number) => {
-        setCustomerPaid(amount);
 
-        // const total = currentOrder?.totalPrice || 0;
-        // setReturnAmount(Math.max(0, amount - total));
+    const handleIngredientSelection = (ingredient: IIngredient, checked: boolean) => {
+        if (checked) {
+            setSelectedIngredients(prev => [
+                ...prev, 
+                { ...ingredient, quantity: 1, discount: 0 }
+            ]);
+        } else {
+            setSelectedIngredients(prev => 
+                prev.filter(item => item.id !== ingredient.id)
+            );
+        }
     };
 
     const handleQuantityChange = (id: string, value: number) => {
         const newQuantity = Math.max(1, Math.min(99, value));
-        setIngredientList(prevList =>
-            prevList.map(ingredient =>
-                ingredient.id === id ? { ...ingredient, quantity: newQuantity } : ingredient
+        setSelectedIngredients(prev =>
+            prev.map(item =>
+                item.id === id ? { ...item, quantity: newQuantity } : item
             )
         );
     };
 
+    const handleDiscountChange = (id: string, value: number) => {
+        const newDiscount = Math.max(0, Math.min(99, value));
+        setSelectedIngredients(prev =>
+            prev.map(item =>
+                item.id === id ? { ...item, discount: newDiscount } : item
+            )
+        );
+    };
+
+    const calculateTotal = () => {
+        return selectedIngredients.reduce((total, item) => {
+            const itemTotal = item?.price! * item.quantity!;
+            const itemDiscount = itemTotal * (item.discount! / 100);
+            return total + (itemTotal - itemDiscount);
+        }, 0);
+    };
+
+    const filteredIngredients = ingredients.filter(ingredient =>
+        ingredient?.name!.toLowerCase().includes(searchText.toLowerCase())
+    );
+
     const submitReceipt = async (valuesForm: any) => {
         const { type, note, discount, totalAmount, status } = valuesForm;
+
+        const receiptDetails = selectedIngredients.map(item => ({
+            ingredient: { id: item.id },
+            price: item.price,
+            quantity: item.quantity,
+            discount: item.discount
+        }));
 
         // create invoice
         console.log({
@@ -103,18 +135,7 @@ const ViewUpsertReceipt = () => {
             supplier: {
                 id: 1
             },
-            receiptDetails: [
-                {
-                    price: 3000,
-                    quantity: 1,
-                    ingredient: { id: 1 }
-                },
-                {
-                    price: 3000,
-                    quantity: 1,
-                    ingredient: { id: 1 }
-                }
-            ]
+            receiptDetails
         });
 
         // const res = await receiptApi.callCreate({
@@ -159,20 +180,30 @@ const ViewUpsertReceipt = () => {
                 return (
                     <Flex align="center" justify="space-between" style={{ width: '150px' }}>
                         <Button
-                            size="small" color="danger" variant="outlined"
+                            size="small" 
+                            color="danger" 
+                            variant="outlined"
                             onClick={() => handleQuantityChange(record.id!, (record.initialQuantity || 1) - 1)}
                         >
                             <MinusOutlined />
                         </Button>
 
                         <InputNumber
-                            style={{ width: '70px', margin: '0 6px' }}
-                            type="number" min={1} max={99}
+                            type="number" 
+                            min={0.01} 
+                            max={99}
+                            step={0.1}
+                            precision={2}
+                            value={1}
+                            controls={false}
                             onChange={(value) => handleQuantityChange(record.id!, value || 1)}
+                            style={{ width: '70px', margin: '0 6px' }}
                         />
 
                         <Button
-                            size="small" color="danger" variant="outlined"
+                            size="small" 
+                            color="danger" 
+                            variant="outlined"
                             onClick={() => handleQuantityChange(record.id!, (record.initialQuantity || 1) + 1)}
                         >
                             <PlusOutlined />
@@ -202,6 +233,7 @@ const ViewUpsertReceipt = () => {
                         max={99}
                         value={0}
                         type="number"
+                        controls={false}
                     />
                 );
             },
