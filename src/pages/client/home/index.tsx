@@ -158,7 +158,6 @@ const HomePage = () => {
                     </Typography.Text>
                 </section>
 
-<<<<<<< Updated upstream
                 <section style={sectionStyle}>
                     <Card style={cardStyle}>
                         <Row gutter={[24, 24]} align="middle" justify="start">
@@ -191,39 +190,6 @@ const HomePage = () => {
                         </Row>
                     </Card>
                 </section>
-=======
-                <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
-    <Card style={cardStyle}>
-        <Row gutter={[24, 24]} align="middle" justify="start">
-            <Col xs={24} md={8}>
-                <div style={{ position: 'relative' }}>
-                    <img
-                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615468/cld-sample-5.jpg"
-                        alt="Quản lý quy trình"
-                        style={{ width: '100%', borderRadius: '8px' }}
-                    />
-                </div>
-            </Col>
-            <Col xs={24} md={12}>
-                <Typography.Title level={4} style={{ color: textColor }}>
-                    Quản lý quy trình Phục vụ - Thu ngân - Bếp chuẩn xác, thuận lợi
-                </Typography.Title>
-                <Typography.Paragraph style={{ color: textColor, lineHeight: '1.6' }}>
-                    Theo dõi hoạt động, thao tác thông báo giữa các bên phục vụ, thu ngân, quầy bar/bếp thuận tiện và kịp thời.
-                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                        <li>Tối ưu hóa quá trình xử lý đơn hàng</li>
-                        <li>Giảm thiểu sai sót và tăng tốc độ phục vụ</li>
-                        <li>Cải thiện giao tiếp giữa các bộ phận</li>
-                    </ul>
-                </Typography.Paragraph>
-                <Button type="primary" style={{ backgroundColor: primaryColor, borderColor: primaryColor, color: lightTextColor, borderRadius: '20px' }}>
-                    Tìm hiểu thêm
-                </Button>
-            </Col>
-        </Row>
-    </Card>
-</section>
->>>>>>> Stashed changes
 
 <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
     <Card style={cardStyle}>
@@ -257,8 +223,6 @@ const HomePage = () => {
     </Card>
 </section>
 
-<<<<<<< Updated upstream
-=======
 
               <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
     <Card style={{ ...cardStyle, backgroundColor: '#fff8e1' }}>
@@ -642,7 +606,6 @@ const HomePage = () => {
                     </Row>
                 </section>
 
->>>>>>> Stashed changes
                 <Footer style={{ textAlign: 'center', backgroundColor: '#001529', color: lightTextColor }}>
                     Rservice ©{new Date().getFullYear()} Created by NKL
                 </Footer>
