@@ -1,6 +1,8 @@
 import {
     Space,
     Button,
+    Tag,
+    Badge,
 } from "antd";
 import {
     EditOutlined,
@@ -33,39 +35,62 @@ const ReceiptPage = () => {
     const meta = useAppSelector(state => state.receipt.meta);
     const receipts = useAppSelector(state => state.receipt.result);
     const isFetching = useAppSelector(state => state.receipt.isFetching);
-
+    
     const columns: ProColumns<IReceipt>[] = [
         {
             title: 'Thời gian',
             dataIndex: 'createdDate',
-            width: 150,
-            sorter: true,
+            width: 160,
             align: "center",
             hideInSearch: true,
             render: (_, record) => {
                 return (
-                    <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss - DD/MM/YYYY') : ""}</>
                 )
             },
         },
         {
-            title: 'Mã biên lai',
+            title: 'Mã BL',
             key: 'id',
             align: "center",
+            width: 70,
             hideInSearch: true,
-            render: (text, record, index) => {
-                return (<> BL00{record.id}</>)
+            render: (_, record) => {
+                return (<> {record.id}</>)
             },
         },
         {
             title: 'Loại phiếu',
             dataIndex: 'type',
-            sorter: true,
+            width: 110,
+            align: "center",
+            render: (_, record) => {
+                let color = '';
+                let text = '';
+                
+                switch (record.type) {
+                    case 'IN': 
+                        color = 'green';
+                        text = 'Phiếu nhập';
+                        break;
+                    case 'OUT': 
+                        color = 'volcano';
+                        text = 'Phiếu trả';
+                        break;
+                    case 'TEMPORARY': 
+                        color = 'orange';
+                        text = 'Phiếu tạm';
+                        break;
+                    default: 
+                        color = 'default';
+                }
+                
+                return <Tag color={color}>{text}</Tag>;
+            }
         },
         {
             title: 'Nhà cung cấp',
-            dataIndex: ['supplier', 'id'],
-            align: "center",
+            dataIndex: ['supplier', 'name'],
             hideInSearch: true,
         },
         {
@@ -73,25 +98,57 @@ const ReceiptPage = () => {
             dataIndex: 'totalAmount',
             align: "center",
             hideInSearch: true,
-        },
-        {
-            title: 'Ghi chú',
-            dataIndex: 'note',
-            align: "center",
-            hideInSearch: true,
+            width: 100
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             align: "center",
             hideInSearch: true,
+            width: 140,
+            render: (_, record) => {
+                let statusText = '';
+                let statusColor = '';
+        
+                switch (record.status) {
+                    case 'PAID':
+                        statusText = 'Đã thanh toán';
+                        statusColor = '#52c41a';
+                        break;
+                    case 'UNPAID':
+                        statusText = 'Chưa thanh toán';
+                        statusColor = 'red';
+                        break;
+                    case 'PENDING':
+                        statusText = 'Đang chuẩn bị';
+                        statusColor = 'orange';
+                        break;
+                    case 'CANCELLED':
+                        statusText = 'Đã hủy';
+                        statusColor = 'gray';
+                        break;
+                    default:
+                        statusColor = 'blue';
+                }
+        
+                return (
+                    <Badge 
+                        color={statusColor} 
+                        text={
+                            <span style={{ color: statusColor, fontWeight: 500 }}>
+                                {statusText}
+                            </span>
+                        } 
+                    />
+                );
+            }
         },
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 90,
+            width: 80,
             align: "center",
-            render: (_value, entity, _index, _action) => (
+            render: (_, entity) => (
                 <Space>
                     <EditOutlined
                         style={{ fontSize: 20, color: '#ffa500' }}

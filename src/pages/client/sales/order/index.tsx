@@ -30,21 +30,21 @@ import {
     ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { ColumnType } from 'antd/es/table';
+import TextArea from 'antd/es/input/TextArea';
 
 import InvoiceCard from '../invoice.card';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { formatPrice } from '@/utils/format';
-import TextArea from 'antd/es/input/TextArea';
 import React, { useEffect, useState } from 'react';
 import { orderApi, orderDetailApi } from '@/config/api';
 import DropdownMenu from '@/components/share/dropdown.menu';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { fetchOrderByRestaurant } from '@/redux/slice/orderSlide';
-import { ModalHistoryOrder, ModalMergeOrder, ModalReceptionOrder, ModalUpdateOrderNote } from './container';
 import { IDiningTable, IOrder, IOrderDetail } from '@/types/backend';
 import { fetchDiningTableByRestaurant } from '@/redux/slice/diningTableSlide';
 import { fetchOrderDetailsByOrderId, resetOrderDetails } from '@/redux/slice/orderDetailSlide';
+import { ModalHistoryOrder, ModalMergeOrder, ModalReceptionOrder, ModalUpdateOrderNote } from './container';
 
 interface OrderCardProps {
     currentOrder: IOrder | null;
@@ -166,7 +166,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ currentOrder, setCurrentOrder, cu
             title: 'Tên món ăn',
             key: 'name',
             dataIndex: 'unit',
-            width: 160,
+            width: 180,
             render: (_, record) => (
                 <Space>
                     {{

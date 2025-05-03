@@ -331,14 +331,18 @@ export interface IReceipt {
     totalAmount?: number;
     status?: string;
     active?: boolean;
-    restaurant?: {
-        id?: string;
-        name?: string;
-    }
     supplier?: {
         id?: string;
         name?: string;
     }
+    receiptDetails?: {
+        price?: number;
+        quantity?: number;
+        ingredient?: {
+            id?: string;
+            name?: string;
+        };
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

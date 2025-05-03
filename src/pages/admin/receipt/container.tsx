@@ -91,25 +91,48 @@ const ViewUpsertReceipt = () => {
     };
 
     const submitReceipt = async (valuesForm: any) => {
-        const { type, note, totalAmount, status } = valuesForm;
+        const { type, note, discount, totalAmount, status } = valuesForm;
 
         // create invoice
-        const res = await receiptApi.callCreate({
+        console.log({
             type,
             note,
+            discount,
             totalAmount,
             status,
-            restaurant: {
-                id: currentRestaurant?.id,
-                name: currentRestaurant?.name
-            }
+            supplier: {
+                id: 1
+            },
+            receiptDetails: [
+                {
+                    price: 3000,
+                    quantity: 1,
+                    ingredient: { id: 1 }
+                },
+                {
+                    price: 3000,
+                    quantity: 1,
+                    ingredient: { id: 1 }
+                }
+            ]
         });
 
-        if (res.data) {
-            message.success(`Tạo phiếu [ ${res.data.id} ] thành công `);
-        } else {
-            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
-        }
+        // const res = await receiptApi.callCreate({
+        //     type,
+        //     note,
+        //     totalAmount,
+        //     status,
+        //     restaurant: {
+        //         id: currentRestaurant?.id,
+        //         name: currentRestaurant?.name
+        //     }
+        // });
+
+        // if (res.data) {
+        //     message.success(`Tạo phiếu [ ${res.data.id} ] thành công `);
+        // } else {
+        //     notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
+        // }
     }
 
     const columns: ColumnType<IIngredient>[] = [
@@ -316,6 +339,7 @@ const ViewUpsertReceipt = () => {
 
                             <Col span={24} md={12}>
                                 <ProFormText
+                                    name="discount"
                                     label="Giảm giá"
                                     placeholder="Nhập số tiền giảm giá"
                                 />
