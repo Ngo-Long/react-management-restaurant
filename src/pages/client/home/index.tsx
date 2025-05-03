@@ -158,38 +158,48 @@ const HomePage = () => {
                     </Typography.Text>
                 </section>
 
-                <section style={sectionStyle}>
-                    <Card style={cardStyle}>
-                        <Row gutter={[24, 24]} align="middle" justify="start">
-                            <Col xs={24} md={8}>
-                                <div style={{ position: 'relative' }}>
-                                    <img
-                                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615468/cld-sample-5.jpg"
-                                        alt="Quản lý quy trình"
-                                        style={{ width: '100%', borderRadius: '8px' }}
-                                    />
-                                </div>
-                            </Col>
+             <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
+    <Card style={{ ...cardStyle, backgroundColor: '#fff3e0' }}>
+        <Row gutter={[24, 24]} align="middle" justify="start">
+            <Col xs={24} md={8}>
+                <div style={{ position: 'relative' }}>
+                    <img
+                        src="https://cdn-kvweb.kiotviet.vn/kiotviet-website/wp-content/uploads/2023/10/06034247/Ban-hang-Online-1.png"
+                        alt="Quản lý quy trình"
+                        style={{ width: '100%', borderRadius: '8px' }}
+                    />
+                </div>
+            </Col>
 
-                            <Col xs={24} md={12}>
-                                <Typography.Title level={4} style={{ color: textColor }}>
-                                    Quản lý quy trình Phục vụ - Thu ngân - Bếp chuẩn xác, thuận lợi
-                                </Typography.Title>
-                                <Typography.Paragraph style={{ color: textColor, lineHeight: '1.6' }}>
-                                    Theo dõi hoạt động, thao tác thông báo giữa các bên phục vụ, thu ngân, quầy bar/bếp thuận tiện và kịp thời.
-                                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                                        <li>Tối ưu hóa quá trình xử lý đơn hàng</li>
-                                        <li>Giảm thiểu sai sót và tăng tốc độ phục vụ</li>
-                                        <li>Cải thiện giao tiếp giữa các bộ phận</li>
-                                    </ul>
-                                </Typography.Paragraph>
-                                <Button type="primary" style={{ backgroundColor: primaryColor, borderColor: primaryColor, color: lightTextColor, borderRadius: '20px' }}>
-                                    Tìm hiểu thêm
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Card>
-                </section>
+            <Col xs={24} md={12}>
+                <Typography.Title level={4} style={{ color: textColor }}>
+                    Quản lý quy trình Phục vụ - Thu ngân - Bếp chuẩn xác, thuận lợi
+                </Typography.Title>
+                <Typography.Paragraph style={{ color: textColor, lineHeight: '1.6' }}>
+                    Theo dõi hoạt động, thao tác thông báo giữa các bên phục vụ, thu ngân, quầy bar/bếp thuận tiện và kịp thời.
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        <li>Tối ưu hóa quá trình xử lý đơn hàng</li>
+                        <li>Giảm thiểu sai sót và tăng tốc độ phục vụ</li>
+                        <li>Cải thiện giao tiếp giữa các bộ phận</li>
+                    </ul>
+                </Typography.Paragraph>
+                <Button
+                    type="primary"
+                    style={{
+                        backgroundColor: primaryColor,
+                        borderColor: primaryColor,
+                        color: lightTextColor,
+                        borderRadius: '20px',
+                    }}
+                >
+                    Tìm hiểu thêm
+                </Button>
+            </Col>
+        </Row>
+    </Card>
+</section>
+
+
 
 <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
     <Card style={cardStyle}>
@@ -197,7 +207,7 @@ const HomePage = () => {
             <Col xs={24} md={8}>
                 <div style={{ position: 'relative' }}>
                     <img
-                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615468/cld-sample-4.jpg"
+                        src="https://cdn-kvweb.kiotviet.vn/kiotviet-website/wp-content/uploads/2023/10/06034315/Image-5.png"
                         alt="Tiết kiệm thời gian"
                         style={{ width: '100%', borderRadius: '8px' }}
                     />
@@ -215,7 +225,15 @@ const HomePage = () => {
                         <li>Nâng cao trải nghiệm khách hàng</li>
                     </ul>
                 </Typography.Paragraph>
-                <Button type="primary" style={{ backgroundColor: primaryColor, borderColor: primaryColor, color: lightTextColor, borderRadius: '20px' }}>
+                <Button
+                    type="primary"
+                    style={{
+                        backgroundColor: primaryColor,
+                        borderColor: primaryColor,
+                        color: lightTextColor,
+                        borderRadius: '20px',
+                    }}
+                >
                     Xem chi tiết
                 </Button>
             </Col>
@@ -224,13 +242,14 @@ const HomePage = () => {
 </section>
 
 
+
               <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
     <Card style={{ ...cardStyle, backgroundColor: '#fff8e1' }}>
         <Row gutter={[24, 24]} align="middle" justify="start">
             <Col xs={24} md={8}>
                 <div style={{ position: 'relative' }}>
                     <img
-                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/cld-sample-3.jpg"
+                        src="https://cdn-kvweb.kiotviet.vn/kiotviet-website/wp-content/uploads/2023/10/06034238/Image-1-1.png"
                         alt="Thanh toán nhanh"
                         style={{ width: '100%', borderRadius: '8px' }}
                     />
@@ -261,6 +280,7 @@ const HomePage = () => {
 </section>
 
 
+
                <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
     <Card style={{ ...cardStyle, backgroundColor: '#e8f5e9' }}>
         <Row gutter={[24, 24]} align="middle" justify="start">
@@ -268,7 +288,7 @@ const HomePage = () => {
             <Col xs={24} md={8} style={{ order: 2 }}>
                 <div style={{ position: 'relative' }}>
                     <img
-                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/cld-sample-2.jpg"
+                        src="https://cdn-kvweb.kiotviet.vn/kiotviet-website/wp-content/uploads/2023/10/06034256/Image-2-1.png"
                         alt="Điều phối chế biến"
                         style={{ width: '100%', borderRadius: '8px' }}
                     />
@@ -298,13 +318,14 @@ const HomePage = () => {
 </section>
 
 
-                <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
+
+              <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
     <Card style={{ ...cardStyle, backgroundColor: '#e3f2fd' }}>
         <Row gutter={[24, 24]} align="middle" justify="start">
             <Col xs={24} md={8}>
                 <div style={{ position: 'relative' }}>
                     <img
-                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/cld-sample.jpg"
+                        src="https://cdn-kvweb.kiotviet.vn/kiotviet-website/wp-content/uploads/2019/07/3-gai-qu%C3%A1n-2.jpg"
                         alt="Đặt bàn dễ dàng"
                         style={{ width: '100%', borderRadius: '8px' }}
                     />
@@ -335,26 +356,26 @@ const HomePage = () => {
 </section>
 
 
+
               <section style={{ ...sectionStyle, maxWidth: '1000px', margin: '40px auto' }}>
-    <Card style={{ ...cardStyle, backgroundColor: '#f3e5f5' }}>
+    <Card style={{ ...cardStyle, backgroundColor: '#e3f2fd' }}>
         <Row gutter={[24, 24]} align="middle" justify="start">
-            {/* Đảo thứ tự để ảnh nằm bên phải */}
-            <Col xs={24} md={8} style={{ order: 2 }}>
+            <Col xs={24} md={8}>
                 <div style={{ position: 'relative' }}>
                     <img
-                        src="https://res.cloudinary.com/dhrv7a7lq/image/upload/v1712615467/samples/people/kitchen.jpg"
-                        alt="Quản lý nhân viên"
+                        src="https://cdn-kvweb.kiotviet.vn/kiotviet-website/wp-content/uploads/2020/08/B%C3%A1-Minh-Silk.png"
+                        alt="Đặt bàn dễ dàng"
                         style={{ width: '100%', borderRadius: '8px' }}
                     />
                 </div>
             </Col>
-            <Col xs={24} md={12} style={{ order: 1 }}>
+            <Col xs={24} md={12}>
                 <Typography.Title level={4} style={{ color: textColor }}>
-                    Quản lý chấm công và tính lương nhân viên
+                    Đặt bàn, đặt chỗ từ xa một cách dễ dàng
                 </Typography.Title>
                 <Typography.Paragraph style={{ color: textColor, lineHeight: '1.6' }}>
-                    Rservice kết nối và đồng bộ tự động với máy chấm công, lưu trữ toàn bộ dữ liệu như giờ đến, giờ về, ngày nghỉ...
-                    và tự động tính lương, thưởng cho từng nhân viên.
+                    Phần mềm hỗ trợ quản lý phòng bàn chuyên nghiệp, kiểm tra nhanh bàn nào còn trống,
+                    bàn nào đã có khách... hoặc đặt bàn sẵn theo nhu cầu của khách.
                 </Typography.Paragraph>
                 <Button
                     type="primary"
@@ -371,6 +392,7 @@ const HomePage = () => {
         </Row>
     </Card>
 </section>
+
 
 
                 <section style={{ padding: '20px', marginTop: '20px', textAlign: 'center', backgroundColor: backgroundColor }}>
