@@ -1,9 +1,15 @@
+import { 
+    Form, 
+    Input, 
+    Button, 
+    message, 
+    notification 
+} from 'antd';
 import { useState } from 'react';
 import { authApi } from '@/config/api';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setUserLoginInfo } from '@/redux/slice/accountSlide';
-import { Button, Form, Input, message, notification } from 'antd';
 
 const LoginModal = () => {
     const navigate = useNavigate();

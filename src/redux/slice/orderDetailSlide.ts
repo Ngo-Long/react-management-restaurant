@@ -10,10 +10,31 @@ interface IState {
         pages: number;
         total: number;
     },
-    result: IOrderDetail[]
+    result: IOrderDetail[],
+    totalCost: number
 }
 
+const initialState: IState = {
+    isFetching: true,
+    meta: {
+        page: 1,
+        pageSize: 10,
+        pages: 0,
+        total: 0
+    },
+    result: [],
+    totalCost: 0
+};
+
 // First, create the thunk
+export const fetchTotalCost = createAsyncThunk(
+    'orderDetail/fetchTotalCost',
+    async () => {
+        const response = await orderDetailApi.callTotalCost();
+        return response.data;
+    }
+);
+
 export const fetchOrderDetail = createAsyncThunk(
     'orderDetail/fetchOrderDetail',
     async ({ query }: { query: string }) => {
@@ -37,17 +58,6 @@ export const fetchOrderDetailsByRestaurant = createAsyncThunk(
         return response;
     }
 )
-
-const initialState: IState = {
-    isFetching: true,
-    meta: {
-        page: 1,
-        pageSize: 10,
-        pages: 0,
-        total: 0
-    },
-    result: []
-};
 
 export const orderDetailSlide = createSlice({
     name: 'orderDetail',
@@ -100,6 +110,13 @@ export const orderDetailSlide = createSlice({
                 state.isFetching = false;
                 state.meta = action.payload.data.meta;
                 state.result = action.payload.data.result;
+            }
+        });
+
+        // fetch total cost
+        builder.addCase(fetchTotalCost.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.totalCost = action.payload.totalCost;
             }
         });
     },

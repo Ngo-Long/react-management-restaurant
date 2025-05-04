@@ -1,13 +1,12 @@
 import {
-    Space,
-    Button,
     Tag,
     Badge,
+    Space,
+    Button,
 } from "antd";
 import {
-    EditOutlined,
-    InfoCircleOutlined,
     PlusOutlined,
+    InfoCircleOutlined,
 } from "@ant-design/icons";
 import {
     ActionType,
@@ -17,7 +16,9 @@ import {
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { useState, useRef } from 'react';
+import { ModalReceipt } from "./container";
 import { IReceipt } from "@/types/backend";
+import { formatPrice } from "@/utils/format";
 import { useNavigate } from "react-router-dom";
 import Access from "@/components/share/access";
 import { ALL_PERMISSIONS } from "@/config/permissions";
@@ -25,8 +26,6 @@ import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from '@/utils/paginator';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchReceiptByRestaurant } from "@/redux/slice/receiptSlide";
-import { formatPrice } from "@/utils/format";
-import { ModalReceipt } from "./container";
 
 const ReceiptPage = () => {
     const navigate = useNavigate();
@@ -199,9 +198,8 @@ const ReceiptPage = () => {
             }
         }
 
-        // Thêm sắp xếp mặc định: active giảm dần (true đứng trước false) và createdDate tăng dần
         if (Object.keys(sortBy).length === 0) {
-            temp = `${temp}&sort=active,desc&sort=createdDate,asc`;
+            temp = `${temp}&sort=createdDate,desc`;
         } else {
             temp = `${temp}&sort=active,desc&${sortBy}`;
         }

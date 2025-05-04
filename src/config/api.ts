@@ -407,6 +407,10 @@ export const orderDetailApi = {
     callFetchByRestaurant(query: string) {
         return axios.get<IBackendRes<IModelPaginate<IOrderDetail>>>(`/api/v1/order-details/by-restaurant?${query}`);
     },
+
+    callTotalCost: () => {
+        return axios.get<IBackendRes<{ totalCost: number }>>(`/api/v1/order-details/total-cost`);
+    }
 }
 
 /**
@@ -433,6 +437,10 @@ export const invoiceApi = {
     callFetchById(id: string) {
         return axios.get<IBackendRes<IInvoice>>(`/api/v1/invoices/${id}`);
     },
+
+    callTotalRevenue: () => {
+        return axios.get<IBackendRes<{ totalRevenue: number }>>(`/api/v1/invoices/total-revenue`);
+    }
 }
 
 /**
