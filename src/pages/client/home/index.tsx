@@ -406,7 +406,8 @@ const HomePage = () => {
                                 Email: hotro@rservice.com
                             </Typography.Paragraph>
                             <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Trụ sở: Tầng 6, Toà nhà FPT Tower, số 10 Phạm Văn Bạch, Phường Dịch Vọng, Quận Cầu Giấy, Thành phố Hà Nội, Việt Nam
+                               Tòa nhà QTSC9 (toà T), đường Tô Ký, phường Tân Chánh Hiệp, quận 12, TP. HCM.778/B1 Nguyễn Kiệm, phường 04, quận Phú Nhuận, TP HCM
+SĐT: 0901 660 002 – 028 6686 6486
                             </Typography.Paragraph>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={6}>
@@ -446,95 +447,7 @@ const HomePage = () => {
                             </Typography.Paragraph>
                         </Col>
                     </Row>
-                    <Row gutter={[16, 16]} justify="space-around">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Ngành hàng</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Bán lẻ
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Siêu thị & tạp hóa
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Thiết bị điện tử & điện máy
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Vật liệu xây dựng
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Mẹ & Bé
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Thời trang & phụ kiện
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Sách & văn phòng phẩm
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Sản xuất
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Ẩm thực</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Mỳ cay
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Nhà hàng & quán ăn
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Cafe, Trà sữa
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Bún, Phở & đồ ăn sáng
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Cơm
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Lẩu, Nướng
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Dịch vụ</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Spa & Massage
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Nail & Mi
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Khách sạn & nhà nghỉ
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Karaoke
-                            </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Bida
-                            </Typography.Paragraph>
-                        </Col>
-                    </Row>
-                    <Row gutter={[16, 16]} justify="space-around">
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Địa chỉ miền Bắc</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Số 10, ngõ Quan Thổ 1, phố Tôn Đức Thắng, phường Hàng Bột, quận Đống Đa, Hà Nội <br />
-                                Hotline: 02473050616
-                            </Typography.Paragraph>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Địa chỉ miền Trung</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Số 386 Điện Biên Phủ, phường Thanh Khê Đông, quận Thanh Khê, Đà Nẵng <br />
-                                Hotline: 02367305616
-                            </Typography.Paragraph>
-                        </Col>
-                        <Col xs={24} sm={12} md={8} lg={6}>
-                            <Typography.Title level={5} style={{ color: lightTextColor }}>Địa chỉ miền Nam</Typography.Title>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Tầng 6, toà nhà Lottery Tower, số 77 Trần Nhân Tôn, Phường 9, Quận 5, TP. Hồ Chí Minh <br />
-                                Hotline: 02873050616
-                            </Typography.Paragraph>
-                        </Col>
-                    </Row>
+                
                 </section>
 
                 <Footer style={{ textAlign: 'center', backgroundColor: '#001529', color: lightTextColor }}>
