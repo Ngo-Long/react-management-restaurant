@@ -350,6 +350,16 @@ export interface IReceipt {
     lastModifiedDate?: string;
 }
 
+export interface IReceiptDetail {
+    id?: string,
+    price?: number;
+    discount?: number;
+    quantity?: number;
+    ingredient?: {
+        id?: string;
+        name?: string;
+    };
+}
 
 export interface IReview {
     id?: string;
