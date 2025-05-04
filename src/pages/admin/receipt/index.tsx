@@ -6,6 +6,7 @@ import {
 } from "antd";
 import {
     EditOutlined,
+    InfoCircleOutlined,
     PlusOutlined,
 } from "@ant-design/icons";
 import {
@@ -24,11 +25,14 @@ import DataTable from "@/components/client/data.table";
 import { paginationConfigure } from '@/utils/paginator';
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchReceiptByRestaurant } from "@/redux/slice/receiptSlide";
+import { formatPrice } from "@/utils/format";
+import { ModalReceipt } from "./container";
 
 const ReceiptPage = () => {
     const navigate = useNavigate();
     const tableRef = useRef<ActionType>();
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openDetail, setOpenDetail] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IReceipt | null>(null);
 
     const dispatch = useAppDispatch();
@@ -98,7 +102,8 @@ const ReceiptPage = () => {
             dataIndex: 'totalAmount',
             align: "center",
             hideInSearch: true,
-            width: 100
+            width: 100,
+            render: (_, record) => formatPrice(record.totalAmount)
         },
         {
             title: 'Trạng thái',
@@ -150,11 +155,11 @@ const ReceiptPage = () => {
             align: "center",
             render: (_, entity) => (
                 <Space>
-                    <EditOutlined
-                        style={{ fontSize: 20, color: '#ffa500' }}
-                        onClick={() => {
-                            setOpenModal(true);
+                    <InfoCircleOutlined
+                        style={{ fontSize: 20, color: '#666' }}
+                        onClick={()=> {
                             setDataInit(entity);
+                            setOpenDetail(true)
                         }}
                     />
                 </Space >
@@ -225,6 +230,12 @@ const ReceiptPage = () => {
                         </Button>
                     </Access>
                 ]}
+            />
+
+            <ModalReceipt
+                openDetail={openDetail}
+                setOpenDetail={setOpenDetail}
+                dataInit={dataInit}
             />
         </Access>
     )

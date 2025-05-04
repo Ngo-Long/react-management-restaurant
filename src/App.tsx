@@ -14,8 +14,8 @@ import IngredientPage from './pages/admin/ingredient';
 import RestaurantPage from './pages/admin/restaurant';
 import PermissionPage from './pages/admin/permission';
 import DiningTablePage from './pages/admin/dining-table';
-import ViewUpsertReceipt from './pages/admin/receipt/container';
 import ViewUpsertProduct from './pages/admin/product/container';
+import { ViewUpsertReceipt } from './pages/admin/receipt/container';
 
 import HomePage from './pages/client/home';
 import SaleClient from './pages/client/sales';

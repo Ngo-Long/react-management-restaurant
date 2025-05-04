@@ -18,6 +18,7 @@ import {
     TimePicker,
     InputNumber,
     notification,
+    Modal,
 } from "antd";
 import {
     PlusOutlined,
@@ -32,6 +33,9 @@ import {
     ProFormText,
     FooterToolbar,
     ProFormSelect,
+    ModalForm,
+    ProFormTextArea,
+    ProFormSwitch,
 } from "@ant-design/pro-components";
 import { ColumnType } from "antd/es/table";
 
@@ -40,6 +44,7 @@ import { receiptApi } from "@/config/api";
 import '../../../styles/client.table.scss';
 import { formatPrice } from "@/utils/format";
 import styles from 'styles/admin.module.scss';
+import { isMobile } from 'react-device-detect';
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IIngredient, IReceipt, IReceiptDetail } from "@/types/backend";
@@ -48,7 +53,7 @@ import { fetchUserByRestaurant } from "@/redux/slice/userSlide";
 import { fetchSupplierByRestaurant } from "@/redux/slice/supplierSlide";
 import { fetchIngredientByRestaurant } from "@/redux/slice/ingredientSlide";
 
-const ViewUpsertReceipt = () => {
+export const ViewUpsertReceipt = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -116,7 +121,7 @@ const ViewUpsertReceipt = () => {
     );
 
     const submitReceipt = async (valuesForm: any) => {
-        const { type, note, discount, totalAmount, status } = valuesForm;
+        const { type, note, discount, status, supplierId } = valuesForm;
 
         const receiptDetails = selectedIngredients.map(item => ({
             ingredient: { id: item.id },
@@ -125,35 +130,26 @@ const ViewUpsertReceipt = () => {
             discount: item.discount
         }));
 
+        const totalAmount = calculateTotal() - (discount || 0);
+
         // create invoice
-        console.log({
+        const receiptData = {
             type,
             note,
-            discount,
+            discount: discount || 0,
             totalAmount,
             status,
-            supplier: {
-                id: 1
-            },
+            supplier: { id: supplierId },
             receiptDetails
-        });
+        };
 
-        // const res = await receiptApi.callCreate({
-        //     type,
-        //     note,
-        //     totalAmount,
-        //     status,
-        //     restaurant: {
-        //         id: currentRestaurant?.id,
-        //         name: currentRestaurant?.name
-        //     }
-        // });
-
-        // if (res.data) {
-        //     message.success(`Tạo phiếu [ ${res.data.id} ] thành công `);
-        // } else {
-        //     notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
-        // }
+        const res = await receiptApi.callCreate(receiptData);
+        if (res.data) {
+            message.success(`Tạo phiếu [ ${res.data.id} ] thành công `);
+            navigate('/admin/receipt');
+        } else {
+            notification.error({ message: 'Có lỗi đơn hàng xảy ra', description: res.message });
+        }
     }
 
     const columns: ColumnType<IIngredient>[] = [
@@ -162,7 +158,12 @@ const ViewUpsertReceipt = () => {
             title: "Chọn",
             width: 60,
             align: "center",
-            render: (_, record) => <Checkbox />
+            render: (_, record) => (
+                <Checkbox
+                    checked={selectedIngredients.some(item => item.id === record.id)}
+                    onChange={(e) => handleIngredientSelection(record, e.target.checked)}
+                />
+            )
         },
         {
             key: "name",
@@ -172,29 +173,28 @@ const ViewUpsertReceipt = () => {
         },
         {
             key: "quantity",
-            dataIndex: "initialQuantity",
             title: "Số lượng",
             width: 168,
             align: "center",
             render: (_, record) => {
+                const selected = selectedIngredients.find(item => item.id === record.id);
+                if (!selected) return null;
+                
                 return (
                     <Flex align="center" justify="space-between" style={{ width: '150px' }}>
                         <Button
                             size="small" 
                             color="danger" 
                             variant="outlined"
-                            onClick={() => handleQuantityChange(record.id!, (record.initialQuantity || 1) - 1)}
+                            onClick={() => handleQuantityChange(record.id!, selected.quantity! - 1)}
                         >
                             <MinusOutlined />
                         </Button>
 
                         <InputNumber
-                            type="number" 
-                            min={0.01} 
+                            min={1} 
                             max={99}
-                            step={0.1}
-                            precision={2}
-                            value={1}
+                            value={selected.quantity}
                             controls={false}
                             onChange={(value) => handleQuantityChange(record.id!, value || 1)}
                             style={{ width: '70px', margin: '0 6px' }}
@@ -204,7 +204,7 @@ const ViewUpsertReceipt = () => {
                             size="small" 
                             color="danger" 
                             variant="outlined"
-                            onClick={() => handleQuantityChange(record.id!, (record.initialQuantity || 1) + 1)}
+                            onClick={() => handleQuantityChange(record.id!, selected.quantity! + 1)}
                         >
                             <PlusOutlined />
                         </Button>
@@ -217,34 +217,40 @@ const ViewUpsertReceipt = () => {
             dataIndex: 'price',
             title: 'Đơn giá',
             align: "center",
-            render(_, record) {
-                return <>{formatPrice(record.price)}</>
-            },
+            render: (price) => formatPrice(price)
         },
         {
-            key: "price",
-            dataIndex: "price",
-            title: "Giảm giá",
+            key: "discount",
+            title: "Giảm giá (%)",
             align: "center",
             render: (_, record) => {
+                const selected = selectedIngredients.find(item => item.id === record.id);
+                if (!selected) return null;
+                
                 return (
                     <InputNumber
-                        min={1}
+                        min={0}
                         max={99}
-                        value={0}
-                        type="number"
-                        controls={false}
+                        value={selected.discount}
+                        formatter={value => `${value}%`}
+                        // parser={value => value!.replace('%', '')}
+                        onChange={(value) => handleDiscountChange(record.id!, value || 0)}
+                        style={{ width: '80px' }}
                     />
                 );
             },
         },
         {
-            key: 'price',
-            dataIndex: 'price',
+            key: 'total',
             title: 'Thành tiền',
             align: "center",
-            render(_, record) {
-                return <>{formatPrice(record.price)}</>
+            render: (_, record) => {
+                const selected = selectedIngredients.find(item => item.id === record.id);
+                if (!selected) return null;
+                
+                const itemTotal = selected.price! * selected.quantity!;
+                const discountAmount = itemTotal * (selected.discount! / 100);
+                return formatPrice(itemTotal - discountAmount);
             },
         },
     ];
@@ -326,22 +332,18 @@ const ViewUpsertReceipt = () => {
                                     ]}
                                 />
                             </Col>
-
+                    
                             <Col span={24} md={12}>
-                                <Form.Item
+                                <ProFormSelect
+                                    name="supplierId"
                                     label="Nhà cung cấp"
+                                    placeholder="Chọn nhà cung cấp"
                                     rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
-                                >
-                                    <Select
-                                        style={{ width: '100%' }}
-                                        placeholder="Chọn nhà cung cấp"
-                                        suffixIcon={<PlusOutlined style={{ fontSize: 20, color: '#555' }} />}
-                                        options={suppliers.map(supplier => ({
-                                            value: supplier.id,
-                                            label: supplier.name
-                                        }))}
-                                    />
-                                </Form.Item>
+                                    options={suppliers.map(supplier => ({
+                                        value: supplier.id,
+                                        label: supplier.name
+                                    }))}
+                                />
                             </Col>
 
                             <Col span={24} md={12}>
@@ -382,12 +384,15 @@ const ViewUpsertReceipt = () => {
                                     label={
                                         <>
                                             Tổng tiền
-                                            <Badge count={0} showZero style={{ marginLeft: '6px' }} />
+                                            <Badge count={selectedIngredients.length} showZero style={{ marginLeft: '6px' }} />
                                         </>
                                     }
                                     name="totalAmount"
                                     initialValue={0}
-                                    fieldProps={{ disabled: true }}
+                                    fieldProps={{ 
+                                        disabled: true,
+                                        value: formatPrice(calculateTotal())
+                                    }}
                                 />
                             </Col>
                         </Row>
@@ -399,18 +404,26 @@ const ViewUpsertReceipt = () => {
                     title={
                         <Flex justify="space-between" align="center">
                             <Flex align="center" gap="small">
-                                <DiffOutlined /> Chọn nguyên liệu
+                                <DiffOutlined /> Danh sách nguyên liệu
                             </Flex>
 
                             <Flex gap="small" align="center">
-                                <Input placeholder="Nhập tên nguyên liệu" />
+                                <Input 
+                                    placeholder="Nhập tên nguyên liệu" 
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    allowClear
+                                />
 
-                                <Button type="primary">
+                                <Button 
+                                    type="primary" 
+                                    onClick={() => setSearchText('')}
+                                >
                                     <SearchOutlined /> Tìm kiếm
                                 </Button>
 
-                                <Button type="primary">
-                                    <PlusOutlined />  Thêm nguyên liệu
+                                <Button type="primary" onClick={() => navigate('/admin/ingredient/')}>
+                                    <PlusOutlined /> Thêm nguyên liệu
                                 </Button>
                             </Flex>
                         </Flex>
@@ -422,10 +435,13 @@ const ViewUpsertReceipt = () => {
                         rowClassName="order-table-row"
                         bordered
                         columns={columns}
-                        dataSource={ingredients}
+                        dataSource={filteredIngredients }
                         pagination={{ pageSize: 5 }}
                         rowKey={(record) => record.id || ''}
-                        scroll={ingredients.length > 10 ? { y: 48 * 10 } : undefined}
+                        scroll={filteredIngredients.length > 10 ? { y: 48 * 10 } : undefined}
+                        locale={{
+                            emptyText: 'Không có nguyên liệu nào'
+                        }}
                     />
                 </Card>
             </div>
@@ -433,4 +449,79 @@ const ViewUpsertReceipt = () => {
     )
 }
 
-export default ViewUpsertReceipt;
+declare type IProps = {
+    openDetail: boolean;
+    setOpenDetail: (v: boolean) => void;
+    dataInit?: IReceipt | null;
+}
+
+export const ModalReceipt = (props: IProps) => {
+    const { openDetail, setOpenDetail, dataInit } = props;
+    const [form] = Form.useForm();
+
+    const columns: ColumnType<IReceiptDetail>[] = [
+        {
+            title: 'Tên nguyên liệu',
+            key: 'name',
+            dataIndex: 'ingredient',
+            render: (ingredient) => {
+                if (dataInit?.type === "IN") {
+                    return `[+] ${ingredient.name}`;
+                } else {
+                    return `[-] ${ingredient.name}`;
+                }
+            }
+        },
+        {
+            title: 'Số lượng',
+            key: 'quantity',
+            dataIndex: 'quantity',
+            align: 'center',
+            width: 100,
+        },
+        {
+            title: 'Đơn giá',
+            key: 'price',
+            dataIndex: 'price',
+            align: 'center',
+            width: 110,
+            render: (price) => formatPrice(price)
+        },
+        {
+            title: 'Tổng tiền',
+            key: 'total',
+            align: 'center',
+            width: 120,
+            render: (_, record) => {
+                const total = (record.price ?? 0) * (record.quantity ?? 0);
+                return `${formatPrice(total)} ₫`;
+            },
+        },
+    ];
+
+    return (
+        <Modal
+            title={"Chi tiết biên lai"}
+            open={openDetail}
+            width={isMobile ? "100%" : 600}
+            onCancel={() => setOpenDetail(false)}
+            footer={[
+                <Button onClick={() => setOpenDetail(false)}>
+                    Đóng
+                </Button>
+            ]}
+        >
+            <Table<IReceiptDetail>
+                    size='small'
+                    columns={columns}
+                    pagination={false}
+                    style={{ marginTop: 20 }}
+                    dataSource={dataInit?.receiptDetails}
+                    className="order-table"
+                    rowClassName="order-table-row"
+                    rowKey={(record) => record.id || ''}
+                    scroll={{ y: '35vh' }}
+                />
+        </Modal >
+    )
+}

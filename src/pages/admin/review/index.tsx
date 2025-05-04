@@ -248,7 +248,6 @@ const ReviewPage = () => {
                 dataInit={dataInit}
                 setDataInit={setDataInit}
             />
-
         </Access>
     )
 }

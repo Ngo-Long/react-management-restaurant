@@ -21,7 +21,7 @@ import { ALL_PERMISSIONS } from "@/config/permissions";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
 import { paginationConfigure } from "@/utils/paginator";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const OrderPage = () => {
     const dispatch = useAppDispatch();
@@ -33,17 +33,13 @@ const OrderPage = () => {
     const orders = useAppSelector(state => state.order.result);
     const isFetching = useAppSelector(state => state.order.isFetching);
 
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
-
     const columns: ProColumns<IOrder>[] = [
         {
             title: 'Mã ĐH',
             width: 80,
             align: "center",
             dataIndex: 'id',
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
                     <div onClick={() => {
                         setOpenViewDetail(true);
@@ -56,26 +52,14 @@ const OrderPage = () => {
             hideInSearch: false,
         },
         {
-            title: 'Thời gian đặt',
-            dataIndex: 'reservationTime',
-            sorter: true,
-            align: "center",
-            hideInSearch: true,
-            render: (text, record, index, action) => {
-                return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('DD/MM/YYYY - HH:mm:ss') : ""}</>
-                )
-            },
-        },
-        {
             title: 'Thời gian đến',
             dataIndex: 'reservationTime',
             sorter: true,
             align: "center",
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (text, record) => {
                 return (
-                    <>{record.reservationTime ? dayjs(record.reservationTime).format('DD/MM/YYYY - HH:mm:ss') : ""}</>
+                    <>{record.reservationTime ? dayjs(record.reservationTime).format('HH:mm - DD/MM/YYYY') : ""}</>
                 )
             },
         },
@@ -119,6 +103,7 @@ const OrderPage = () => {
                     RESERVED: { color: '#fa8c16', text: 'Đang chờ' },
                     PENDING: { color: '#52c41a', text: 'Đã nhận bàn' },
                     CANCELED: { color: '#ff4d4f', text: 'Đã hủy' },
+                    PAID: { color: '#52c41a', text: 'Đã thanh toán' },
                 } as const;
                 const config = statusConfig[status as keyof typeof statusConfig] || { color: '#fa8c16', text: 'Đã hủy' };
 
@@ -148,27 +133,25 @@ const OrderPage = () => {
             hideInSearch: true,
             width: 90,
             align: "center",
-            render: (_value, entity, _index, _action) => (
-                <Space>
-                    <Access permission={ALL_PERMISSIONS.ORDERS.DELETE} hideChildren>
-                        <Popconfirm
-                            okText="Xác nhận"
-                            cancelText="Đóng"
-                            placement="leftTop"
-                            title={"Xác nhận xóa bàn ăn"}
-                            description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
-                        >
-                            <InfoCircleOutlined
-                                style={{
-                                    fontSize: 20,
-                                    color: '#444',
-                                    cursor: "pointer",
-                                    padding: "0 10px"
-                                }}
-                            />
-                        </Popconfirm>
-                    </Access>
-                </Space >
+            render: (_, entity) => (
+                <Access permission={ALL_PERMISSIONS.ORDERS.DELETE} hideChildren>
+                    <Popconfirm
+                        okText="Xác nhận"
+                        cancelText="Đóng"
+                        placement="leftTop"
+                        title={"Xác nhận xóa bàn ăn"}
+                        description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
+                    >
+                        <InfoCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#444',
+                                cursor: "pointer",
+                                padding: "0 10px"
+                            }}
+                        />
+                    </Popconfirm>
+                </Access>
             ),
 
         },
@@ -228,7 +211,8 @@ const OrderPage = () => {
                 pagination={paginationConfigure(meta)}
                 request={async (params, sort, filter): Promise<any> => {
                     const query = buildQuery(params, sort, filter);
-                    dispatch(fetchOrderByRestaurant({ query: "filter=option~'TAKEAWAY'&sort=reservationTime,asc" }))
+                    dispatch(fetchOrderByRestaurant({ query: "filter=option~'SCHEDULED'&sort=reservationTime,asc" }))
+                    // dispatch(fetchOrderByRestaurant({ query: "" }))
                 }}
             />
 
