@@ -1,17 +1,22 @@
-
+import {
+    Col, 
+    Row,
+    Form, 
+    message, 
+    notification
+} from "antd";
 import {
     ModalForm,
     ProFormText,
+    ProFormTextArea,
 } from "@ant-design/pro-components";
-import {
-    Col, Form, Row,
-    message, notification
-} from "antd";
+
+import { useEffect} from 'react';
 import 'react-quill/dist/quill.snow.css';
 import { feedbackApi } from "@/config/api";
-import { isMobile } from 'react-device-detect';
 import { IFeedback } from "@/types/backend";
-import { useEffect, useRef, useState } from 'react';
+import { isMobile } from 'react-device-detect';
+import { useAppSelector } from "@/redux/hooks";
 
 declare type IProps = {
     openModal: boolean;
@@ -22,8 +27,9 @@ declare type IProps = {
 }
 
 export const ModalFeedback = (props: IProps) => {
-    const [form] = Form.useForm();
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
+    const [form] = Form.useForm();
+    const currentUser = useAppSelector(state => state.account.user);
 
     useEffect(() => {
         if (dataInit?.id) {
@@ -44,6 +50,7 @@ export const ModalFeedback = (props: IProps) => {
             id: dataInit?.id,
             content,
             subject,
+            user: currentUser
         };
 
         const res = dataInit?.id
@@ -65,16 +72,16 @@ export const ModalFeedback = (props: IProps) => {
     return (
         <>
             <ModalForm
-                title={<>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>}
+                title={<>{dataInit?.id ? "Cập nhật đánh giá" : "Tạo đánh giá"}</>}
                 open={openModal}
                 modalProps={{
                     onCancel: () => handleReset(),
                     afterClose: () => handleReset(),
                     destroyOnClose: true,
-                    width: isMobile ? "100%" : 600,
+                    width: isMobile ? "100%" : 500,
                     keyboard: false,
                     maskClosable: false,
-                    okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
+                    okText: "Xác nhận",
                     cancelText: "Đóng"
                 }}
                 scrollToFirstError={true}
@@ -86,7 +93,7 @@ export const ModalFeedback = (props: IProps) => {
                 }}
             >
                 <Row gutter={[20, 20]}>
-                    <Col span={24} md={12}>
+                    <Col span={24}>
                         <ProFormText
                             name="subject"
                             label="Tên tiêu đề"
@@ -95,8 +102,8 @@ export const ModalFeedback = (props: IProps) => {
                         />
                     </Col>
 
-                    <Col span={24} md={12}>
-                        <ProFormText
+                    <Col span={24}>
+                        <ProFormTextArea
                             name="content"
                             label="Nội Dung "
                             placeholder="Nhập nội dung"

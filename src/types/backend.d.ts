@@ -387,7 +387,10 @@ export interface IFeedback {
     id?: string;
     subject?: string;
     content?: string;
-    status?: string;
+    user?: {
+        id?: string,
+        name?: string
+    }
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

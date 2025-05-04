@@ -1,27 +1,20 @@
 import {
     Space,
-    Popconfirm,
     Badge,
+    Popconfirm,
 } from "antd";
-import {
-    ActionType,
-    ProColumns,
-    ProFormSelect,
-} from '@ant-design/pro-components';
-import {
-    InfoCircleOutlined
-} from "@ant-design/icons";
+import {InfoCircleOutlined} from "@ant-design/icons";
+import {ActionType, ProColumns} from '@ant-design/pro-components';
 
 import dayjs from 'dayjs';
-import queryString from 'query-string';
 import { IOrder } from "@/types/backend";
+import { useRef, useState } from "react";
 import Access from "@/components/share/access";
 import DataTable from "@/components/client/data.table";
 import { ALL_PERMISSIONS } from "@/config/permissions";
+import { paginationConfigure } from "@/utils/paginator";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchOrderByRestaurant } from "@/redux/slice/orderSlide";
-import { paginationConfigure } from "@/utils/paginator";
-import { useEffect, useRef, useState } from "react";
 
 const OrderPage = () => {
     const dispatch = useAppDispatch();

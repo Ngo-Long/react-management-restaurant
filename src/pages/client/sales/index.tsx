@@ -14,7 +14,9 @@ import React, { useState } from 'react';
 import ProductCard from './product.card';
 import DiningTableCard from './table.card';
 import { useAppDispatch } from '@/redux/hooks';
+import Access from '@/components/share/access';
 import { IOrderDetail } from '../../../types/backend';
+import { ALL_PERMISSIONS } from '@/config/permissions';
 import { IDiningTable, IOrder } from '@/types/backend';
 import { orderApi, orderDetailApi } from "@/config/api";
 import { fetchOrderDetailsByOrderId } from '@/redux/slice/orderDetailSlide';
@@ -109,31 +111,33 @@ const SaleClient: React.FC = () => {
     };
 
     return (
-        <Row className={'no-select'}>
-            <Col span={15}>
-                <Card
-                    style={{ height: '100vh' }}
-                    tabList={[
-                        { key: 'tab1', tab: 'Phòng bàn', icon: <GatewayOutlined /> },
-                        { key: 'tab2', tab: 'Thực đơn', icon: <CoffeeOutlined /> }
-                    ]}
-                    bordered={true}
-                    activeTabKey={activeTabKey}
-                    onTabChange={(key) => setActiveTabKey(key)}
-                >
-                    {contentList[activeTabKey]}
-                </Card>
-            </Col>
+        <Access permission={ALL_PERMISSIONS.ORDERS.GET_PAGINATE}>
+            <Row className={'no-select'}>
+                <Col span={15}>
+                    <Card
+                        style={{ height: '100vh' }}
+                        tabList={[
+                            { key: 'tab1', tab: 'Phòng bàn', icon: <GatewayOutlined /> },
+                            { key: 'tab2', tab: 'Thực đơn', icon: <CoffeeOutlined /> }
+                        ]}
+                        bordered={true}
+                        activeTabKey={activeTabKey}
+                        onTabChange={(key) => setActiveTabKey(key)}
+                    >
+                        {contentList[activeTabKey]}
+                    </Card>
+                </Col>
 
-            <Col span={9} >
-                <OrderCard
-                    currentOrder={currentOrder}
-                    setCurrentOrder={setCurrentOrder}
-                    currentTable={currentTable}
-                    setActiveTabKey={setActiveTabKey}
-                />
-            </Col>
-        </Row>
+                <Col span={9} >
+                    <OrderCard
+                        currentOrder={currentOrder}
+                        setCurrentOrder={setCurrentOrder}
+                        currentTable={currentTable}
+                        setActiveTabKey={setActiveTabKey}
+                    />
+                </Col>
+            </Row>
+        </Access>
     );
 };
 

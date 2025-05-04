@@ -24,6 +24,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { fetchProductsByRestaurant } from '@/redux/slice/productSlide';
 import { ModalReasonCancel } from './container';
+import Access from '@/components/share/access';
+import { ALL_PERMISSIONS } from '@/config/permissions';
 dayjs.extend(relativeTime);
 
 const KitchenClient: React.FC = () => {
@@ -165,7 +167,7 @@ const KitchenClient: React.FC = () => {
     }, {} as Record<string, React.ReactNode>);
 
     return (
-        <>
+        <Access permission={ALL_PERMISSIONS.PRODUCTS.GET_PAGINATE}>
             <Card
                 tabList={stations.map(station => ({ key: station, tab: station }))}
                 bordered={true}
@@ -201,7 +203,7 @@ const KitchenClient: React.FC = () => {
                 currentData={currentData}
                 setCurrentData={setCurrentData}
             />
-        </>
+        </Access>
     );
 };
 

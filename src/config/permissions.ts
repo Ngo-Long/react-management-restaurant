@@ -47,6 +47,12 @@ export const ALL_PERMISSIONS = {
         UPDATE: { method: "PUT", apiPath: '/api/v1/orders', module: "ORDERS" },
         DELETE: { method: "DELETE", apiPath: '/api/v1/orders/{id}', module: "ORDERS" },
     },
+    ORDERDETAILS: {
+        GET_PAGINATE: { method: "GET", apiPath: '/api/v1/order-details', module: "ORDERDETAILS" },
+        CREATE: { method: "POST", apiPath: '/api/v1/order-details', module: "ORDERDETAILS" },
+        UPDATE: { method: "PUT", apiPath: '/api/v1/order-details', module: "ORDERDETAILS" },
+        DELETE: { method: "DELETE", apiPath: '/api/v1/order-details/{id}', module: "ORDERDETAILS" },
+    },
     PRODUCTS: {
         GET_PAGINATE: { method: "GET", apiPath: '/api/v1/products', module: "PRODUCTS" },
         CREATE: { method: "POST", apiPath: '/api/v1/products', module: "PRODUCTS" },
@@ -107,5 +113,6 @@ export const ALL_MODULES = {
     RESTAURANTS: 'RESTAURANTS',
     PERMISSIONS: 'PERMISSIONS',
     INGREDIENTS: 'INGREDIENTS',
+    ORDERDETAILS: 'ORDERDETAILS',
     DININGTABLES: 'DININGTABLES',
 }

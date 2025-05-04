@@ -173,7 +173,7 @@ const LayoutAdmin: React.FC = () => {
                 }] : []),
 
                 ...(viewOrder || ACL_ENABLE === 'false' ? [{
-                    label: 'Review',
+                    label: 'Bài đăng',
                     key: '/admin/review',
                     icon: <StarOutlined />,
                     onClick: () => navigate('/admin/review')

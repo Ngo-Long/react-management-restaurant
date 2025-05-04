@@ -2,8 +2,10 @@ import {
     Col,
     Row,
     Form,
+    Upload,
     message,
     notification,
+    ConfigProvider,
 } from "antd";
 import {
     ModalForm,
@@ -11,12 +13,20 @@ import {
     ProFormSwitch,
     ProFormTextArea,
 } from "@ant-design/pro-components";
+
+import {
+    PlusOutlined,
+    LoadingOutlined,
+} from '@ant-design/icons';
+import { v4 as uuidv4 } from 'uuid';
+import enUS from 'antd/lib/locale/en_US';
 import 'react-quill/dist/quill.snow.css';
 import { reviewApi } from "@/config/api";
+import { IReview } from "@/types/backend";
+import { useEffect, useState } from 'react';
 import { useAppSelector } from "@/redux/hooks";
 import { isMobile } from 'react-device-detect';
-import { IReview } from "@/types/backend";
-import { useEffect, useRef, useState } from 'react';
+import { handleChange, beforeUpload, handleRemoveFile, handleUploadFileLogo, getBase64 } from "@/utils/image";
 
 declare type IProps = {
     openModal: boolean;
@@ -26,12 +36,26 @@ declare type IProps = {
     reloadTable: () => void;
 }
 
+interface IReviewImages {
+    uid: string;
+    name: string | null;
+}
+
 export const ModalReview = (props: IProps) => {
     const [form] = Form.useForm();
     const { openModal, setOpenModal, reloadTable, dataInit, setDataInit } = props;
     const currentUser = useAppSelector(state => state.account.user);
     const currentRestaurant = useAppSelector(state => state.account.user?.restaurant);
 
+    //modal animation
+    const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+    const [dataImage, setDataImage] = useState<IReviewImages[]>([
+        { name: "", uid: "" }
+    ]);
+    
     useEffect(() => {
         if (dataInit?.id) {
             form.setFieldsValue({ dataInit })
@@ -51,10 +75,10 @@ export const ModalReview = (props: IProps) => {
         const review = {
             id: dataInit?.id,
             title,
-            images: "",
-            background_color,
             description,
-            active,
+            images: dataImage[0].name || "",
+            background_color,
+            active: true,
             user: {
                 id: currentUser.id
             },
@@ -101,33 +125,25 @@ export const ModalReview = (props: IProps) => {
                 initialValues={{ ...dataInit }}
             >
                 <Row gutter={[20, 20]}>
-                    {/* <Col span={24}>
+                    <Col span={24}>
                         <Form.Item
-                            labelCol={{ span: 24 }}
+                            name="images"
                             label="Chọn Ảnh"
-                            name="avatar"
-                            // rules={[{
-                            //     required: true,
-                            //     message: 'Vui lòng không bỏ trống',
-                            //     validator: () => {
-                            //         if (dataAvatar.length > 0) return Promise.resolve();
-                            //         else return Promise.reject(false);
-                            //     }
-                            // }]}
+                            labelCol={{ span: 24 }}
                         >
                             <ConfigProvider locale={enUS}>
                                 <Upload
-                                    name="avatar"
+                                    name="images"
                                     listType="picture-card"
                                     className="avatar-uploader"
                                     maxCount={1}
                                     multiple={false}
                                     customRequest={({ file, onSuccess, onError }) => {
-                                        handleUploadFileLogo({ file, onSuccess, onError }, setDataAvatar);
+                                        handleUploadFileLogo({ file, onSuccess, onError }, setDataImage, "review");
                                     }}
                                     beforeUpload={beforeUpload}
                                     onChange={(info) => handleChange(info, setLoadingUpload)}
-                                    onRemove={() => handleRemoveFile(setDataAvatar)}
+                                    onRemove={() => handleRemoveFile(setDataImage)}
                                     onPreview={(file) => {
                                         const fileUrl = file.url || '';
                                         if (!file.originFileObj) {
@@ -148,7 +164,7 @@ export const ModalReview = (props: IProps) => {
                                                 uid: uuidv4(),
                                                 name: dataInit?.images ?? "",
                                                 status: "done",
-                                                url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.images}`,
+                                                url: `${import.meta.env.VITE_BACKEND_URL}/storage/review/${dataInit?.images}`,
                                             }]
                                             : []
                                     }
@@ -160,7 +176,7 @@ export const ModalReview = (props: IProps) => {
                                 </Upload>
                             </ConfigProvider>
                         </Form.Item>
-                    </Col> */}
+                    </Col>
 
                     <Col span={24} md={12}>
                         <ProFormText

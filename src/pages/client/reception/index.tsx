@@ -33,6 +33,8 @@ import 'dayjs/locale/vi';
 import dayjs, { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import Access from '@/components/share/access';
+import { ALL_PERMISSIONS } from '@/config/permissions';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -197,7 +199,7 @@ const ReceptionClient: React.FC = () => {
     };
 
     return (
-        <>
+        <Access permission={ALL_PERMISSIONS.ORDERS.GET_PAGINATE}>
             <Row>
                 <Col span={5}>
                     <Card title="Lịch đặt bàn" style={{ height: '100%', padding: 0 }} >
@@ -234,7 +236,7 @@ const ReceptionClient: React.FC = () => {
                 setSelectedOrder={setSelectedOrder}
                 handleUpdateStatus={handleUpdateStatus}
             />
-        </>
+        </Access>
     );
 };
 

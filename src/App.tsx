@@ -31,10 +31,10 @@ import './styles/reset.scss';
 import viVN from 'antd/locale/vi_VN';
 import { ConfigProvider } from 'antd';
 import { useEffect, useRef } from 'react';
-import Loading from './components/share/loading';
+// import Loading from './components/share/loading';
 import { fetchAccount } from './redux/slice/accountSlide';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom";
 
 const LayoutClient = () => {
   const location = useLocation();
@@ -55,7 +55,7 @@ const LayoutClient = () => {
 
 export default function App() {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isLoading } = useAppSelector(state => state.account);
+  // const { isAuthenticated, isLoading } = useAppSelector(state => state.account);
 
   useEffect(() => {
     if (window.location.pathname === '/') {

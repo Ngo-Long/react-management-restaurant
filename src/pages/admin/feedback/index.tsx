@@ -68,32 +68,19 @@ const FeedbackPage = () => {
             sorter: true,
         },
         {
-            title: 'Hoạt động',
-            align: "center",
-            dataIndex: 'active',
-            hideInSearch: true,
+            title: 'Người dùng',
+            dataIndex: ['user', 'name'],
+            sorter: true,
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
-            hidden: true,
             hideInSearch: true,
             render: (_, record) => {
                 return (
-                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss DD-MM-YYYY') : ""}</>
+                    <>{record.createdDate ? dayjs(record.createdDate).format('HH:mm:ss - DD/MM/YYYY') : ""}</>
                 )
             }
-        },
-        {
-            title: 'Ngày sửa',
-            dataIndex: 'lastModifiedDate',
-            hidden: true,
-            hideInSearch: true,
-            render: (_, record) => {
-                return (
-                    <>{record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}</>
-                )
-            },
         },
         {
             title: 'Tác vụ',
