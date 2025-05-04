@@ -436,9 +436,6 @@ SĐT: 0901 660 002 – 028 6686 6486
                             <Typography.Paragraph style={{ color: lightTextColor }}>
                                 Blog
                             </Typography.Paragraph>
-                            <Typography.Paragraph style={{ color: lightTextColor }}>
-                                Thông tin cập nhật Covid
-                            </Typography.Paragraph>
                         </Col>
                         <Col xs={24} sm={12} md={8} lg={6}>
                             <Typography.Title level={5} style={{ color: lightTextColor }}>1800 6162</Typography.Title>
@@ -451,7 +448,7 @@ SĐT: 0901 660 002 – 028 6686 6486
                 </section>
 
                 <Footer style={{ textAlign: 'center', backgroundColor: '#001529', color: lightTextColor }}>
-                    Rservice ©{new Date().getFullYear()} Created by NKL
+                    Rservice ©{new Date().getFullYear()} Created by WE ARE CODER
                 </Footer>
             </Layout >
 
