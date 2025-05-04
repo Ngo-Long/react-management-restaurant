@@ -3,17 +3,16 @@ import {
     Col,
     Form,
     Input,
+    Upload,
     message,
     notification,
     ConfigProvider,
-    Upload
 } from "antd";
 import {
     ProForm,
+    DrawerForm,
     ProFormText,
     ProFormSelect,
-    ProFormTextArea,
-    DrawerForm,
     FooterToolbar,
     ProFormSwitch,
     ProFormDatePicker,
@@ -219,7 +218,7 @@ const ModalUser = (props: IProps) => {
                 render: (_: any, dom: any) => <FooterToolbar>{dom}</FooterToolbar>,
                 submitButtonProps: { icon: <CheckSquareOutlined /> },
                 searchConfig: {
-                    resetText: "Hủy",
+                    resetText: "Đóng",
                     submitText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
                 }
             }}
@@ -232,14 +231,6 @@ const ModalUser = (props: IProps) => {
                                 labelCol={{ span: 24 }}
                                 label="Chọn Ảnh"
                                 name="avatar"
-                                rules={[{
-                                    required: true,
-                                    message: 'Vui lòng không bỏ trống',
-                                    validator: () => {
-                                        if (dataAvatar.length > 0) return Promise.resolve();
-                                        else return Promise.reject(false);
-                                    }
-                                }]}
                             >
                                 <ConfigProvider locale={enUS}>
                                     <Upload
@@ -249,7 +240,7 @@ const ModalUser = (props: IProps) => {
                                         maxCount={1}
                                         multiple={false}
                                         customRequest={({ file, onSuccess, onError }) => {
-                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataAvatar);
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataAvatar, "user");
                                         }}
                                         beforeUpload={beforeUpload}
                                         onChange={(info) => handleChange(info, setLoadingUpload)}
@@ -269,12 +260,12 @@ const ModalUser = (props: IProps) => {
                                             });
                                         }}
                                         defaultFileList={
-                                            dataInit?.id
+                                            dataInit?.id && dataInit?.avatar
                                                 ? [{
                                                     uid: uuidv4(),
-                                                    name: dataInit?.avatar ?? "",
+                                                    name: dataInit?.avatar,
                                                     status: "done",
-                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.avatar}`,
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/user/${dataInit?.avatar}`,
                                                 }]
                                                 : []
                                         }
@@ -357,7 +348,7 @@ const ModalUser = (props: IProps) => {
                                     OTHER: 'Khác',
                                 }}
                                 placeholder="Chọn giới tính"
-                                rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
                             />
                         </Col>
 
@@ -365,7 +356,7 @@ const ModalUser = (props: IProps) => {
                             <ProForm.Item
                                 name="role"
                                 label="Vai trò"
-                                rules={[{ required: true, message: 'Vui lòng chọn vai trò!' }]}
+                                rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
                             >
                                 <DebounceSelect
                                     allowClear
@@ -389,7 +380,7 @@ const ModalUser = (props: IProps) => {
                                 name="phoneNumber"
                                 label="Số điện thoại"
                                 placeholder="Nhập số điện thoại"
-                                rules={[{ required: false, message: '' }]}
+                                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
                             />
                         </Col>
 
@@ -401,45 +392,6 @@ const ModalUser = (props: IProps) => {
                                 rules={[{ required: false, message: '' }]}
                             />
                         </Col>
-
-                        {isRoleOwner && (
-                            <Col lg={12} md={12} sm={24} xs={24}>
-                                <ProForm.Item
-                                    label="Thuộc nhà hàng"
-                                    name="restaurant"
-                                    rules={[{ required: true, message: 'Vui lòng chọn nhà hàng!' }]}
-                                >
-                                    {isRoleOwner ? (
-                                        <DebounceSelect
-                                            allowClear
-                                            showSearch
-                                            value={restaurants}
-                                            defaultValue={restaurants}
-                                            style={{ width: '100%' }}
-                                            placeholder="Chọn nhà hàng"
-                                            fetchOptions={fetchRestaurantList}
-                                            onChange={(newValue: any) => {
-                                                if (newValue?.length === 0 || newValue?.length === 1) {
-                                                    setRestaurants(newValue as IRestaurantSelect[]);
-                                                }
-                                            }}
-                                        />
-                                    ) : (
-                                        <>
-                                            <Input value={currentRestaurant?.name || "Không có nhà hàng"} disabled />
-                                            <ProFormText
-                                                hidden
-                                                name="restaurant"
-                                                initialValue={{
-                                                    label: currentRestaurant?.name,
-                                                    value: currentRestaurant?.id,
-                                                }}
-                                            />
-                                        </>
-                                    )}
-                                </ProForm.Item>
-                            </Col>
-                        )}
 
                         <Col span={24} style={{ "marginBottom": "30px" }}>
                             <ProForm.Item

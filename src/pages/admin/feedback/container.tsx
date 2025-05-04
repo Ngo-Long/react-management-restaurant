@@ -6,7 +6,7 @@ import {
 import {
     Col, Form, Row,
     message, notification
- }from "antd";
+} from "antd";
 import 'react-quill/dist/quill.snow.css';
 import { feedbackApi } from "@/config/api";
 import { isMobile } from 'react-device-detect';
@@ -37,8 +37,8 @@ export const ModalFeedback = (props: IProps) => {
         setOpenModal(false);
     }
 
-    const submitFeedback= async (valuesForm: any) => {
-        const { subject,content  } = valuesForm;
+    const submitFeedback = async (valuesForm: any) => {
+        const { subject, content } = valuesForm;
 
         const feedback = {
             id: dataInit?.id,
@@ -75,7 +75,7 @@ export const ModalFeedback = (props: IProps) => {
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: "Hủy"
+                    cancelText: "Đóng"
                 }}
                 scrollToFirstError={true}
                 preserve={false}

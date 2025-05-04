@@ -34,8 +34,8 @@ import ModalRestaurant from "@/components/admin/restaurant/modal.restaurant";
 const RestaurantPage = () => {
     const tableRef = useRef<ActionType>();
     const dispatch = useAppDispatch();
-    const meta = useAppSelector(state => state.restaurant.meta);
     const restaurants = useAppSelector(state => state.restaurant.result);
+    const meta = useAppSelector(state => state.restaurant.meta);
     const isFetching = useAppSelector(state => state.restaurant.isFetching);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<IRestaurant | null>(null);
@@ -63,14 +63,11 @@ const RestaurantPage = () => {
 
     const columns: ProColumns<IRestaurant>[] = [
         {
-            title: 'STT',
-            key: 'index',
-            width: 50,
+            title: 'ID',
+            dataIndex: 'id',
+            width: 40,
             align: "center",
             hideInSearch: true,
-            render: (text, record, index) => {
-                return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)} </>)
-            },
         },
         {
             title: 'Tên',
@@ -92,7 +89,7 @@ const RestaurantPage = () => {
             align: "center",
             dataIndex: 'active',
             hideInSearch: false,
-            renderFormItem: (item, props, form) => (
+            renderFormItem: () => (
                 <ProFormSelect
                     showSearch
                     allowClear
@@ -103,7 +100,7 @@ const RestaurantPage = () => {
                     placeholder="Chọn hoạt động"
                 />
             ),
-            render(dom, entity) {
+            render(_, entity) {
                 return <>
                     <Tag color={entity.active ? "lime" : "red"} >
                         {entity.active ? "ACTIVE" : "INACTIVE"}
@@ -118,7 +115,7 @@ const RestaurantPage = () => {
             sorter: true,
             align: 'center',
             hideInSearch: true,
-            render: (text, record, index, action) => {
+            render: (_, record) => {
                 return (
                     <>
                         {record.createdDate ? dayjs(record.createdDate).format('DD-MM-YYYY HH:mm:ss') : ""}
@@ -133,7 +130,7 @@ const RestaurantPage = () => {
         //     sorter: true,
         //     align: 'center',
         //     hideInSearch: true,
-        //     render: (text, record, index, action) => {
+        //     render: (text, record) => {
         //         return (
         //             <>
         //                 {record.lastModifiedDate ? dayjs(record.lastModifiedDate).format('DD-MM-YYYY HH:mm:ss') : ""}
@@ -143,10 +140,10 @@ const RestaurantPage = () => {
         // },
         {
             title: 'Tác vụ',
-            width: 100,
+            width: 90,
             align: 'center',
             hideInSearch: true,
-            render: (_value, entity, _index, _action) => (
+            render: (_, entity) => (
                 <Space>
                     <Access permission={ALL_PERMISSIONS.RESTAURANTS.UPDATE} hideChildren>
                         <EditOutlined
@@ -164,7 +161,7 @@ const RestaurantPage = () => {
                             description={"Bạn có chắc chắn muốn xóa nhà hàng này?"}
                             onConfirm={() => handleDeleteRestaurant(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>
@@ -218,9 +215,7 @@ const RestaurantPage = () => {
     }
 
     return (
-        <Access
-            permission={ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE}
-        >
+        <Access permission={ALL_PERMISSIONS.RESTAURANTS.GET_PAGINATE}>
             <DataTable<IRestaurant>
                 rowKey="RestaurantId"
                 headerTitle="Danh sách nhà hàng"

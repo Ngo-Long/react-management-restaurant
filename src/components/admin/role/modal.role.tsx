@@ -118,7 +118,7 @@ const ModalRole = (props: IProps) => {
                     icon: <CheckSquareOutlined />
                 },
                 searchConfig: {
-                    resetText: "Hủy",
+                    resetText: "Đóng",
                     submitText: <>{singleRole?.id ? "Cập nhật" : "Tạo mới"}</>,
                 }
             }}

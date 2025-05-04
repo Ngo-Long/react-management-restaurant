@@ -126,7 +126,7 @@ const ModalClient = (props: IProps) => {
                 keyboard: false,
                 maskClosable: false,
                 okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                cancelText: "Hủy"
+                cancelText: "Đóng"
             }}
         >
             <Row gutter={16}>
@@ -146,7 +146,7 @@ const ModalClient = (props: IProps) => {
                                         maxCount={1}
                                         multiple={false}
                                         customRequest={({ file, onSuccess, onError }) => {
-                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataAvatar);
+                                            handleUploadFileLogo({ file, onSuccess, onError }, setDataAvatar, "client");
                                         }}
                                         beforeUpload={beforeUpload}
                                         onChange={(info) => handleChange(info, setLoadingUpload)}
@@ -166,12 +166,12 @@ const ModalClient = (props: IProps) => {
                                             });
                                         }}
                                         defaultFileList={
-                                            dataInit?.id
+                                            dataInit?.id && dataInit?.avatar
                                                 ? [{
                                                     uid: uuidv4(),
-                                                    name: dataInit?.avatar ?? "",
+                                                    name: dataInit?.avatar,
                                                     status: "done",
-                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/restaurant/${dataInit?.avatar}`,
+                                                    url: `${import.meta.env.VITE_BACKEND_URL}/storage/client/${dataInit?.avatar}`,
                                                 }]
                                                 : []
                                         }

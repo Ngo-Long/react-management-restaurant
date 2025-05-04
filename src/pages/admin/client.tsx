@@ -61,7 +61,7 @@ const ClientPage = () => {
 
     const columns: ProColumns<IClient>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
             width: 50,
             align: "center",
@@ -137,7 +137,7 @@ const ClientPage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_value, entity, _index, _action) => (
                 <Space>
@@ -158,7 +158,7 @@ const ClientPage = () => {
                             description={"Bạn có chắc chắn muốn xóa khách hàng này ?"}
                             onConfirm={() => handleDeleteClient(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

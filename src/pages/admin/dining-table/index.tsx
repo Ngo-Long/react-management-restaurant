@@ -129,7 +129,7 @@ const DiningTablePage = () => {
 
     const columns: ProColumns<IDiningTable>[] = [
         {
-            title: 'STT',
+            title: '#',
             align: "center",
             dataIndex: 'sequence',
             width: 70,
@@ -199,7 +199,7 @@ const DiningTablePage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 100,
+            width: 90,
             align: "center",
             render: (_, entity) => (
                 <Space>
@@ -220,7 +220,7 @@ const DiningTablePage = () => {
                             description={"Bạn có chắc chắn muốn xóa bàn ăn này ?"}
                             onConfirm={() => handleDeleteDiningTable(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

@@ -124,9 +124,9 @@ const SupplierPage = () => {
 
     const columns: ProColumns<ISupplier>[] = [
         {
-            title: 'STT',
+            title: '#',
             key: 'index',
-            width: 50,
+            width: 40,
             align: "center",
             render: (text, record, index) => {
                 return (<> {(index + 1) + (meta.page - 1) * (meta.pageSize)}</>)
@@ -139,14 +139,8 @@ const SupplierPage = () => {
             sorter: true,
         },
         {
-            title: 'SĐT',
+            title: 'Số điện thoại',
             dataIndex: 'phone',
-            sorter: true,
-            align: "center",
-        },
-        {
-            title: 'Email',
-            dataIndex: 'email',
             sorter: true,
             align: "center",
         },
@@ -217,7 +211,7 @@ const SupplierPage = () => {
         {
             title: 'Tác vụ',
             hideInSearch: true,
-            width: 90,
+            width: 80,
             align: "center",
             render: (_value, entity) => (
                 <Space>
@@ -238,7 +232,7 @@ const SupplierPage = () => {
                             description={"Bạn có chắc chắn muốn xóa nhà cung cấp này ?"}
                             onConfirm={() => handleDeleteSupplier(entity.id)}
                             okText="Xác nhận"
-                            cancelText="Hủy"
+                            cancelText="Đóng"
                         >
                             <DeleteOutlined style={{ fontSize: 20, color: '#ff4d4f' }} />
                         </Popconfirm>

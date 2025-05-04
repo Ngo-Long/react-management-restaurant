@@ -139,6 +139,12 @@ export interface IDiningTable {
     description?: string;
     status?: string;
     active: boolean;
+    orders?: {
+        id?: string | null;
+        totalPrice?: number;
+        createdDate?: string;
+        lastModifiedDate?: string;
+    }[];
     restaurant?: {
         id: string;
         name: string;
@@ -192,10 +198,7 @@ export interface IOrderDetail {
         name?: string;
         station?: string;
     }
-    diningTables?: {
-        id?: string | null;
-        name?: string | null;
-    }[];
+    diningTables?: string[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;
@@ -328,14 +331,18 @@ export interface IReceipt {
     totalAmount?: number;
     status?: string;
     active?: boolean;
-    restaurant?: {
-        id?: string;
-        name?: string;
-    }
     supplier?: {
         id?: string;
         name?: string;
     }
+    receiptDetails?: {
+        price?: number;
+        quantity?: number;
+        ingredient?: {
+            id?: string;
+            name?: string;
+        };
+    }[];
     createdBy?: string;
     isDeleted?: boolean;
     deletedAt?: boolean | null;

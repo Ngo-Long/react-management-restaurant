@@ -44,21 +44,21 @@ export const ModalReview = (props: IProps) => {
         setDataInit(null);
         setOpenModal(false);
     }
-  
+
     const submitReview = async (valuesForm: any) => {
-        const {  title, description, background_color,  active } = valuesForm;
+        const { title, description, background_color, active } = valuesForm;
 
         const review = {
             id: dataInit?.id,
             title,
-            images:  "",
+            images: "",
             background_color,
             description,
             active,
-            user:{
+            user: {
                 id: currentUser.id
             },
-            restaurant:{
+            restaurant: {
                 id: currentRestaurant.id
             }
         };
@@ -92,7 +92,7 @@ export const ModalReview = (props: IProps) => {
                     keyboard: false,
                     maskClosable: false,
                     okText: <>{dataInit?.id ? "Cập nhật" : "Tạo mới"}</>,
-                    cancelText: "Hủy"
+                    cancelText: "Đóng"
                 }}
                 scrollToFirstError={true}
                 preserve={false}
@@ -170,7 +170,7 @@ export const ModalReview = (props: IProps) => {
                             rules={[{ required: true, message: 'Vui lòng không bỏ trống' }]}
                         />
                     </Col>
-                   
+
                     <Col span={24} md={12}>
                         <ProFormText
                             name="background_color"

@@ -19,12 +19,12 @@ import { Table } from 'antd/lib';
 import { IOrder } from "@/types/backend";
 import { ColumnType } from 'antd/es/table';
 import { convertCSV, handleExportAsXlsx } from "@/utils/file";
+import { OrderStatus, StatusBadgeMap } from '@/utils/statusConfig';
 
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { OrderStatus, StatusBadgeMap } from '@/utils/statusConfig';
 dayjs.locale('vi');
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
@@ -40,17 +40,16 @@ declare type IProps = {
     loading: boolean;
 }
 
-const TableCalendarModal = ({ 
-    dataOrders, 
-    selectedStatuses, 
-    onStatusChange, 
+const TableCalendarModal = ({
+    dataOrders,
+    selectedStatuses,
+    onStatusChange,
     setOpenModal,
     selectedOrder,
     setSelectedOrder,
     handleUpdateStatus,
     loading,
 }: IProps) => {
-
     const formatCSV = (data: IOrder[]) => {
         const excludeKeys = [
             'createdBy', 'createdDate',
@@ -71,10 +70,20 @@ const TableCalendarModal = ({
             title: 'Mã phiếu',
             key: 'id',
             dataIndex: 'id',
-            width: 80,
-            render: (_, record) => {
-                return (<>DB-{record.id}</>);
-            }
+            width: 60,
+            align: 'center',
+            render: (_, record) => (
+                <a
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setOpenModal(true);
+                        setSelectedOrder(record);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                >
+                    {record.id}
+                </a>
+            )
         },
         {
             title: 'Giờ đến',
@@ -100,6 +109,7 @@ const TableCalendarModal = ({
             key: 'guestCount',
             dataIndex: 'guestCount',
             width: 75,
+            align: 'center',
         },
         {
             title: 'Phòng/bàn',
@@ -112,7 +122,7 @@ const TableCalendarModal = ({
                         <Tag
                             key={table.id}
                             style={{
-                                padding: '2px 4px',
+                                padding: '2px 6px',
                                 borderRadius: '4px',
                                 fontSize: '14px'
                             }}
@@ -169,7 +179,7 @@ const TableCalendarModal = ({
                         <Tooltip title="Hủy đặt" placement="top">
                             <Popconfirm
                                 okText="Xác nhận"
-                                cancelText="Hủy"
+                                cancelText="Đóng"
                                 placement="leftTop"
                                 title={"Xác nhận hủy"}
                                 description={"Bạn có muốn hủy phiếu đặt bàn này?"}
