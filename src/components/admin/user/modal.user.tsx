@@ -133,8 +133,8 @@ const ModalUser = (props: IProps) => {
                 name: ""
             },
             restaurant: {
-                id: restaurantValue?.value,
-                name: restaurantValue?.label
+                id: currentRestaurant?.id,
+                name: currentRestaurant?.name
             }
         };
 
@@ -154,27 +154,11 @@ const ModalUser = (props: IProps) => {
         }
     }
 
-    async function fetchRestaurantList(name: string): Promise<IRestaurantSelect[]> {
-        const res = await restaurantApi.callFetchFilter(`page=1&size=100&name=/${name}/i`);
-        if (res && res.data) {
-            const list = res.data.result;
-            const temp = list.map(item => {
-                return {
-                    label: item.name as string,
-                    value: item.id as string
-                }
-            })
-            return temp;
-        } else return [];
-    }
-
     async function fetchRoleList(name: string): Promise<IRestaurantSelect[]> {
         const res = await roleApi.callFetchFilter(`page=1&size=100&name=/${name}/i`);
         if (res && res.data) {
             const list = res.data.result;
-
-            const filteredList = isRoleOwner ? list : list.filter(item => Number(item.id) != 1);
-
+            const filteredList = list.filter(item => Number(item.id) !== 1);
             const temp = filteredList.map(item => {
                 return {
                     label: item.name as string,

@@ -15,7 +15,7 @@ import {
 } from "antd";
 import Search from "antd/es/input/Search";
 import { ColumnType } from "antd/es/table";
-import { UserOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, EditOutlined, HourglassOutlined, UserOutlined } from '@ant-design/icons';
 
 import dayjs from 'dayjs';
 import jsPDF from 'jspdf';
@@ -122,10 +122,27 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
         {
             title: 'Tên món ăn',
             key: 'name',
+            dataIndex: 'unit',
+            width: 180,
             render: (_, record) => (
-                <div className='btn-name'>
-                    {`${record.product?.name} (${record.unit?.name})`}
-                </div>
+                <Space>
+                    {{
+                        CONFIRMED: <CheckOutlined className='btn-icon' />,
+                        PENDING: <HourglassOutlined className='btn-icon' />,
+                        AWAITING: <EditOutlined className='btn-icon' />,
+                        CANCELED: <CloseOutlined className='btn-icon' />
+                    }[record.status!] || null}
+
+                    <div className='btn-name'>
+                        {`${record.product?.name} (${record.unit?.name})`}
+                        {record?.note && (
+                            <>
+                                <br />
+                                {`⤷ ${record.note}`}
+                            </>
+                        )}
+                    </div>
+                </Space >
             )
         },
         {
